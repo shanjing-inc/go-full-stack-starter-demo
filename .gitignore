@@ -1,0 +1,33 @@
+# 本地工具、下载缓存与隔离 POC 运行数据
+/.tools/
+.runtime/
+.cache/
+
+# 本地环境配置；配置示例纳入版本管理
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# 前端依赖与构建产物
+node_modules/
+dist/
+
+# Go 编译、热重载与测试产物
+/bin/
+tmp/
+coverage/
+*.test
+
+# 日志与编辑器临时文件
+*.log
+*.swp
+.DS_Store
+
+# Python 脚本缓存
+__pycache__/
+*.pyc
+
+# 浏览器测试运行产物
+playwright-report/
+test-results/

@@ -1,0 +1,14 @@
+-- 公共认证表及初始化互斥行；时间统一使用 timestamptz。
+CREATE TABLE "user" ("id" serial,"name" varchar(255) COLLATE "starter_unicode_ci" NOT NULL,"email" varchar(255) COLLATE "starter_unicode_ci" NOT NULL,"email_verified" boolean NOT NULL DEFAULT false,"image" text COLLATE "starter_unicode_ci","role" varchar(255) COLLATE "starter_unicode_ci","banned" boolean DEFAULT false,"ban_reason" text COLLATE "starter_unicode_ci","ban_expires" timestamptz,"created_at" timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,"updated_at" timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,PRIMARY KEY ("id"));
+CREATE INDEX IF NOT EXISTS "user_role_idx" ON "user" ("role");
+CREATE UNIQUE INDEX IF NOT EXISTS "user_email_unique" ON "user" ("email");
+CREATE TABLE "session" ("id" serial,"expires_at" timestamptz NOT NULL,"token" varchar(255) COLLATE "starter_unicode_ci" NOT NULL,"ip_address" varchar(255) COLLATE "starter_unicode_ci","user_agent" text COLLATE "starter_unicode_ci","user_id" integer NOT NULL,"impersonated_by" varchar(255) COLLATE "starter_unicode_ci","created_at" timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,"updated_at" timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,PRIMARY KEY ("id"),CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "user" ("id") ON DELETE CASCADE);
+CREATE INDEX IF NOT EXISTS "session_user_id_idx" ON "session" ("user_id");
+CREATE UNIQUE INDEX IF NOT EXISTS "session_token_unique" ON "session" ("token");
+CREATE TABLE "account" ("id" serial,"account_id" varchar(255) COLLATE "starter_unicode_ci" NOT NULL,"provider_id" varchar(255) COLLATE "starter_unicode_ci" NOT NULL,"user_id" integer NOT NULL,"access_token" text COLLATE "starter_unicode_ci","refresh_token" text COLLATE "starter_unicode_ci","id_token" text COLLATE "starter_unicode_ci","access_token_expires_at" timestamptz,"refresh_token_expires_at" timestamptz,"scope" text COLLATE "starter_unicode_ci","password" text COLLATE "starter_unicode_ci","created_at" timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,"updated_at" timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,PRIMARY KEY ("id"),CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "user" ("id") ON DELETE CASCADE);
+CREATE INDEX IF NOT EXISTS "account_user_id_idx" ON "account" ("user_id");
+CREATE UNIQUE INDEX IF NOT EXISTS "account_provider_account_unique" ON "account" ("provider_id","account_id");
+CREATE TABLE "verification" ("id" serial,"identifier" varchar(255) COLLATE "starter_unicode_ci" NOT NULL,"value" text COLLATE "starter_unicode_ci" NOT NULL,"expires_at" timestamptz NOT NULL,"created_at" timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,"updated_at" timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,PRIMARY KEY ("id"));
+CREATE INDEX IF NOT EXISTS "verification_identifier_idx" ON "verification" ("identifier");
+CREATE TABLE "auth_bootstrap" ("id" integer,"revision" integer NOT NULL DEFAULT 0,PRIMARY KEY ("id"));
+INSERT INTO "auth_bootstrap" ("id", "revision") VALUES (1, 0);

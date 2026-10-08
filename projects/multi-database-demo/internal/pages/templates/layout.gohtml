@@ -1,0 +1,42 @@
+{{define "layout"}}
+<!doctype html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="{{.Description}}">
+        <title>{{.Title}}</title>
+        <script src="/public/theme.js"></script>
+        {{range .Assets.CSS}}<link rel="stylesheet" href="{{.}}">{{end}}
+        {{if .Assets.Script}}<script type="module" src="{{.Assets.Script}}"></script>{{end}}
+    </head>
+    <body class="min-h-screen bg-background text-foreground antialiased">
+        {{if eq .Page "queue"}}
+        <main id="main-content" class="relative mx-auto flex min-h-screen w-full max-w-7xl flex-col px-6 py-10 md:px-10">
+            <div class="absolute top-6 right-6 z-10 md:top-10 md:right-10">
+                <button type="button" data-theme-toggle data-theme-icon aria-label="切换主题" class="inline-flex size-9 cursor-pointer items-center justify-center rounded-md border bg-background shadow-xs transition hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
+                    <svg data-theme-moon aria-hidden="true" class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.9 13A9 9 0 0 1 11 3.1a9 9 0 1 0 9.9 9.9Z"/></svg>
+                    <svg data-theme-sun hidden aria-hidden="true" class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>
+                </button>
+            </div>
+            {{template "queue" .}}
+        </main>
+        {{else}}
+        <div class="mx-auto w-full max-w-7xl px-6 py-8 md:px-10 md:py-10">
+            <header class="mb-12 flex flex-wrap items-center justify-between gap-4">
+                <a class="font-semibold tracking-tight focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring" href="/">Go 全栈示例</a>
+                <nav aria-label="网站导航" class="flex items-center gap-4 text-sm">
+                    <a class="text-muted-foreground transition hover:text-foreground" href="/test/queue">队列测试</a>
+                    <a class="text-muted-foreground transition hover:text-foreground" href="/admin/">管理后台</a>
+                    <button type="button" data-theme-toggle aria-label="切换主题" class="min-h-11 cursor-pointer rounded-lg border bg-card px-4 text-card-foreground transition hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">切换主题</button>
+                </nav>
+            </header>
+            <main id="main-content">
+                {{if eq .Page "home"}}{{template "home" .}}{{else}}{{template "queue" .}}{{end}}
+            </main>
+            <footer class="mt-14 border-t pt-6 text-sm text-muted-foreground">Go 服务端渲染 · React 管理后台</footer>
+        </div>
+        {{end}}
+    </body>
+</html>
+{{end}}

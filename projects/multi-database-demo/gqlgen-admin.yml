@@ -1,0 +1,57 @@
+schema:
+    - schema/common.graphqls
+    - schema/admin.graphqls
+    - schema/queue.graphqls
+exec:
+    filename: internal/graph/admin/generated.go
+    package: admin
+model:
+    filename: internal/graph/admin/models_gen.go
+    package: admin
+resolver:
+    layout: follow-schema
+    dir: internal/graph/admin
+    package: admin
+    filename_template: "{name}.resolvers.go"
+models:
+    JSON:
+        model: github.com/99designs/gqlgen/graphql.Any
+    QueueExecutionRecord:
+        model: codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit/modules/queue.Record
+    QueueExecutionRecordSummary:
+        model: codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit/modules/queue.Record
+    QueueExecutionRecordsPayload:
+        model: codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit/modules/queue.RecordsPayload
+    QueueDashboardCapabilities:
+        model: codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit/modules/queue.Capabilities
+    QueueOverview:
+        model: codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit/modules/queue.Overview
+    QueueWorkerProcess:
+        model: codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit/modules/queue.WorkerProcess
+    QueueSnapshot:
+        model: codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit/modules/queue.Snapshot
+    QueueSchedule:
+        model: codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit/infra/schedule.Item
+    QueueSchedulerHeartbeat:
+        model: codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit/infra/schedule.Heartbeat
+    QueueSchedulesPayload:
+        model: codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit/infra/schedule.Payload
+    QueueDashboardPayload:
+        model: codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit/modules/queue.DashboardPayload
+    UpdateUserSetInput:
+        fields:
+            banExpires:
+                omittable: true
+            banReason:
+                omittable: true
+    DateTime:
+        model: codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/projects/multi-database-demo/internal/graph/scalar.DateTime
+    IntFilters:
+        model: codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/projects/multi-database-demo/internal/graph/model.IntFilters
+    StringFilters:
+        model: codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/projects/multi-database-demo/internal/graph/model.StringFilters
+    ShopFilters:
+        model: codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/projects/multi-database-demo/internal/graph/model.ShopFilters
+    ShopItem:
+        model: codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/projects/multi-database-demo/internal/graph/model.ShopItem
+skip_mod_tidy: true

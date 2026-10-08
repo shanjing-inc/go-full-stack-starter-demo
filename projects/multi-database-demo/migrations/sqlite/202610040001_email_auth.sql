@@ -1,0 +1,14 @@
+-- 邮箱认证：公共四表及初始化互斥行，保留旧字段和索引。
+CREATE TABLE `user` (`id` integer PRIMARY KEY AUTOINCREMENT,`name` varchar(255) NOT NULL,`email` varchar(255) NOT NULL,`email_verified` boolean NOT NULL DEFAULT false,`image` text,`role` varchar(255),`banned` boolean DEFAULT false,`ban_reason` text,`ban_expires` datetime,`created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,`updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP);
+CREATE INDEX `user_role_idx` ON `user`(`role`);
+CREATE UNIQUE INDEX `user_email_unique` ON `user`(`email`);
+CREATE TABLE `session` (`id` integer PRIMARY KEY AUTOINCREMENT,`expires_at` datetime NOT NULL,`token` varchar(255) NOT NULL,`ip_address` varchar(255),`user_agent` text,`user_id` integer NOT NULL,`impersonated_by` varchar(255),`created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,`updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,CONSTRAINT `session_user_id_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE);
+CREATE INDEX `session_user_id_idx` ON `session`(`user_id`);
+CREATE UNIQUE INDEX `session_token_unique` ON `session`(`token`);
+CREATE TABLE `account` (`id` integer PRIMARY KEY AUTOINCREMENT,`account_id` varchar(255) NOT NULL,`provider_id` varchar(255) NOT NULL,`user_id` integer NOT NULL,`access_token` text,`refresh_token` text,`id_token` text,`access_token_expires_at` datetime,`refresh_token_expires_at` datetime,`scope` text,`password` text,`created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,`updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,CONSTRAINT `account_user_id_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE);
+CREATE INDEX `account_user_id_idx` ON `account`(`user_id`);
+CREATE UNIQUE INDEX `account_provider_account_unique` ON `account`(`provider_id`,`account_id`);
+CREATE TABLE `verification` (`id` integer PRIMARY KEY AUTOINCREMENT,`identifier` varchar(255) NOT NULL,`value` text NOT NULL,`expires_at` datetime NOT NULL,`created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,`updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP);
+CREATE INDEX `verification_identifier_idx` ON `verification`(`identifier`);
+CREATE TABLE `auth_bootstrap` (`id` integer,`revision` integer NOT NULL DEFAULT 0,PRIMARY KEY (`id`));
+INSERT INTO `auth_bootstrap` (`id`, `revision`) VALUES (1, 0);

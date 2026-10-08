@@ -1,0 +1,212 @@
+[
+    {
+        "name": "mysql-basic",
+        "url": "mysql://dev:password@127.0.0.1:3306/demo?parseTime=true&loc=UTC",
+        "driver": "mysql"
+    },
+    {
+        "name": "mysql-default-port",
+        "url": "mysql://dev:password@localhost/demo",
+        "driver": "mysql"
+    },
+    {
+        "name": "mysql-ipv6",
+        "url": "mysql://dev:password@[::1]:3307/demo?timeout=1s",
+        "driver": "mysql"
+    },
+    {
+        "name": "mysql-encoded-secret",
+        "url": "mysql://dev:p%40%3A%2F%3F%23%25@localhost/demo",
+        "driver": "mysql"
+    },
+    {
+        "name": "mysql-unicode",
+        "url": "mysql://dev:password@localhost/%E6%B5%8B%E8%AF%95",
+        "driver": "mysql"
+    },
+    {
+        "name": "postgres-basic",
+        "url": "postgres://dev:password@127.0.0.1:5432/demo?sslmode=disable",
+        "driver": "postgres"
+    },
+    {
+        "name": "postgresql-alias",
+        "url": "postgresql://dev:password@localhost/demo?timezone=UTC",
+        "driver": "postgres"
+    },
+    {
+        "name": "postgres-default-user",
+        "url": "postgres://localhost/demo",
+        "driver": "postgres"
+    },
+    {
+        "name": "postgres-ipv6",
+        "url": "postgres://dev:password@[::1]:5432/demo",
+        "driver": "postgres"
+    },
+    {
+        "name": "sqlite-absolute",
+        "url": "sqlite:///tmp/demo.sqlite",
+        "driver": "sqlite"
+    },
+    {
+        "name": "sqlite-relative",
+        "url": "sqlite://demo.sqlite",
+        "driver": "sqlite"
+    },
+    {
+        "name": "sqlite-encoded-path",
+        "url": "sqlite:///tmp/demo%20test.sqlite?_pragma=busy_timeout%285000%29",
+        "driver": "sqlite"
+    },
+    {
+        "name": "sqlite-memory",
+        "url": "sqlite:///:memory:",
+        "driver": "sqlite"
+    },
+    {
+        "name": "invalid-0",
+        "url": "",
+        "driver": ""
+    },
+    {
+        "name": "invalid-1",
+        "url": "dev:password@tcp(localhost:3306)/demo",
+        "driver": ""
+    },
+    {
+        "name": "invalid-2",
+        "url": "host=localhost dbname=demo",
+        "driver": ""
+    },
+    {
+        "name": "invalid-3",
+        "url": "sample.sqlite",
+        "driver": ""
+    },
+    {
+        "name": "invalid-4",
+        "url": "mongodb://dev:password@localhost/demo",
+        "driver": ""
+    },
+    {
+        "name": "invalid-5",
+        "url": "mysql://dev:password@localhost",
+        "driver": ""
+    },
+    {
+        "name": "invalid-6",
+        "url": "postgres://localhost/",
+        "driver": ""
+    },
+    {
+        "name": "invalid-7",
+        "url": "mysql://localhost/demo",
+        "driver": ""
+    },
+    {
+        "name": "invalid-8",
+        "url": "mysql://dev%3Aother:password@localhost/demo",
+        "driver": ""
+    },
+    {
+        "name": "invalid-9",
+        "url": "postgres://dev:password@:5432/demo",
+        "driver": ""
+    },
+    {
+        "name": "invalid-10",
+        "url": "mysql://dev:password@localhost:0/demo",
+        "driver": ""
+    },
+    {
+        "name": "invalid-11",
+        "url": "postgres://dev:password@localhost:65536/demo",
+        "driver": ""
+    },
+    {
+        "name": "invalid-12",
+        "url": "postgres://dev:password@localhost:abc/demo",
+        "driver": ""
+    },
+    {
+        "name": "invalid-13",
+        "url": "mysql://dev:password@localhost:/demo",
+        "driver": ""
+    },
+    {
+        "name": "invalid-14",
+        "url": "postgres://localhost/demo/extra",
+        "driver": ""
+    },
+    {
+        "name": "invalid-15",
+        "url": "sqlite://",
+        "driver": ""
+    },
+    {
+        "name": "invalid-16",
+        "url": "sqlite://dev:password@file.sqlite",
+        "driver": ""
+    },
+    {
+        "name": "invalid-17",
+        "url": "sqlite://file.sqlite:123",
+        "driver": ""
+    },
+    {
+        "name": "invalid-18",
+        "url": "postgres://dev:password@localhost/demo#fragment",
+        "driver": ""
+    },
+    {
+        "name": "invalid-19",
+        "url": "mysql://dev:password@localhost/demo?timeout=%ZZ",
+        "driver": ""
+    },
+    {
+        "name": "invalid-20",
+        "url": "postgres://dev:password@localhost/%",
+        "driver": ""
+    },
+    {
+        "name": "invalid-21",
+        "url": "postgres://dev:password@localhost/demo?one=1;two=2",
+        "driver": ""
+    },
+    {
+        "name": "invalid-22",
+        "url": "mysql://dev:password@localhost/demo\n",
+        "driver": ""
+    },
+    {
+        "name": "invalid-23",
+        "url": "postgres://dev:password@::1/demo",
+        "driver": ""
+    },
+    {
+        "name": "postgres-uppercase-scheme",
+        "url": "POSTGRES://dev:password@localhost/demo",
+        "driver": "postgres"
+    },
+    {
+        "name": "mysql-uppercase-scheme",
+        "url": "MYSQL://dev:password@localhost/demo",
+        "driver": "mysql"
+    },
+    {
+        "name": "invalid-empty-fragment",
+        "url": "postgres://localhost/demo#",
+        "driver": ""
+    },
+    {
+        "name": "mysql-encoded-unicode-credentials",
+        "url": "mysql://%E7%94%A8%E6%88%B7:%E5%AF%86%E7%A0%81@localhost/demo",
+        "driver": "mysql"
+    },
+    {
+        "name": "invalid-unencoded-unicode-credentials",
+        "url": "mysql://dev:密码@localhost/demo",
+        "driver": ""
+    }
+]

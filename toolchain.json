@@ -1,0 +1,21 @@
+{
+    "go": {
+        "version": "go1.26.8",
+        "url": "https://go.dev/dl/go1.26.8.linux-amd64.tar.gz",
+        "sha256": "d0f743b33e8d8945e6b1f432edd15785c70507121d6e2a723b21285eddf8b57b"
+    },
+    "atlas": {
+        "version": "v1.3.0",
+        "url": "https://atlasbinaries.com/atlas/atlas-community-linux-amd64-v1.3.0",
+        "sha256": "10d7913e3dce43ab99b8d71534a4cbadaf11a16dc293adf3b91d10e83a0ac70b"
+    },
+    "mysql": "8.0.46",
+    "air": "v1.64.5",
+    "node": "v24.15.0",
+    "pnpm": "11.15.1",
+    "ruff": {
+        "version": "0.13.3",
+        "url": "https://files.pythonhosted.org/packages/ab/b5/c0feca27d45ae74185a6bacc399f5d8920ab82df2d732a17213fb86a2c4c/ruff-0.13.3-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+        "sha256": "dc742c50f4ba72ce2a3be362bd359aef7d0d302bf7637a6f942eaa763bd292af"
+    }
+}

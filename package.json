@@ -1,0 +1,39 @@
+{
+    "name": "go-full-stack-starter",
+    "private": true,
+    "type": "module",
+    "packageManager": "pnpm@11.15.1",
+    "scripts": {
+        "dev": "python3 scripts/dev.py",
+        "setup": "python3 scripts/setup.py",
+        "generate": "python3 scripts/project.py generate",
+        "schema": "python3 scripts/project.py schema",
+        "migrate": "python3 scripts/project.py migrate",
+        "test": "python3 scripts/project.py test",
+        "test:go": "python3 scripts/project.py test-go",
+        "test:go:coverage": "python3 scripts/project.py test-go --coverage",
+        "check": "python3 scripts/project.py check",
+        "build": "python3 scripts/project.py build",
+        "verify": "python3 scripts/verify-project.py",
+        "test:ui": "pnpm --filter @shanjing/shadcnui-dashboard test",
+        "test:browser": "pnpm --filter multi-database-demo-dashboard test:browser",
+        "build:dashboard": "pnpm --filter @shanjing/shadcnui-dashboard build",
+        "build:frontend": "pnpm build:dashboard && pnpm --filter multi-database-demo-dashboard build",
+        "schema:diff": "python3 scripts/project.py diff",
+        "format": "python3 scripts/format.py",
+        "format:check": "python3 scripts/format.py --check",
+        "verify:docker": "python3 scripts/verify-project-docker.py",
+        "test:docker-verifier": "python3 scripts/test-verify-project-docker.py",
+        "verify:mysql": "python3 scripts/verify-project.py",
+        "verify:postgresql": "python3 scripts/verify-postgresql.py",
+        "verify:postgresql:docker": "python3 scripts/verify-postgresql.py --docker-build",
+        "verify:postgresql:browser": "python3 scripts/verify-postgresql.py --browser",
+        "clean:runtime": "python3 scripts/clean-runtime.py",
+        "clean:cache": "python3 scripts/clean-runtime.py --cache-only",
+        "clean:all": "python3 scripts/clean-runtime.py --cache",
+        "test:cleanup": "python3 scripts/test-runtime-cleanup.py"
+    },
+    "devDependencies": {
+        "prettier": "3.6.2"
+    }
+}

@@ -1,0 +1,6 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "@shanjing/shadcnui-dashboard/styles.css";
+@source "../../../../packages/shadcnui-dashboard/dist";
+@source "../../../../packages/shadcnui-dashboard/src";
+@source "../../internal/pages/templates";

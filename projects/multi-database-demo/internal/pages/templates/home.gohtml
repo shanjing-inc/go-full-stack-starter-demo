@@ -1,0 +1,44 @@
+{{define "home"}}
+<section class="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-start">
+    <div class="space-y-6">
+        <p class="text-sm font-medium tracking-[0.3em] text-muted-foreground uppercase">Go Runtime Ready</p>
+        <h1 class="max-w-3xl text-4xl font-semibold tracking-tight sm:text-6xl">Go SSR + React Dashboard + GraphQL 示例</h1>
+        <p class="max-w-2xl text-base/8 text-muted-foreground sm:text-lg">首页由 Go 服务端渲染，集中展示能力测试与后台入口。队列测试页用于验证 Redis、Asynq 与 Worker；管理后台用于验证 SPA、权限和数据端点。</p>
+        <div class="flex flex-wrap gap-3 text-sm text-muted-foreground" aria-label="技术栈">
+            <span class="rounded-full border bg-secondary px-4 py-2 text-secondary-foreground">Go SSR</span>
+            <span class="rounded-full border bg-secondary px-4 py-2 text-secondary-foreground">Echo</span>
+            <span class="rounded-full border bg-secondary px-4 py-2 text-secondary-foreground">React</span>
+            <span class="rounded-full border bg-secondary px-4 py-2 text-secondary-foreground">Tailwind CSS</span>
+            <span class="rounded-full border bg-secondary px-4 py-2 text-secondary-foreground">GraphQL</span>
+            <span class="rounded-full border bg-secondary px-4 py-2 text-secondary-foreground">MySQL</span>
+            <span class="rounded-full border bg-secondary px-4 py-2 text-secondary-foreground">Redis</span>
+            <span class="rounded-full border bg-secondary px-4 py-2 text-secondary-foreground">Asynq</span>
+        </div>
+        <div class="grid gap-4 md:grid-cols-2">
+            {{range .Cards}}
+            <a class="group rounded-xl border bg-card p-6 text-card-foreground shadow-sm transition hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring" href="{{.Href}}">
+                <p class="text-xs font-medium tracking-widest text-muted-foreground uppercase">{{.Tag}}</p>
+                <h2 class="mt-3 text-xl font-semibold">{{.Title}}</h2>
+                <p class="mt-3 text-sm/7 text-muted-foreground">{{.Description}}</p>
+                <p class="mt-5 text-sm font-medium text-primary">进入页面 →</p>
+            </a>
+            {{end}}
+        </div>
+    </div>
+    <section class="rounded-xl border bg-card p-6 text-card-foreground shadow-sm sm:p-8" aria-labelledby="counter-title">
+        <p class="text-sm font-medium tracking-widest text-muted-foreground uppercase">Persistent Store Demo</p>
+        <h2 id="counter-title" class="mt-3 text-2xl font-semibold">持久化计数器</h2>
+        <p class="mt-4 text-sm/7 text-muted-foreground">计数状态保存在浏览器本地，验证服务端 HTML、浏览器交互和 Tailwind 样式链路。</p>
+        <div class="my-8 rounded-xl bg-muted/50 p-6 text-center">
+            <p class="text-sm text-muted-foreground">当前值</p>
+            <output data-counter aria-live="polite" class="mt-2 block text-5xl font-semibold tabular-nums">0</output>
+        </div>
+        <div class="flex flex-wrap gap-3">
+            <button data-counter-action="increment" type="button" class="min-h-11 cursor-pointer rounded-lg bg-primary px-5 text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">+1</button>
+            <button data-counter-action="decrement" type="button" class="min-h-11 cursor-pointer rounded-lg border px-5 hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">-1</button>
+            <button data-counter-action="reset" type="button" class="min-h-11 cursor-pointer rounded-lg border px-5 hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">重置</button>
+        </div>
+        <noscript><p class="mt-4 text-sm text-muted-foreground">开启 JavaScript 可使用计数器和主题切换。</p></noscript>
+    </section>
+</section>
+{{end}}

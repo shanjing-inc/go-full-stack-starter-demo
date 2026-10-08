@@ -1,0 +1,13 @@
+type Query {
+    getShop(where: ShopFilters!): ShopItem
+}
+
+type Mutation {
+    createShop(set: CreateShopSetInput!): ShopItem!
+}
+
+input CreateShopSetInput {
+    name: String!
+    slug: String!
+    status: String
+}

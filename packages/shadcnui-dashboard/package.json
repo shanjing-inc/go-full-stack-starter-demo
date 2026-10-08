@@ -1,0 +1,45 @@
+{
+    "name": "@shanjing/shadcnui-dashboard",
+    "version": "0.1.0",
+    "type": "module",
+    "files": [
+        "dist",
+        "README.md"
+    ],
+    "sideEffects": [
+        "**/*.css"
+    ],
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        },
+        "./styles.css": "./dist/styles.css"
+    },
+    "scripts": {
+        "build": "node ../../scripts/clean-dashboard.mjs && tsc6 -p tsconfig.build.json && node ../../scripts/copy-dashboard-css.mjs",
+        "typecheck": "tsc6 --noEmit",
+        "test": "vitest run"
+    },
+    "peerDependencies": {
+        "react": "^19.2.8",
+        "react-dom": "^19.2.8",
+        "react-router": "^8.3.0"
+    },
+    "dependencies": {
+        "class-variance-authority": "0.7.1",
+        "clsx": "2.1.1",
+        "lucide-react": "1.25.0",
+        "radix-ui": "1.6.4",
+        "tailwind-merge": "3.6.0"
+    },
+    "devDependencies": {
+        "@types/react": "19.2.17",
+        "@types/react-dom": "19.2.3",
+        "typescript": "npm:@typescript/typescript6@6.0.2",
+        "vitest": "4.1.10"
+    },
+    "publishConfig": {
+        "registry": "https://packages.aliyun.com/5eb77c7538076f00011bd238/npm/npm-registry/"
+    }
+}

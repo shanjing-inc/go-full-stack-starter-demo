@@ -1,0 +1,9 @@
+{
+    "source": "Better Auth 1.6.24 / @better-auth/utils 0.4.2 Node 导出",
+    "password": "迁移Ｐａｓｓｗｏｒｄ-2026",
+    "normalized": "迁移Password-2026",
+    "hash": "d55a73a9d2085dbb09b2c87f26e11395:9296b79da05941e291cac89cfd16fc7205572ec349fca3593f3cef573413df00bec00569103e3dceff59f9c6de04fdb4da78d85262500c4c4aab903fdab6cdfb",
+    "secret": "test-secret-with-at-least-32-bytes",
+    "token": "reference-legacy-session-token",
+    "cookie": "reference-legacy-session-token.2xWcHBLK5BRDRD96qlrm6FMVSPSQYya7rNebmpCM8X0%3D"
+}

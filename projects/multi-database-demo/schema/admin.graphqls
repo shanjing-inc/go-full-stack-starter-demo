@@ -1,0 +1,100 @@
+type Query {
+    getCurrentUser: UserItem
+    getCurrentPermissions: [String!]!
+    getUser(where: UserFilters!): UserItem
+    listUsers(limit: Int, offset: Int, orderBy: UserOrderBy, where: UserFilters): [UserItem!]
+    listUserSessions(userId: ID!, limit: Int, offset: Int): [UserSessionItem!]!
+    getShop(where: ShopFilters!): ShopItem
+    listShops(limit: Int, offset: Int, orderBy: ShopOrderBy, where: ShopFilters): [ShopItem!]
+}
+
+type Mutation {
+    createUser(set: CreateUserSetInput!): [UserItem!]!
+    updateUser(set: UpdateUserSetInput!, where: UserFilters!): [UserItem!]!
+    revokeUserSessions(userId: ID!): Boolean!
+    revokeUserSession(userId: ID!, sessionId: ID!): Boolean!
+    createShop(set: CreateShopSetInput!): ShopItem!
+}
+
+input CreateShopSetInput {
+    name: String!
+    slug: String!
+    status: String
+}
+
+# 保留参考项目的排序输入协议。
+enum OrderDirection {
+    asc
+    desc
+}
+input InnerOrder {
+    direction: OrderDirection!
+    priority: Int!
+}
+input ShopOrderBy {
+    createdAt: InnerOrder
+    id: InnerOrder
+    name: InnerOrder
+    slug: InnerOrder
+    status: InnerOrder
+    updatedAt: InnerOrder
+}
+
+# 用户查询契约沿用参考 Admin SDL。
+input UserFilters {
+    banned: Boolean
+    email: StringFilters
+    emailVerified: Boolean
+    id: IntFilters
+    role: StringFilters
+}
+
+type UserItem {
+    banExpires: DateTime
+    banReason: String
+    banned: Boolean
+    createdAt: DateTime
+    email: String
+    emailVerified: Boolean
+    id: ID
+    image: String
+    name: String
+    role: String
+    updatedAt: DateTime
+}
+
+input UserOrderBy {
+    createdAt: InnerOrder
+    email: InnerOrder
+    id: InnerOrder
+    name: InnerOrder
+    role: InnerOrder
+    updatedAt: InnerOrder
+}
+
+# 创建／更新用户沿用参考后台 SDL；会话撤销由 Go 管理服务执行。
+input CreateUserSetInput {
+    email: String!
+    name: String!
+    password: String!
+    role: String
+}
+input UpdateUserSetInput {
+    banExpires: DateTime
+    banReason: String
+    banned: Boolean
+    name: String
+    role: String
+}
+
+# Go 后台会话管理扩展；凭据字段保持在认证模块内部。
+type UserSessionItem {
+    id: ID!
+    userId: ID!
+    ipAddress: String
+    userAgent: String
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    expiresAt: DateTime!
+    current: Boolean!
+}

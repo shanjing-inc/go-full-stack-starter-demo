@@ -1,0 +1,26 @@
+schema:
+    - schema/common.graphqls
+    - schema/member.graphqls
+exec:
+    filename: internal/graph/member/generated.go
+    package: member
+model:
+    filename: internal/graph/member/models_gen.go
+    package: member
+resolver:
+    layout: follow-schema
+    dir: internal/graph/member
+    package: member
+    filename_template: "{name}.resolvers.go"
+models:
+    DateTime:
+        model: codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/projects/multi-database-demo/internal/graph/scalar.DateTime
+    IntFilters:
+        model: codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/projects/multi-database-demo/internal/graph/model.IntFilters
+    StringFilters:
+        model: codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/projects/multi-database-demo/internal/graph/model.StringFilters
+    ShopFilters:
+        model: codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/projects/multi-database-demo/internal/graph/model.ShopFilters
+    ShopItem:
+        model: codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/projects/multi-database-demo/internal/graph/model.ShopItem
+skip_mod_tidy: true

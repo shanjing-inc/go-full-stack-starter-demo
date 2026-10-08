@@ -1,0 +1,3 @@
+packages:
+    - packages/shadcnui-dashboard
+    - projects/multi-database-demo/frontend

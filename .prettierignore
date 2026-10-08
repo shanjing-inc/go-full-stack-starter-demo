@@ -1,0 +1,11 @@
+# 工具、依赖、构建与运行产物。
+.tools/
+.runtime/
+node_modules/
+dist/
+tmp/
+playwright-report/
+test-results/
+# 数据库 migration／checksum 与生成 SQL 由数据库工具维护。
+**/migrations/
+**/schema/generated/

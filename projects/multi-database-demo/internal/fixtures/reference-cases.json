@@ -1,0 +1,1208 @@
+{
+    "description": "完整参考 SDL + 现有 Yoga/health 处理器；业务 Resolver 使用内存替身。解析与校验错误比较状态及结构。",
+    "sources": {
+        "/home/dream/wwwroot/astro-full-stack-starter/projects/deno-mysql-demo/src/graphql/generated/member-schema.graphql": "3a3e8fc005083e673c059f4350c35656e9517f1feee68ef1b133ee4241fd6405",
+        "/home/dream/wwwroot/astro-full-stack-starter/projects/deno-mysql-demo/src/graphql/generated/admin-schema.graphql": "f7d0c7f76e3f12e10eb889b6c49a47f30c4ca16255df2860850bc2104d6f8963",
+        "/home/dream/wwwroot/astro-full-stack-starter/packages/astro-full-stack-starter/src/graphql/yoga.ts": "6d16b5257dd78547d655a31d19a93e99aff08bedfd41d9f103b98c892d230fa1",
+        "/home/dream/wwwroot/astro-full-stack-starter/packages/astro-full-stack-starter/src/graphql/errors.ts": "ce1b486abbf5e563d2e2201a9e9e027efbfd27dd09313fa9cd7c240aa9427fb3",
+        "/home/dream/wwwroot/astro-full-stack-starter/packages/astro-full-stack-starter/src/graphql/utils.ts": "540727d2a356323091291116ce658ca204d30f31f69eb7b15503d43e9f7bad96",
+        "/home/dream/wwwroot/astro-full-stack-starter/projects/deno-mysql-demo/src/pages/api/rest/internal/health.ts": "f8e6e2fc1faa7ab8de4c4a50d475cf8dfafc9ad373d688f00a4cbce447b46ecb"
+    },
+    "versions": {
+        "node": "v24.15.0",
+        "graphql": "17.0.2",
+        "yoga": "5.21.2"
+    },
+    "cases": [
+        {
+            "name": "health_get",
+            "endpoint": "health",
+            "method": "GET",
+            "mode": "exact",
+            "headers": {},
+            "expected": {
+                "status": 200,
+                "text": "ok\n",
+                "headers": {
+                    "content-type": "text/plain; charset=utf-8",
+                    "cache-control": "no-store"
+                }
+            }
+        },
+        {
+            "name": "health_head",
+            "endpoint": "health",
+            "method": "HEAD",
+            "mode": "exact",
+            "headers": {},
+            "expected": {
+                "status": 200,
+                "text": "",
+                "headers": {
+                    "content-type": "text/plain; charset=utf-8",
+                    "cache-control": "no-store"
+                }
+            }
+        },
+        {
+            "name": "member_post",
+            "endpoint": "member",
+            "method": "POST",
+            "mode": "exact",
+            "headers": {
+                "content-type": "application/json"
+            },
+            "body": "{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":1}}}}",
+            "expected": {
+                "status": 200,
+                "json": {
+                    "data": {
+                        "getShop": {
+                            "id": "1",
+                            "name": "示例店铺",
+                            "slug": "demo",
+                            "status": "active",
+                            "createdAt": "2025-01-02T03:04:05Z",
+                            "updatedAt": "2025-01-02T03:04:05Z"
+                        }
+                    }
+                },
+                "headers": {
+                    "content-type": "application/json; charset=utf-8"
+                }
+            }
+        },
+        {
+            "name": "admin_get",
+            "endpoint": "admin",
+            "method": "GET",
+            "mode": "exact",
+            "headers": {},
+            "search": "?query=query+GetShop%28%24where%3A+ShopFilters%21%29+%7B+getShop%28where%3A+%24where%29+%7B+id+name+slug+status+createdAt+updatedAt+%7D+%7D&variables=%7B%22where%22%3A%7B%22id%22%3A%7B%22eq%22%3A1%7D%7D%7D",
+            "expected": {
+                "status": 200,
+                "json": {
+                    "data": {
+                        "getShop": {
+                            "id": "1",
+                            "name": "示例店铺",
+                            "slug": "demo",
+                            "status": "active",
+                            "createdAt": "2025-01-02T03:04:05Z",
+                            "updatedAt": "2025-01-02T03:04:05Z"
+                        }
+                    }
+                },
+                "headers": {
+                    "content-type": "application/json; charset=utf-8"
+                }
+            }
+        },
+        {
+            "name": "nullable_missing",
+            "endpoint": "member",
+            "method": "POST",
+            "mode": "exact",
+            "headers": {
+                "content-type": "application/json"
+            },
+            "body": "{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":99}}}}",
+            "expected": {
+                "status": 200,
+                "json": {
+                    "data": {
+                        "getShop": null
+                    }
+                },
+                "headers": {
+                    "content-type": "application/json; charset=utf-8"
+                }
+            }
+        },
+        {
+            "name": "error_400",
+            "endpoint": "member",
+            "method": "POST",
+            "mode": "exact",
+            "headers": {
+                "content-type": "application/json"
+            },
+            "body": "{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":400}}}}",
+            "expected": {
+                "status": 200,
+                "json": {
+                    "errors": [
+                        {
+                            "message": "输入参数无效",
+                            "locations": [
+                                {
+                                    "line": 1,
+                                    "column": 39
+                                }
+                            ],
+                            "path": ["getShop"],
+                            "extensions": {
+                                "code": "BAD_USER_INPUT"
+                            }
+                        }
+                    ],
+                    "data": {
+                        "getShop": null
+                    }
+                },
+                "headers": {
+                    "content-type": "application/json; charset=utf-8"
+                }
+            }
+        },
+        {
+            "name": "error_403",
+            "endpoint": "member",
+            "method": "POST",
+            "mode": "exact",
+            "headers": {
+                "content-type": "application/json"
+            },
+            "body": "{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":403}}}}",
+            "expected": {
+                "status": 200,
+                "json": {
+                    "errors": [
+                        {
+                            "message": "操作权限不足",
+                            "locations": [
+                                {
+                                    "line": 1,
+                                    "column": 39
+                                }
+                            ],
+                            "path": ["getShop"],
+                            "extensions": {
+                                "code": "FORBIDDEN"
+                            }
+                        }
+                    ],
+                    "data": {
+                        "getShop": null
+                    }
+                },
+                "headers": {
+                    "content-type": "application/json; charset=utf-8"
+                }
+            }
+        },
+        {
+            "name": "error_410",
+            "endpoint": "member",
+            "method": "POST",
+            "mode": "exact",
+            "headers": {
+                "content-type": "application/json"
+            },
+            "body": "{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":410}}}}",
+            "expected": {
+                "status": 200,
+                "json": {
+                    "errors": [
+                        {
+                            "message": "目标资源不存在",
+                            "locations": [
+                                {
+                                    "line": 1,
+                                    "column": 39
+                                }
+                            ],
+                            "path": ["getShop"],
+                            "extensions": {
+                                "code": "NOT_FOUND"
+                            }
+                        }
+                    ],
+                    "data": {
+                        "getShop": null
+                    }
+                },
+                "headers": {
+                    "content-type": "application/json; charset=utf-8"
+                }
+            }
+        },
+        {
+            "name": "error_503",
+            "endpoint": "member",
+            "method": "POST",
+            "mode": "exact",
+            "headers": {
+                "content-type": "application/json"
+            },
+            "body": "{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":503}}}}",
+            "expected": {
+                "status": 200,
+                "json": {
+                    "errors": [
+                        {
+                            "message": "服务暂时不可用",
+                            "locations": [
+                                {
+                                    "line": 1,
+                                    "column": 39
+                                }
+                            ],
+                            "path": ["getShop"],
+                            "extensions": {
+                                "code": "SERVICE_UNAVAILABLE"
+                            }
+                        }
+                    ],
+                    "data": {
+                        "getShop": null
+                    }
+                },
+                "headers": {
+                    "content-type": "application/json; charset=utf-8"
+                }
+            }
+        },
+        {
+            "name": "error_500",
+            "endpoint": "member",
+            "method": "POST",
+            "mode": "exact",
+            "headers": {
+                "content-type": "application/json"
+            },
+            "body": "{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":500}}}}",
+            "expected": {
+                "status": 200,
+                "json": {
+                    "errors": [
+                        {
+                            "message": "Unexpected error.",
+                            "locations": [
+                                {
+                                    "line": 1,
+                                    "column": 39
+                                }
+                            ],
+                            "path": ["getShop"],
+                            "extensions": {
+                                "code": "INTERNAL_SERVER_ERROR"
+                            }
+                        }
+                    ],
+                    "data": {
+                        "getShop": null
+                    }
+                },
+                "headers": {
+                    "content-type": "application/json; charset=utf-8"
+                }
+            }
+        },
+        {
+            "name": "partial_error",
+            "endpoint": "member",
+            "method": "POST",
+            "mode": "exact",
+            "headers": {
+                "content-type": "application/json"
+            },
+            "body": "{\"query\":\"{ ok: getShop(where:{id:{eq:1}}){id} denied: getShop(where:{id:{eq:403}}){id} }\"}",
+            "expected": {
+                "status": 200,
+                "json": {
+                    "errors": [
+                        {
+                            "message": "操作权限不足",
+                            "locations": [
+                                {
+                                    "line": 1,
+                                    "column": 38
+                                }
+                            ],
+                            "path": ["denied"],
+                            "extensions": {
+                                "code": "FORBIDDEN"
+                            }
+                        }
+                    ],
+                    "data": {
+                        "ok": {
+                            "id": "1"
+                        },
+                        "denied": null
+                    }
+                },
+                "headers": {
+                    "content-type": "application/json; charset=utf-8"
+                }
+            }
+        },
+        {
+            "name": "directive_skip",
+            "endpoint": "member",
+            "method": "POST",
+            "mode": "exact",
+            "headers": {
+                "content-type": "application/json"
+            },
+            "body": "{\"query\":\"query($show:Boolean!){ getShop(where:{id:{eq:1}}) @include(if:$show){id} }\",\"variables\":{\"show\":false}}",
+            "expected": {
+                "status": 200,
+                "json": {
+                    "data": {}
+                },
+                "headers": {
+                    "content-type": "application/json; charset=utf-8"
+                }
+            }
+        },
+        {
+            "name": "directive_include",
+            "endpoint": "member",
+            "method": "POST",
+            "mode": "exact",
+            "headers": {
+                "content-type": "application/json"
+            },
+            "body": "{\"query\":\"query($show:Boolean!){ getShop(where:{id:{eq:1}}) @include(if:$show){id} }\",\"variables\":{\"show\":true}}",
+            "expected": {
+                "status": 200,
+                "json": {
+                    "data": {
+                        "getShop": {
+                            "id": "1"
+                        }
+                    }
+                },
+                "headers": {
+                    "content-type": "application/json; charset=utf-8"
+                }
+            }
+        },
+        {
+            "name": "admin_mutation",
+            "endpoint": "admin",
+            "method": "POST",
+            "mode": "exact",
+            "headers": {
+                "content-type": "application/json"
+            },
+            "body": "{\"query\":\"mutation($set:CreateShopSetInput!){createShop(set:$set){id name slug status createdAt updatedAt}}\",\"variables\":{\"set\":{\"name\":\"新店铺\",\"slug\":\"new-shop\"}}}",
+            "expected": {
+                "status": 200,
+                "json": {
+                    "data": {
+                        "createShop": {
+                            "id": "2",
+                            "name": "新店铺",
+                            "slug": "new-shop",
+                            "status": "active",
+                            "createdAt": "2025-01-02T03:04:05Z",
+                            "updatedAt": "2025-01-02T03:04:05Z"
+                        }
+                    }
+                },
+                "headers": {
+                    "content-type": "application/json; charset=utf-8"
+                }
+            }
+        },
+        {
+            "name": "member_schema_isolation",
+            "endpoint": "member",
+            "method": "POST",
+            "mode": "request-error",
+            "headers": {
+                "content-type": "application/json"
+            },
+            "body": "{\"query\":\"mutation($set:CreateShopSetInput!){createShop(set:$set){id name slug status createdAt updatedAt}}\",\"variables\":{\"set\":{\"name\":\"新店铺\",\"slug\":\"new-shop\"}}}",
+            "expected": {
+                "status": 200,
+                "json": {
+                    "errors": [
+                        {
+                            "message": "The mutation operation is not supported by the schema.",
+                            "locations": [
+                                {
+                                    "line": 1,
+                                    "column": 1
+                                }
+                            ],
+                            "extensions": {
+                                "code": "GRAPHQL_VALIDATION_FAILED"
+                            }
+                        }
+                    ]
+                },
+                "headers": {
+                    "content-type": "application/json; charset=utf-8"
+                }
+            }
+        },
+        {
+            "name": "get_mutation",
+            "endpoint": "admin",
+            "method": "GET",
+            "mode": "request-error",
+            "headers": {},
+            "search": "?query=mutation%28%24set%3ACreateShopSetInput%21%29%7BcreateShop%28set%3A%24set%29%7Bid+name+slug+status+createdAt+updatedAt%7D%7D&variables=%7B%22set%22%3A%7B%22name%22%3A%22%E6%96%B0%E5%BA%97%E9%93%BA%22%2C%22slug%22%3A%22new-shop%22%7D%7D",
+            "expected": {
+                "status": 405,
+                "json": {
+                    "errors": [
+                        {
+                            "message": "Can only perform a mutation operation from a POST request.",
+                            "extensions": {
+                                "code": "BAD_REQUEST"
+                            }
+                        }
+                    ]
+                },
+                "headers": {
+                    "content-type": "application/json; charset=utf-8",
+                    "allow": "POST"
+                }
+            }
+        },
+        {
+            "name": "batch_success",
+            "endpoint": "member",
+            "method": "POST",
+            "mode": "exact",
+            "headers": {
+                "content-type": "application/json"
+            },
+            "body": "[{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":1}}}},{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":99}}}}]",
+            "expected": {
+                "status": 200,
+                "json": [
+                    {
+                        "data": {
+                            "getShop": {
+                                "id": "1",
+                                "name": "示例店铺",
+                                "slug": "demo",
+                                "status": "active",
+                                "createdAt": "2025-01-02T03:04:05Z",
+                                "updatedAt": "2025-01-02T03:04:05Z"
+                            }
+                        }
+                    },
+                    {
+                        "data": {
+                            "getShop": null
+                        }
+                    }
+                ],
+                "headers": {
+                    "content-type": "application/json; charset=utf-8"
+                }
+            }
+        },
+        {
+            "name": "batch_mixed",
+            "endpoint": "member",
+            "method": "POST",
+            "mode": "exact",
+            "headers": {
+                "content-type": "application/json"
+            },
+            "body": "[{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":403}}}},{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":1}}}}]",
+            "expected": {
+                "status": 200,
+                "json": [
+                    {
+                        "errors": [
+                            {
+                                "message": "操作权限不足",
+                                "locations": [
+                                    {
+                                        "line": 1,
+                                        "column": 39
+                                    }
+                                ],
+                                "path": ["getShop"],
+                                "extensions": {
+                                    "code": "FORBIDDEN"
+                                }
+                            }
+                        ],
+                        "data": {
+                            "getShop": null
+                        }
+                    },
+                    {
+                        "data": {
+                            "getShop": {
+                                "id": "1",
+                                "name": "示例店铺",
+                                "slug": "demo",
+                                "status": "active",
+                                "createdAt": "2025-01-02T03:04:05Z",
+                                "updatedAt": "2025-01-02T03:04:05Z"
+                            }
+                        }
+                    }
+                ],
+                "headers": {
+                    "content-type": "application/json; charset=utf-8"
+                }
+            }
+        },
+        {
+            "name": "batch_limit",
+            "endpoint": "member",
+            "method": "POST",
+            "mode": "exact",
+            "headers": {
+                "content-type": "application/json"
+            },
+            "body": "[{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":1}}}},{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":1}}}},{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":1}}}},{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":1}}}},{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":1}}}},{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":1}}}},{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":1}}}},{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":1}}}},{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":1}}}},{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":1}}}}]",
+            "expected": {
+                "status": 200,
+                "json": [
+                    {
+                        "data": {
+                            "getShop": {
+                                "id": "1",
+                                "name": "示例店铺",
+                                "slug": "demo",
+                                "status": "active",
+                                "createdAt": "2025-01-02T03:04:05Z",
+                                "updatedAt": "2025-01-02T03:04:05Z"
+                            }
+                        }
+                    },
+                    {
+                        "data": {
+                            "getShop": {
+                                "id": "1",
+                                "name": "示例店铺",
+                                "slug": "demo",
+                                "status": "active",
+                                "createdAt": "2025-01-02T03:04:05Z",
+                                "updatedAt": "2025-01-02T03:04:05Z"
+                            }
+                        }
+                    },
+                    {
+                        "data": {
+                            "getShop": {
+                                "id": "1",
+                                "name": "示例店铺",
+                                "slug": "demo",
+                                "status": "active",
+                                "createdAt": "2025-01-02T03:04:05Z",
+                                "updatedAt": "2025-01-02T03:04:05Z"
+                            }
+                        }
+                    },
+                    {
+                        "data": {
+                            "getShop": {
+                                "id": "1",
+                                "name": "示例店铺",
+                                "slug": "demo",
+                                "status": "active",
+                                "createdAt": "2025-01-02T03:04:05Z",
+                                "updatedAt": "2025-01-02T03:04:05Z"
+                            }
+                        }
+                    },
+                    {
+                        "data": {
+                            "getShop": {
+                                "id": "1",
+                                "name": "示例店铺",
+                                "slug": "demo",
+                                "status": "active",
+                                "createdAt": "2025-01-02T03:04:05Z",
+                                "updatedAt": "2025-01-02T03:04:05Z"
+                            }
+                        }
+                    },
+                    {
+                        "data": {
+                            "getShop": {
+                                "id": "1",
+                                "name": "示例店铺",
+                                "slug": "demo",
+                                "status": "active",
+                                "createdAt": "2025-01-02T03:04:05Z",
+                                "updatedAt": "2025-01-02T03:04:05Z"
+                            }
+                        }
+                    },
+                    {
+                        "data": {
+                            "getShop": {
+                                "id": "1",
+                                "name": "示例店铺",
+                                "slug": "demo",
+                                "status": "active",
+                                "createdAt": "2025-01-02T03:04:05Z",
+                                "updatedAt": "2025-01-02T03:04:05Z"
+                            }
+                        }
+                    },
+                    {
+                        "data": {
+                            "getShop": {
+                                "id": "1",
+                                "name": "示例店铺",
+                                "slug": "demo",
+                                "status": "active",
+                                "createdAt": "2025-01-02T03:04:05Z",
+                                "updatedAt": "2025-01-02T03:04:05Z"
+                            }
+                        }
+                    },
+                    {
+                        "data": {
+                            "getShop": {
+                                "id": "1",
+                                "name": "示例店铺",
+                                "slug": "demo",
+                                "status": "active",
+                                "createdAt": "2025-01-02T03:04:05Z",
+                                "updatedAt": "2025-01-02T03:04:05Z"
+                            }
+                        }
+                    },
+                    {
+                        "data": {
+                            "getShop": {
+                                "id": "1",
+                                "name": "示例店铺",
+                                "slug": "demo",
+                                "status": "active",
+                                "createdAt": "2025-01-02T03:04:05Z",
+                                "updatedAt": "2025-01-02T03:04:05Z"
+                            }
+                        }
+                    }
+                ],
+                "headers": {
+                    "content-type": "application/json; charset=utf-8"
+                }
+            }
+        },
+        {
+            "name": "batch_over_limit",
+            "endpoint": "member",
+            "method": "POST",
+            "mode": "request-error",
+            "headers": {
+                "content-type": "application/json"
+            },
+            "body": "[{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":1}}}},{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":1}}}},{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":1}}}},{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":1}}}},{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":1}}}},{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":1}}}},{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":1}}}},{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":1}}}},{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":1}}}},{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":1}}}},{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":1}}}}]",
+            "expected": {
+                "status": 413,
+                "json": {
+                    "errors": [
+                        {
+                            "message": "Batching is limited to 10 operations per request.",
+                            "extensions": {
+                                "code": "BAD_REQUEST"
+                            }
+                        }
+                    ]
+                },
+                "headers": {
+                    "content-type": "application/json; charset=utf-8"
+                }
+            }
+        },
+        {
+            "name": "batch_empty",
+            "endpoint": "member",
+            "method": "POST",
+            "mode": "exact",
+            "headers": {
+                "content-type": "application/json"
+            },
+            "body": "[]",
+            "expected": {
+                "status": 200,
+                "json": [],
+                "headers": {
+                    "content-type": "application/json; charset=utf-8"
+                }
+            }
+        },
+        {
+            "name": "invalid_field",
+            "endpoint": "member",
+            "method": "POST",
+            "mode": "request-error",
+            "headers": {
+                "content-type": "application/json"
+            },
+            "body": "{\"query\":\"{ secretField }\"}",
+            "expected": {
+                "status": 200,
+                "json": {
+                    "errors": [
+                        {
+                            "message": "Cannot query field \"secretField\" on type \"Query\".",
+                            "locations": [
+                                {
+                                    "line": 1,
+                                    "column": 3
+                                }
+                            ],
+                            "extensions": {
+                                "code": "GRAPHQL_VALIDATION_FAILED"
+                            }
+                        }
+                    ]
+                },
+                "headers": {
+                    "content-type": "application/json; charset=utf-8"
+                }
+            }
+        },
+        {
+            "name": "invalid_syntax",
+            "endpoint": "member",
+            "method": "POST",
+            "mode": "request-error",
+            "headers": {
+                "content-type": "application/json"
+            },
+            "body": "{\"query\":\"{\"}",
+            "expected": {
+                "status": 200,
+                "json": {
+                    "errors": [
+                        {
+                            "message": "Syntax Error: Expected Name, found <EOF>.",
+                            "locations": [
+                                {
+                                    "line": 1,
+                                    "column": 2
+                                }
+                            ],
+                            "extensions": {
+                                "code": "GRAPHQL_PARSE_FAILED"
+                            }
+                        }
+                    ]
+                },
+                "headers": {
+                    "content-type": "application/json; charset=utf-8"
+                }
+            }
+        },
+        {
+            "name": "invalid_json",
+            "endpoint": "member",
+            "method": "POST",
+            "mode": "request-error",
+            "headers": {
+                "content-type": "application/json"
+            },
+            "body": "{",
+            "expected": {
+                "status": 400,
+                "json": {
+                    "errors": [
+                        {
+                            "message": "POST body sent invalid JSON.",
+                            "extensions": {
+                                "code": "BAD_REQUEST",
+                                "originalError": {
+                                    "name": "SyntaxError",
+                                    "message": "Expected property name or '}' in JSON at position 1 (line 1 column 2)"
+                                }
+                            }
+                        }
+                    ]
+                },
+                "headers": {
+                    "content-type": "application/json; charset=utf-8"
+                }
+            }
+        },
+        {
+            "name": "unsupported_method",
+            "endpoint": "member",
+            "method": "PUT",
+            "mode": "request-error",
+            "headers": {
+                "content-type": "application/json"
+            },
+            "body": "{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":1}}}}",
+            "expected": {
+                "status": 405,
+                "json": {
+                    "errors": [
+                        {
+                            "message": "GraphQL only supports GET and POST requests.",
+                            "extensions": {
+                                "code": "BAD_REQUEST"
+                            }
+                        }
+                    ]
+                },
+                "headers": {
+                    "content-type": "application/json; charset=utf-8",
+                    "allow": "GET, POST"
+                }
+            }
+        },
+        {
+            "name": "preflight",
+            "endpoint": "member",
+            "method": "OPTIONS",
+            "mode": "preflight",
+            "headers": {
+                "origin": "http://localhost:5173",
+                "access-control-request-method": "POST",
+                "access-control-request-headers": "content-type"
+            },
+            "expected": {
+                "status": 204,
+                "headers": {
+                    "access-control-allow-origin": "http://localhost:5173",
+                    "access-control-allow-methods": "POST",
+                    "access-control-allow-headers": "content-type"
+                }
+            }
+        },
+        {
+            "name": "modern_invalid_field",
+            "endpoint": "member",
+            "method": "POST",
+            "mode": "request-error",
+            "headers": {
+                "accept": "application/graphql-response+json",
+                "content-type": "application/json"
+            },
+            "body": "{\"query\":\"{ secretField }\"}",
+            "expected": {
+                "status": 400,
+                "json": {
+                    "errors": [
+                        {
+                            "message": "Cannot query field \"secretField\" on type \"Query\".",
+                            "locations": [
+                                {
+                                    "line": 1,
+                                    "column": 3
+                                }
+                            ],
+                            "extensions": {
+                                "code": "GRAPHQL_VALIDATION_FAILED"
+                            }
+                        }
+                    ]
+                },
+                "headers": {
+                    "content-type": "application/graphql-response+json; charset=utf-8"
+                }
+            }
+        },
+        {
+            "name": "modern_invalid_syntax",
+            "endpoint": "member",
+            "method": "POST",
+            "mode": "request-error",
+            "headers": {
+                "accept": "application/graphql-response+json",
+                "content-type": "application/json"
+            },
+            "body": "{\"query\":\"{\"}",
+            "expected": {
+                "status": 400,
+                "json": {
+                    "errors": [
+                        {
+                            "message": "Syntax Error: Expected Name, found <EOF>.",
+                            "locations": [
+                                {
+                                    "line": 1,
+                                    "column": 2
+                                }
+                            ],
+                            "extensions": {
+                                "code": "GRAPHQL_PARSE_FAILED"
+                            }
+                        }
+                    ]
+                },
+                "headers": {
+                    "content-type": "application/graphql-response+json; charset=utf-8"
+                }
+            }
+        },
+        {
+            "name": "modern_success",
+            "endpoint": "member",
+            "method": "POST",
+            "mode": "exact",
+            "headers": {
+                "accept": "application/graphql-response+json",
+                "content-type": "application/json"
+            },
+            "body": "{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":1}}}}",
+            "expected": {
+                "status": 200,
+                "json": {
+                    "data": {
+                        "getShop": {
+                            "id": "1",
+                            "name": "示例店铺",
+                            "slug": "demo",
+                            "status": "active",
+                            "createdAt": "2025-01-02T03:04:05Z",
+                            "updatedAt": "2025-01-02T03:04:05Z"
+                        }
+                    }
+                },
+                "headers": {
+                    "content-type": "application/graphql-response+json; charset=utf-8"
+                }
+            }
+        },
+        {
+            "name": "operation_name_post",
+            "endpoint": "member",
+            "method": "POST",
+            "mode": "exact",
+            "headers": {
+                "content-type": "application/json"
+            },
+            "body": "{\"query\":\"query First {getShop(where:{id:{eq:99}}){id}} query Second {getShop(where:{id:{eq:1}}){id}}\",\"operationName\":\"Second\"}",
+            "expected": {
+                "status": 200,
+                "json": {
+                    "data": {
+                        "getShop": {
+                            "id": "1"
+                        }
+                    }
+                },
+                "headers": {
+                    "content-type": "application/json; charset=utf-8"
+                }
+            }
+        },
+        {
+            "name": "operation_name_get",
+            "endpoint": "member",
+            "method": "GET",
+            "mode": "exact",
+            "headers": {},
+            "search": "?query=query+First+%7BgetShop%28where%3A%7Bid%3A%7Beq%3A99%7D%7D%29%7Bid%7D%7D+query+Second+%7BgetShop%28where%3A%7Bid%3A%7Beq%3A1%7D%7D%29%7Bid%7D%7D&operationName=Second",
+            "expected": {
+                "status": 200,
+                "json": {
+                    "data": {
+                        "getShop": {
+                            "id": "1"
+                        }
+                    }
+                },
+                "headers": {
+                    "content-type": "application/json; charset=utf-8"
+                }
+            }
+        },
+        {
+            "name": "missing_operation_name",
+            "endpoint": "member",
+            "method": "POST",
+            "mode": "request-error",
+            "headers": {
+                "content-type": "application/json"
+            },
+            "body": "{\"query\":\"query First {getShop(where:{id:{eq:99}}){id}} query Second {getShop(where:{id:{eq:1}}){id}}\"}",
+            "expected": {
+                "status": 400,
+                "json": {
+                    "errors": [
+                        {
+                            "message": "Could not determine what operation to execute.",
+                            "extensions": {
+                                "code": "OPERATION_RESOLUTION_FAILURE"
+                            }
+                        }
+                    ]
+                },
+                "headers": {
+                    "content-type": "application/json; charset=utf-8"
+                }
+            }
+        },
+        {
+            "name": "invalid_variables",
+            "endpoint": "member",
+            "method": "POST",
+            "mode": "request-error",
+            "headers": {
+                "content-type": "application/json"
+            },
+            "body": "{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":\"bad\"}}}}",
+            "expected": {
+                "status": 200,
+                "json": {
+                    "errors": [
+                        {
+                            "message": "Variable \"$where\" has invalid value at .id.eq: Int cannot represent non-integer value: \"bad\"",
+                            "locations": [
+                                {
+                                    "line": 1,
+                                    "column": 15
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "headers": {
+                    "content-type": "application/json; charset=utf-8"
+                }
+            }
+        },
+        {
+            "name": "missing_variables",
+            "endpoint": "member",
+            "method": "POST",
+            "mode": "request-error",
+            "headers": {
+                "content-type": "application/json"
+            },
+            "body": "{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\"}",
+            "expected": {
+                "status": 200,
+                "json": {
+                    "errors": [
+                        {
+                            "message": "Variable \"$where\" has invalid value: Expected a value of non-null type \"ShopFilters!\" to be provided.",
+                            "locations": [
+                                {
+                                    "line": 1,
+                                    "column": 15
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "headers": {
+                    "content-type": "application/json; charset=utf-8"
+                }
+            }
+        },
+        {
+            "name": "unknown_operation_name",
+            "endpoint": "member",
+            "method": "POST",
+            "mode": "request-error",
+            "headers": {
+                "content-type": "application/json"
+            },
+            "body": "{\"query\":\"query First {getShop(where:{id:{eq:99}}){id}} query Second {getShop(where:{id:{eq:1}}){id}}\",\"operationName\":\"Absent\"}",
+            "expected": {
+                "status": 400,
+                "json": {
+                    "errors": [
+                        {
+                            "message": "Could not determine what operation to execute.",
+                            "extensions": {
+                                "code": "OPERATION_RESOLUTION_FAILURE"
+                            }
+                        }
+                    ]
+                },
+                "headers": {
+                    "content-type": "application/json; charset=utf-8"
+                }
+            }
+        },
+        {
+            "name": "modern_invalid_variables",
+            "endpoint": "member",
+            "method": "POST",
+            "mode": "request-error",
+            "headers": {
+                "accept": "application/graphql-response+json",
+                "content-type": "application/json"
+            },
+            "body": "{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":\"bad\"}}}}",
+            "expected": {
+                "status": 200,
+                "json": {
+                    "errors": [
+                        {
+                            "message": "Variable \"$where\" has invalid value at .id.eq: Int cannot represent non-integer value: \"bad\"",
+                            "locations": [
+                                {
+                                    "line": 1,
+                                    "column": 15
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "headers": {
+                    "content-type": "application/graphql-response+json; charset=utf-8"
+                }
+            }
+        },
+        {
+            "name": "modern_batch",
+            "endpoint": "member",
+            "method": "POST",
+            "mode": "exact",
+            "headers": {
+                "accept": "application/graphql-response+json",
+                "content-type": "application/json"
+            },
+            "body": "[{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":1}}}},{\"query\":\"query GetShop($where: ShopFilters!) { getShop(where: $where) { id name slug status createdAt updatedAt } }\",\"variables\":{\"where\":{\"id\":{\"eq\":99}}}}]",
+            "expected": {
+                "status": 200,
+                "json": [
+                    {
+                        "data": {
+                            "getShop": {
+                                "id": "1",
+                                "name": "示例店铺",
+                                "slug": "demo",
+                                "status": "active",
+                                "createdAt": "2025-01-02T03:04:05Z",
+                                "updatedAt": "2025-01-02T03:04:05Z"
+                            }
+                        }
+                    },
+                    {
+                        "data": {
+                            "getShop": null
+                        }
+                    }
+                ],
+                "headers": {
+                    "content-type": "application/graphql-response+json; charset=utf-8"
+                }
+            }
+        },
+        {
+            "name": "modern_empty_batch",
+            "endpoint": "member",
+            "method": "POST",
+            "mode": "exact",
+            "headers": {
+                "accept": "application/graphql-response+json",
+                "content-type": "application/json"
+            },
+            "body": "[]",
+            "expected": {
+                "status": 200,
+                "json": [],
+                "headers": {
+                    "content-type": "application/graphql-response+json; charset=utf-8"
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,55 @@
+{{define "queue"}}
+<section class="space-y-8">
+    <div class="space-y-4">
+        <a href="/" class="inline-flex text-sm font-medium text-primary transition hover:text-primary/80">← 返回首页</a>
+        <p class="text-sm font-medium tracking-[0.3em] text-muted-foreground uppercase">Queue Test</p>
+        <h1 class="text-4xl font-semibold tracking-tight text-foreground">Asynq 队列派发测试</h1>
+        <p class="max-w-3xl leading-8 text-muted-foreground">这个页面由手动按钮触发任意队列。提交后可观察 <code class="rounded-sm bg-muted px-2 py-1 text-sm text-foreground">pnpm dev</code> 启动的 Worker 消费日志。队列配置来源于 <code class="rounded-sm bg-muted px-2 py-1 text-sm text-foreground">packages/go-server-kit/infra/queue/queue.go</code>。验证<a href="/admin/queues" class="font-medium text-primary underline underline-offset-4">队列管理</a>的 Retry → Completed 流程时，请使用“失败一次”按钮。</p>
+    </div>
+    <section aria-label="队列派发" class="grid gap-4 lg:grid-cols-3">
+        {{range .Queues}}
+        <form data-queue-dispatch data-queue-name="{{.Name}}" data-queue-description="{{.Description}}" method="post" action="/api/rest/demo/queue-test" class="rounded-xl border bg-card p-6 text-card-foreground shadow-sm">
+            <input name="queue" type="hidden" value="{{.Name}}">
+            <p class="text-sm font-medium tracking-[0.3em] uppercase {{if eq .Name "critical"}}text-destructive{{else if eq .Name "default"}}text-primary{{else}}text-cyan-700 dark:text-cyan-200{{end}}">{{.Name}}</p>
+            <h2 class="mt-4 text-2xl font-semibold">派发 {{.Description}}</h2>
+            <p class="mt-3 text-sm/7 text-muted-foreground">写入队列：<code class="rounded-sm bg-muted px-2 py-1 text-xs text-foreground">{{.Name}}</code></p>
+            <div class="mt-6 flex flex-wrap gap-3">
+                <button name="mode" type="submit" value="success" class="cursor-pointer rounded-lg border border-primary/30 bg-primary/10 px-4 py-2 text-sm font-medium text-primary transition hover:bg-primary/15 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring" {{if not $.CanDispatch}}disabled{{end}}>触发成功任务</button>
+                <button name="mode" type="submit" value="fail-once" class="cursor-pointer rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-sm font-medium text-amber-700 transition hover:bg-amber-500/15 disabled:cursor-not-allowed disabled:opacity-50 dark:text-amber-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring" {{if not $.CanDispatch}}disabled{{end}}>失败一次（可 Retry）</button>
+                <button name="mode" type="submit" value="always-fail" class="cursor-pointer rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm font-medium text-destructive transition hover:bg-destructive/15 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring" {{if not $.CanDispatch}}disabled{{end}}>持续失败</button>
+            </div>
+        </form>
+        {{end}}
+    </section>
+    <section aria-labelledby="request-result-title" class="rounded-xl border bg-card p-6 text-card-foreground shadow-sm">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <h2 id="request-result-title" class="text-2xl font-semibold">当前请求结果</h2>
+            <a data-refresh-records data-preserve-scroll="queue-status-refresh" href="/test/queue" class="inline-flex w-fit items-center rounded-lg border border-emerald-600 bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:border-emerald-700 hover:bg-emerald-700">刷新执行状态</a>
+        </div>
+        <p class="mt-2 text-sm/7 text-muted-foreground">最近一次动作：<code data-queue-action class="ml-2 rounded-sm bg-muted px-2 py-1 text-xs text-foreground">none</code><code class="ml-2 rounded-sm bg-muted px-2 py-1 text-xs text-foreground">mode: <span data-queue-mode>成功</span></code><span class="ml-3">请求时间：<span data-queue-requested-at>{{.RequestedAt}}</span></span></p>
+        {{if .UserName}}<p class="text-sm text-muted-foreground">当前账号：{{.UserName}}</p>{{end}}
+        <div data-queue-result role="status" aria-live="polite" class="mt-6">
+            {{if .Message}}<div role="alert" class="rounded-xl border border-destructive/20 bg-destructive/10 p-4 text-sm text-destructive">{{.Message}}</div>{{else}}<div class="rounded-xl border bg-muted/40 p-4 text-sm text-muted-foreground"><p>尚未派发任何队列任务。</p><p class="mt-2 leading-7">点击上面的按钮后，这里会显示 job id 或错误信息。</p></div>{{end}}
+        </div>
+        {{if not .CanRead}}<div class="mt-4 rounded-xl border bg-muted/40 p-5 text-sm/7"><p>登录具备队列读取权限的账号后，可查看最近执行记录。投递任务还需要队列重试权限。</p><a href="/admin/login?returnTo=%2Ftest%2Fqueue" class="mt-2 inline-block font-medium text-primary underline underline-offset-4">前往登录</a></div>{{end}}
+        <noscript><p class="mt-4 text-sm text-muted-foreground">开启 JavaScript 可派发任务；刷新页面可查看服务端渲染的最新执行记录。</p></noscript>
+    </section>
+    <section aria-labelledby="records-title" class="rounded-xl border bg-card p-6 text-card-foreground shadow-sm">
+        <h2 id="records-title" class="text-2xl font-semibold">最近执行记录</h2>
+        <p class="mt-2 text-sm/7 text-muted-foreground">刷新页面可查看 Asynq Worker 写回 Redis 的最新状态。</p>
+        {{if .Records}}
+        <div class="mt-6 overflow-x-auto rounded-xl border" tabindex="0" role="region" aria-label="最近执行记录表格">
+            <table class="w-full min-w-[900px] text-left text-sm text-foreground">
+                <caption class="sr-only">最近 20 条队列测试任务执行记录</caption>
+                <thead class="bg-muted/50 text-muted-foreground"><tr class="border-b">
+                    <th scope="col" class="p-3 font-medium whitespace-nowrap">queue</th><th scope="col" class="p-3 font-medium whitespace-nowrap">job id</th><th scope="col" class="p-3 font-medium whitespace-nowrap">mode</th><th scope="col" class="p-3 font-medium whitespace-nowrap">status</th><th scope="col" class="p-3 font-medium whitespace-nowrap">attempt</th><th scope="col" class="p-3 font-medium whitespace-nowrap">requestedAt</th><th scope="col" class="p-3 font-medium whitespace-nowrap">processedAt</th><th scope="col" class="p-3 font-medium whitespace-nowrap">error</th>
+                </tr></thead>
+                <tbody>{{range .Records}}<tr class="border-b bg-card last:border-b-0">
+                    <td class="p-3 whitespace-nowrap">{{.Queue}}</td><td class="min-w-48 max-w-64 p-3 break-all">{{.JobID}}</td><td class="p-3 whitespace-nowrap">{{.Mode}}</td><td class="p-3 whitespace-nowrap">{{.Status}}</td><td class="p-3">{{.Attempt}}</td><td class="p-3 whitespace-nowrap">{{.RequestedAt}}</td><td class="p-3 whitespace-nowrap">{{.ProcessedAt}}</td><td class="min-w-56 max-w-80 p-3 wrap-break-word">{{if .Error}}{{.Error}}{{else}}-{{end}}</td>
+                </tr>{{end}}</tbody>
+            </table>
+        </div>
+        {{else}}<div class="mt-6 rounded-xl border bg-muted/40 p-4 text-sm text-muted-foreground">{{if .CanRead}}暂无执行记录。投递任务后会先写入 queued 记录。{{else}}登录并取得队列读取权限后显示执行记录。{{end}}</div>{{end}}
+    </section>
+</section>
+{{end}}

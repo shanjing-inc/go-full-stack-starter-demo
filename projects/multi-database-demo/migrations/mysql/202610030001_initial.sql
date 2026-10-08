@@ -1,0 +1,2 @@
+-- 初始化店铺业务示例；由应用维护最终迁移。
+CREATE TABLE `shop` (`id` bigint AUTO_INCREMENT COMMENT '店铺编号',`name` varchar(255) NOT NULL COMMENT '店铺名称',`slug` varchar(255) NOT NULL COMMENT '店铺唯一标识',`status` varchar(32) NOT NULL DEFAULT 'active' COMMENT '状态 active 或 inactive',`created_at` datetime NOT NULL COMMENT '创建时间',`updated_at` datetime NOT NULL COMMENT '更新时间',PRIMARY KEY (`id`),UNIQUE INDEX `uk_slug` (`slug`),INDEX `idx_status` (`status`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

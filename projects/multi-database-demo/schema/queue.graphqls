@@ -1,0 +1,168 @@
+# 队列接口沿用 Node.js 查询与操作名称；时间使用 Unix 毫秒。
+scalar JSON
+
+extend type Query {
+    getQueueDashboard: QueueDashboardPayload!
+    getQueueSchedules: QueueSchedulesPayload!
+    getQueueExecutionRecord(recordId: String!, statusHint: String): QueueExecutionRecord!
+    listQueueExecutionRecords(
+        status: String!
+        limit: Int
+        offset: Int
+        orderBy: String
+        orderDirection: String
+        queueName: String
+        jobName: String
+        from: Float
+        to: Float
+    ): QueueExecutionRecordsPayload!
+}
+extend type Mutation {
+    updateQueueExecutionRecord(
+        set: QueueExecutionRecordSetInput!
+    ): QueueExecutionRecordUpdatePayload!
+}
+input QueueExecutionRecordSetInput {
+    recordId: String!
+    statusHint: String
+}
+type QueueExecutionRecordUpdatePayload {
+    detail: QueueExecutionRecord!
+    noticeMessage: String!
+}
+type QueueExecutionRecordsPayload {
+    records: [QueueExecutionRecordSummary!]!
+    total: Int!
+    limit: Int!
+    offset: Int!
+    status: String!
+    updatedAt: Float!
+    isRecentPage: Boolean!
+}
+type QueueExecutionRecordSummary {
+    id: String!
+    jobId: String!
+    jobName: String!
+    queueName: String!
+    physicalQueueName: String
+    executionNumber: Int!
+    status: String!
+    sortAt: Float!
+    queuedAt: Float
+    processedAt: Float
+    finishedAt: Float
+    runtimeMs: Float
+}
+type QueueExecutionRecord {
+    id: String!
+    jobId: String!
+    name: String!
+    queueName: String!
+    physicalQueueName: String
+    executionNumber: Int!
+    retryOfRecordId: String
+    latestRecordId: String!
+    state: String!
+    statusHint: String!
+    sortAt: Float!
+    queuedAt: Float
+    processedAt: Float
+    finishedAt: Float
+    runtimeMs: Float
+    attempts: Int!
+    data: JSON
+    returnValue: JSON
+    opts: JSON
+    meta: JSON
+    failedReason: String!
+    stacktrace: [String!]!
+    currentJobState: String!
+    canRetry: Boolean!
+    retryDisabledReason: String!
+}
+type QueueDashboardCapabilities {
+    supportsPauseState: Boolean!
+    supportsRetry: Boolean!
+    supportsSchedules: Boolean!
+    supportsWorkerPresence: Boolean!
+}
+type QueueOverview {
+    waiting: Int!
+    active: Int!
+    delayed: Int!
+    retrying: Int!
+    failed: Int!
+    completed: Int!
+    onlineWorkers: Int!
+    succeededExecutions24h: Int!
+    failedExecutions24h: Int!
+}
+type QueueWorkerProcess {
+    name: String!
+    processGroup: String!
+    maxMemory: String!
+    instances: Int
+    concurrency: Int
+    onlineInstances: Int!
+    isOnline: Boolean!
+    memoryBytes: Float
+    queues: [String!]!
+}
+type QueueSnapshot {
+    binding: String
+    concurrency: Int
+    maxMemory: String
+    workerProcessGroup: String
+    workerProcessName: String
+    queueName: String!
+    physicalQueueName: String
+    description: String!
+    waiting: Int!
+    active: Int!
+    delayed: Int!
+    retrying: Int!
+    failed: Int!
+    completed: Int!
+    isListening: Boolean!
+    isPaused: Boolean!
+    workerCount: Int!
+    succeededExecutions24h: Int!
+    failedExecutions24h: Int!
+}
+type QueueDashboardPayload {
+    capabilities: QueueDashboardCapabilities!
+    overview: QueueOverview!
+    queues: [QueueSnapshot!]!
+    queueCount: Int!
+    updatedAt: Float!
+    workerProcesses: [QueueWorkerProcess!]!
+    hasOnlineWorkers: Boolean!
+}
+
+# 计划定义在代码中注册；共享启停与调度结果只读展示。
+type QueueSchedule {
+    name: String!
+    cron: String!
+    timezone: String!
+    description: String!
+    jobName: String!
+    queueName: String!
+    enabled: Boolean!
+    nextRunAt: Float
+    lastActivityAt: Float
+    status: String!
+    statusText: String!
+}
+type QueueSchedulerHeartbeat {
+    instanceId: String!
+    lastHeartbeatAt: Float!
+    role: String!
+}
+type QueueSchedulesPayload {
+    schedules: [QueueSchedule!]!
+    heartbeats: [QueueSchedulerHeartbeat!]!
+    scheduleCount: Int!
+    schedulerInstanceCount: Int!
+    schedulerLeader: String
+    updatedAt: Float!
+}
