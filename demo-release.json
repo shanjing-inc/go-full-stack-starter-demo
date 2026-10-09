@@ -3,7 +3,7 @@
     "layout": "source-bundle-v1",
     "application": "projects/multi-database-demo",
     "sourceRepository": "https://codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git",
-    "sourceCommit": "43038caa54fcfe97bdfb6868f1a4da92001b12a0",
+    "sourceCommit": "814925db9e595005130c121797094beab806aabb",
     "files": {
         ".dockerignore": {
             "sha256": "ab2f37751b25769fd9a3157499939ccdc43db2cc1653d97c866dc3d226422f23",
@@ -29,8 +29,288 @@
             "sha256": "800ffde882634d6fbe759a2751b5eb9f357ef53e1d726e022bad05c39d6dca7c",
             "mode": 420
         },
+        ".trellis/.gitignore": {
+            "sha256": "27c854109dbce0b9e9873710d102ce6de56e5ee9a750433740dcce7aa1f7d255",
+            "mode": 420
+        },
+        ".trellis/.version": {
+            "sha256": "d8af8f3b3cf781075792bf662ba3a2d6d81def4b88d9e3b5160d6c99675ebdb6",
+            "mode": 420
+        },
+        ".trellis/agents/check.md": {
+            "sha256": "d1478c3922d5e963fbff358f0d652c78b32e85da80fe52bc8cfaba5df89b82f0",
+            "mode": 420
+        },
+        ".trellis/agents/implement.md": {
+            "sha256": "b75f10685c69c4a2a0da2ee3e892f9064ed80491222b0798e1cb0921b6e0da1b",
+            "mode": 420
+        },
+        ".trellis/config.yaml": {
+            "sha256": "d1fbb875e9e9066777088194d7d1bfd1f19e8e57a393c32404314c3df99f2cd3",
+            "mode": 420
+        },
+        ".trellis/scripts/__init__.py": {
+            "sha256": "1242be5b972094c2e141aecbe81a4efd478f6534e3d5e28306374e6a18fcf46c",
+            "mode": 493
+        },
+        ".trellis/scripts/add_session.py": {
+            "sha256": "6c0bc22deb005e22921bb4b5e86689e2a8046c8dbc996c943050c234d880f520",
+            "mode": 493
+        },
+        ".trellis/scripts/common/__init__.py": {
+            "sha256": "f258cd873681dc5a4d71db0dd71d10fd78656de55bec96418d6702503c16e87d",
+            "mode": 493
+        },
+        ".trellis/scripts/common/active_task.py": {
+            "sha256": "63d5bc308ac4939fde8923775ced2a76125a4dbbd868b23b6c2857bfbace3bbf",
+            "mode": 493
+        },
+        ".trellis/scripts/common/cli_adapter.py": {
+            "sha256": "e35c4f2ec7ea1e7fbd43ffbcd8a4d00c4d72712352e933042e1b4d105a80f052",
+            "mode": 493
+        },
+        ".trellis/scripts/common/config.py": {
+            "sha256": "08a700f802ef049e86208b2d9f29ce5e1bb08880e4e83b39cad99a8e4bf5b8d2",
+            "mode": 493
+        },
+        ".trellis/scripts/common/developer.py": {
+            "sha256": "795f8842159ef8c967b1af8c09ae39612ec8666510a905cbdb921532c2a0ddc3",
+            "mode": 493
+        },
+        ".trellis/scripts/common/git.py": {
+            "sha256": "5b4bccd7d684419161c96c694a4171ede87c39af3c9d788e70dba624d6feae22",
+            "mode": 493
+        },
+        ".trellis/scripts/common/git_context.py": {
+            "sha256": "25e9aa88a7397e64433c78699cd382dbdc1bae7bcc19dd9296b9ea0426af08ce",
+            "mode": 493
+        },
+        ".trellis/scripts/common/io.py": {
+            "sha256": "08e3ea223179bee9b4bfe19269eb0e8058a8c3cc1be87a748a673c2e8ccfdf91",
+            "mode": 493
+        },
+        ".trellis/scripts/common/log.py": {
+            "sha256": "471df6895cfac80f995edebbf9974f6b7440634b7a688f28b8331c868bc0f3cf",
+            "mode": 493
+        },
+        ".trellis/scripts/common/packages_context.py": {
+            "sha256": "91ec7f9438447421d86b60c78c79c315195c9fd0ed4d03e4417023f1a0ed54ef",
+            "mode": 493
+        },
+        ".trellis/scripts/common/paths.py": {
+            "sha256": "0269a87fd26e2bcf66338d400740e3d42c2e66e4039481a01545b341d4264c1c",
+            "mode": 493
+        },
+        ".trellis/scripts/common/safe_commit.py": {
+            "sha256": "889ae3dd0309a9c4a865ea083c0cf98e09863ad531cca7843a4894de8173cac9",
+            "mode": 493
+        },
+        ".trellis/scripts/common/session_context.py": {
+            "sha256": "e814c22294a6fb90d9de673418411a490cc3e5914534a9827d98a921224ab3ee",
+            "mode": 493
+        },
+        ".trellis/scripts/common/task_context.py": {
+            "sha256": "7fb2fa91635ef440589bc1bd5d5c3deaff522ca4a81d1dda58bb46fc2ec31060",
+            "mode": 493
+        },
+        ".trellis/scripts/common/task_queue.py": {
+            "sha256": "cf03da077080f4309f135d4ace15eee7f3375d9528026fb3b2b697c9cad47ca6",
+            "mode": 493
+        },
+        ".trellis/scripts/common/task_store.py": {
+            "sha256": "96d41d7a54b8f09c581f25ae039c6f6e7afa6793282303366c314608a80e0642",
+            "mode": 493
+        },
+        ".trellis/scripts/common/task_utils.py": {
+            "sha256": "ef8f64958e91baaf7336fe78afa7a403bc123e693f2f23bbf0ba5fe347ed7b86",
+            "mode": 493
+        },
+        ".trellis/scripts/common/tasks.py": {
+            "sha256": "a123b08fb8524daeb82b40d574ba4dccd2ccf4742694a9c9eb99ea2b129ab662",
+            "mode": 493
+        },
+        ".trellis/scripts/common/trellis_config.py": {
+            "sha256": "f1fc705ec463b0b9c163672dc9e50f10d29da967775a1900429205f7c4fcb51c",
+            "mode": 493
+        },
+        ".trellis/scripts/common/types.py": {
+            "sha256": "f4b6461cda81a435fa1bbca539dbfb3083f8d771684015d6c735fa6314983724",
+            "mode": 493
+        },
+        ".trellis/scripts/common/workflow_phase.py": {
+            "sha256": "9ef850614d8a7915513440a5de5324d1c3b1e889f35005bbf3dee4205606e6a2",
+            "mode": 493
+        },
+        ".trellis/scripts/get_context.py": {
+            "sha256": "ca5bf9e90bdb1d75d3de182b95f820f9d108ab28793d29097b24fd71315adcf5",
+            "mode": 493
+        },
+        ".trellis/scripts/get_developer.py": {
+            "sha256": "84c27076323c3e0f2c9c8ed16e8aa865e225d902a187c37e20ee1a46e7142d8f",
+            "mode": 493
+        },
+        ".trellis/scripts/hooks/linear_sync.py": {
+            "sha256": "e09cc4ce4699aada908808718698f33f705a3edf55c4dcf8f777ad892f80ca79",
+            "mode": 493
+        },
+        ".trellis/scripts/init_developer.py": {
+            "sha256": "f9e6c0d882406e81c8cd6b1c5abb204b0befc0069ff89cf650cd536a80f8c60e",
+            "mode": 493
+        },
+        ".trellis/scripts/task.py": {
+            "sha256": "83f06b4b5ea7e8c1a1f98643b4fd554547076fd7893cb1c9830e379ecca5e4e0",
+            "mode": 493
+        },
+        ".trellis/spec/go-server-kit/backend/index.md": {
+            "sha256": "a6e22d360006ee519111be9d0eea2533cdf3cbcee2064195ce29a2e3ff058d6d",
+            "mode": 420
+        },
+        ".trellis/spec/guides/code-reuse-thinking-guide.md": {
+            "sha256": "f495cdfc56c283e55b718bae083e030ddac19b178e8276b606aa26389973ece5",
+            "mode": 420
+        },
+        ".trellis/spec/guides/cross-layer-thinking-guide.md": {
+            "sha256": "3e45d7b6b7440e3496a05461c2c902c326b8479ccd7937d53fe4e9c9751d5b48",
+            "mode": 420
+        },
+        ".trellis/spec/guides/index.md": {
+            "sha256": "93458156eddfd8c339ead1cf88f546890307ed3722d0734dd95eb34e4ac82b14",
+            "mode": 420
+        },
+        ".trellis/spec/guides/reuse-guide.md": {
+            "sha256": "3579debd0c57bf8c728a030a404dc4d3585ae1a1cfd4c023037df6f04e70ff5a",
+            "mode": 420
+        },
+        ".trellis/spec/guides/task-writing-guide.md": {
+            "sha256": "ef0deb61f8220cbf2f4849cc0bce6e6759e689896b72f4d3b8b77c3d8bd2cca3",
+            "mode": 420
+        },
+        ".trellis/spec/guides/tdd-thinking-guide.md": {
+            "sha256": "8a2b90867746cab0c4be97a2301fd3f0b58e7a5d099ed4e839f157ae0e10ec85",
+            "mode": 420
+        },
+        ".trellis/spec/index.md": {
+            "sha256": "c3368c6ebd41e3890f68255cfdfc673f85ed234d80504baafac27e94f48afa18",
+            "mode": 420
+        },
+        ".trellis/spec/multi-database-demo-dashboard/frontend/index.md": {
+            "sha256": "ec265e5cf38e56dbc58f045836533d5323b9d786540b0565605973df6729b205",
+            "mode": 420
+        },
+        ".trellis/spec/multi-database-demo/backend/database-guidelines.md": {
+            "sha256": "528bc5902c8d212d3fd813fcfed1af46517713a3c15fe9ab08fe25c7301f960d",
+            "mode": 420
+        },
+        ".trellis/spec/multi-database-demo/backend/directory-structure.md": {
+            "sha256": "e39e58ab77c4ecf8f66b6756e5126a7814692f115aa9c44dd4ee33a737cc00f2",
+            "mode": 420
+        },
+        ".trellis/spec/multi-database-demo/backend/error-handling.md": {
+            "sha256": "1b466e9c4a5616ccf5ecc96f2827afc54ffa6aedca17cc6a32efa7b8d8c113e5",
+            "mode": 420
+        },
+        ".trellis/spec/multi-database-demo/backend/graphql-guidelines.md": {
+            "sha256": "fe585d55ba8ed5f67341c1b7e773b7b0fac7affdcd97f979166714c0cd4a9634",
+            "mode": 420
+        },
+        ".trellis/spec/multi-database-demo/backend/index.md": {
+            "sha256": "4bc4542caf98d92fcf059eec948a1c68e4bca9967a3024bb50f0801ae2345337",
+            "mode": 420
+        },
+        ".trellis/spec/multi-database-demo/backend/quality-guidelines.md": {
+            "sha256": "4fb6958fe0f19b8f9c0e8220b010a7f8b6dcbbe03a65b018a8d7551ea639423d",
+            "mode": 420
+        },
+        ".trellis/spec/shadcnui-dashboard/frontend/index.md": {
+            "sha256": "2f62a2c7ae7586d20881b7c331c38e7d21a71ce92bd5dfe350a31ff3a8ea4d06",
+            "mode": 420
+        },
+        ".trellis/workflow.md": {
+            "sha256": "14217f49ee44334d3cf441e50719a3d652f64574dc53f7484222767f1aa18493",
+            "mode": 420
+        },
+        "AGENTS.md": {
+            "sha256": "ff5d51391e01f96278115585d77dc3a1456fd7a8531963d8b6f049172f0e1a6a",
+            "mode": 420
+        },
         "README.md": {
-            "sha256": "9ee5d9f43ca0b9f49c7aa9fa6d56f1d6214c44f0e3c0aaf104cf3aa92cd01772",
+            "sha256": "397ef964ad8f17fb80413ed9054f5f80ce42a485833787c9ce98dd6d3c74e978",
+            "mode": 420
+        },
+        "docs/architecture-plan.md": {
+            "sha256": "d75b69e49493bd4335b2c56152a226229c900b8e9241b9c58c021586c220083d",
+            "mode": 420
+        },
+        "docs/auth-migration-verification.md": {
+            "sha256": "b6eb15b5bde3463353f869ec0bce123447c199ee13f83cf4c69e217fe6eaa94c",
+            "mode": 420
+        },
+        "docs/code-review-fixes-verification.md": {
+            "sha256": "bc5fb74d570239ea2f287b1853a5eebc43326160eca2330bcc0c702bc416d249",
+            "mode": 420
+        },
+        "docs/dev-process-investigation.md": {
+            "sha256": "b1257d8c2d6d1d3e55c2700bb0ed253a2b1201d9ae3892bab818d22319d53b87",
+            "mode": 420
+        },
+        "docs/docker-deployment-verification.md": {
+            "sha256": "6721d8da7f5c51a6ebbe16470f39f8d7738862652eedbd6474f6a3a33e741a2d",
+            "mode": 420
+        },
+        "docs/go-code-readability-audit.md": {
+            "sha256": "d213b6de0d2a559602f46f9e860ce284b3b7f9822c2aa8a117090e4af66bb714",
+            "mode": 420
+        },
+        "docs/go-code-readability.md": {
+            "sha256": "182f8e6faf5e60c3fe57c03af39668e8fbae975b885c0a59ecfe256a56919ca5",
+            "mode": 420
+        },
+        "docs/go-test-layout.md": {
+            "sha256": "cc6b57117957aee5ec108fdcfed09a342f67753ca18752f8da86496fecec3602",
+            "mode": 420
+        },
+        "docs/migration-compatibility-matrix.md": {
+            "sha256": "fbe1db233238e92b2f8379eb45b6a6008ebe99725287c7a9dd39d73159243bb6",
+            "mode": 420
+        },
+        "docs/multi-database-verification.md": {
+            "sha256": "1266a5f8a00e4ff493536645cf6df11fbee97a721126227c97e10a0e71134a08",
+            "mode": 420
+        },
+        "docs/phase-one-verification.md": {
+            "sha256": "3a5b1033b1315cb2e1da311006a75ca335a461d23f563907f7990bef4f4cbc68",
+            "mode": 420
+        },
+        "docs/public-ssr-verification.md": {
+            "sha256": "82091425e1c19b2607be0989b3c23dd915bb301ed5c29f36cbeee77c16673b5e",
+            "mode": 420
+        },
+        "docs/queue-management-verification.md": {
+            "sha256": "800855b559e8e810a511b40da1bf005b755c0882b885ca7f3aba525de6032e05",
+            "mode": 420
+        },
+        "docs/remaining-migration-plan.md": {
+            "sha256": "01db897560fbdf72767c22d0c460c74b6cd509622a1f151c8a132e146b5b2a4a",
+            "mode": 420
+        },
+        "docs/runtime-cleanup.md": {
+            "sha256": "e91c92464c8abd15b7a4c8a844089fc30f04f47fee65a49aca71b9a5113147f1",
+            "mode": 420
+        },
+        "docs/session-management-verification.md": {
+            "sha256": "be33abaaeb757940b05176c20f5ef4def0e147f65e07d49c2cc08ec3910ea528",
+            "mode": 420
+        },
+        "docs/shop-list-verification.md": {
+            "sha256": "e2865a762fe44525b5b7ad647de888c083ec9abd424f0874387efe6d43b60436",
+            "mode": 420
+        },
+        "docs/user-management-verification.md": {
+            "sha256": "2582c583e7238876f3cb36df7c10aa95d905f84b2467177da949f35fb3ebd000",
+            "mode": 420
+        },
+        "docs/user-query-verification.md": {
+            "sha256": "21abfbe1ed9d2e460a54aab3d87feab2efd0328ae2e2b994c363864f9377fecb",
             "mode": 420
         },
         "go.work": {
@@ -637,12 +917,212 @@
             "sha256": "7d006e1fc45114c97008d55af56fdbd0bcdce5a5d46f6f0d196ed8c15aa83792",
             "mode": 420
         },
+        "projects/multi-database-demo/.trellis/.gitignore": {
+            "sha256": "27c854109dbce0b9e9873710d102ce6de56e5ee9a750433740dcce7aa1f7d255",
+            "mode": 420
+        },
+        "projects/multi-database-demo/.trellis/.version": {
+            "sha256": "d8af8f3b3cf781075792bf662ba3a2d6d81def4b88d9e3b5160d6c99675ebdb6",
+            "mode": 420
+        },
+        "projects/multi-database-demo/.trellis/agents/check.md": {
+            "sha256": "d1478c3922d5e963fbff358f0d652c78b32e85da80fe52bc8cfaba5df89b82f0",
+            "mode": 420
+        },
+        "projects/multi-database-demo/.trellis/agents/implement.md": {
+            "sha256": "b75f10685c69c4a2a0da2ee3e892f9064ed80491222b0798e1cb0921b6e0da1b",
+            "mode": 420
+        },
+        "projects/multi-database-demo/.trellis/config.yaml": {
+            "sha256": "baf2779721f7ad1586cd409982ba1371ae00ad43ffe37805d7e8c621567300f9",
+            "mode": 420
+        },
+        "projects/multi-database-demo/.trellis/scripts/__init__.py": {
+            "sha256": "1242be5b972094c2e141aecbe81a4efd478f6534e3d5e28306374e6a18fcf46c",
+            "mode": 493
+        },
+        "projects/multi-database-demo/.trellis/scripts/add_session.py": {
+            "sha256": "6c0bc22deb005e22921bb4b5e86689e2a8046c8dbc996c943050c234d880f520",
+            "mode": 493
+        },
+        "projects/multi-database-demo/.trellis/scripts/common/__init__.py": {
+            "sha256": "f258cd873681dc5a4d71db0dd71d10fd78656de55bec96418d6702503c16e87d",
+            "mode": 493
+        },
+        "projects/multi-database-demo/.trellis/scripts/common/active_task.py": {
+            "sha256": "63d5bc308ac4939fde8923775ced2a76125a4dbbd868b23b6c2857bfbace3bbf",
+            "mode": 493
+        },
+        "projects/multi-database-demo/.trellis/scripts/common/cli_adapter.py": {
+            "sha256": "e35c4f2ec7ea1e7fbd43ffbcd8a4d00c4d72712352e933042e1b4d105a80f052",
+            "mode": 493
+        },
+        "projects/multi-database-demo/.trellis/scripts/common/config.py": {
+            "sha256": "08a700f802ef049e86208b2d9f29ce5e1bb08880e4e83b39cad99a8e4bf5b8d2",
+            "mode": 493
+        },
+        "projects/multi-database-demo/.trellis/scripts/common/developer.py": {
+            "sha256": "795f8842159ef8c967b1af8c09ae39612ec8666510a905cbdb921532c2a0ddc3",
+            "mode": 493
+        },
+        "projects/multi-database-demo/.trellis/scripts/common/git.py": {
+            "sha256": "5b4bccd7d684419161c96c694a4171ede87c39af3c9d788e70dba624d6feae22",
+            "mode": 493
+        },
+        "projects/multi-database-demo/.trellis/scripts/common/git_context.py": {
+            "sha256": "25e9aa88a7397e64433c78699cd382dbdc1bae7bcc19dd9296b9ea0426af08ce",
+            "mode": 493
+        },
+        "projects/multi-database-demo/.trellis/scripts/common/io.py": {
+            "sha256": "08e3ea223179bee9b4bfe19269eb0e8058a8c3cc1be87a748a673c2e8ccfdf91",
+            "mode": 493
+        },
+        "projects/multi-database-demo/.trellis/scripts/common/log.py": {
+            "sha256": "471df6895cfac80f995edebbf9974f6b7440634b7a688f28b8331c868bc0f3cf",
+            "mode": 493
+        },
+        "projects/multi-database-demo/.trellis/scripts/common/packages_context.py": {
+            "sha256": "91ec7f9438447421d86b60c78c79c315195c9fd0ed4d03e4417023f1a0ed54ef",
+            "mode": 493
+        },
+        "projects/multi-database-demo/.trellis/scripts/common/paths.py": {
+            "sha256": "0269a87fd26e2bcf66338d400740e3d42c2e66e4039481a01545b341d4264c1c",
+            "mode": 493
+        },
+        "projects/multi-database-demo/.trellis/scripts/common/safe_commit.py": {
+            "sha256": "889ae3dd0309a9c4a865ea083c0cf98e09863ad531cca7843a4894de8173cac9",
+            "mode": 493
+        },
+        "projects/multi-database-demo/.trellis/scripts/common/session_context.py": {
+            "sha256": "e814c22294a6fb90d9de673418411a490cc3e5914534a9827d98a921224ab3ee",
+            "mode": 493
+        },
+        "projects/multi-database-demo/.trellis/scripts/common/task_context.py": {
+            "sha256": "7fb2fa91635ef440589bc1bd5d5c3deaff522ca4a81d1dda58bb46fc2ec31060",
+            "mode": 493
+        },
+        "projects/multi-database-demo/.trellis/scripts/common/task_queue.py": {
+            "sha256": "cf03da077080f4309f135d4ace15eee7f3375d9528026fb3b2b697c9cad47ca6",
+            "mode": 493
+        },
+        "projects/multi-database-demo/.trellis/scripts/common/task_store.py": {
+            "sha256": "96d41d7a54b8f09c581f25ae039c6f6e7afa6793282303366c314608a80e0642",
+            "mode": 493
+        },
+        "projects/multi-database-demo/.trellis/scripts/common/task_utils.py": {
+            "sha256": "ef8f64958e91baaf7336fe78afa7a403bc123e693f2f23bbf0ba5fe347ed7b86",
+            "mode": 493
+        },
+        "projects/multi-database-demo/.trellis/scripts/common/tasks.py": {
+            "sha256": "a123b08fb8524daeb82b40d574ba4dccd2ccf4742694a9c9eb99ea2b129ab662",
+            "mode": 493
+        },
+        "projects/multi-database-demo/.trellis/scripts/common/trellis_config.py": {
+            "sha256": "f1fc705ec463b0b9c163672dc9e50f10d29da967775a1900429205f7c4fcb51c",
+            "mode": 493
+        },
+        "projects/multi-database-demo/.trellis/scripts/common/types.py": {
+            "sha256": "f4b6461cda81a435fa1bbca539dbfb3083f8d771684015d6c735fa6314983724",
+            "mode": 493
+        },
+        "projects/multi-database-demo/.trellis/scripts/common/workflow_phase.py": {
+            "sha256": "9ef850614d8a7915513440a5de5324d1c3b1e889f35005bbf3dee4205606e6a2",
+            "mode": 493
+        },
+        "projects/multi-database-demo/.trellis/scripts/get_context.py": {
+            "sha256": "ca5bf9e90bdb1d75d3de182b95f820f9d108ab28793d29097b24fd71315adcf5",
+            "mode": 493
+        },
+        "projects/multi-database-demo/.trellis/scripts/get_developer.py": {
+            "sha256": "84c27076323c3e0f2c9c8ed16e8aa865e225d902a187c37e20ee1a46e7142d8f",
+            "mode": 493
+        },
+        "projects/multi-database-demo/.trellis/scripts/hooks/linear_sync.py": {
+            "sha256": "e09cc4ce4699aada908808718698f33f705a3edf55c4dcf8f777ad892f80ca79",
+            "mode": 493
+        },
+        "projects/multi-database-demo/.trellis/scripts/init_developer.py": {
+            "sha256": "f9e6c0d882406e81c8cd6b1c5abb204b0befc0069ff89cf650cd536a80f8c60e",
+            "mode": 493
+        },
+        "projects/multi-database-demo/.trellis/scripts/task.py": {
+            "sha256": "83f06b4b5ea7e8c1a1f98643b4fd554547076fd7893cb1c9830e379ecca5e4e0",
+            "mode": 493
+        },
+        "projects/multi-database-demo/.trellis/spec/backend/database-guidelines.md": {
+            "sha256": "528bc5902c8d212d3fd813fcfed1af46517713a3c15fe9ab08fe25c7301f960d",
+            "mode": 420
+        },
+        "projects/multi-database-demo/.trellis/spec/backend/directory-structure.md": {
+            "sha256": "e39e58ab77c4ecf8f66b6756e5126a7814692f115aa9c44dd4ee33a737cc00f2",
+            "mode": 420
+        },
+        "projects/multi-database-demo/.trellis/spec/backend/error-handling.md": {
+            "sha256": "1b466e9c4a5616ccf5ecc96f2827afc54ffa6aedca17cc6a32efa7b8d8c113e5",
+            "mode": 420
+        },
+        "projects/multi-database-demo/.trellis/spec/backend/graphql-guidelines.md": {
+            "sha256": "fe585d55ba8ed5f67341c1b7e773b7b0fac7affdcd97f979166714c0cd4a9634",
+            "mode": 420
+        },
+        "projects/multi-database-demo/.trellis/spec/backend/index.md": {
+            "sha256": "4bc4542caf98d92fcf059eec948a1c68e4bca9967a3024bb50f0801ae2345337",
+            "mode": 420
+        },
+        "projects/multi-database-demo/.trellis/spec/backend/quality-guidelines.md": {
+            "sha256": "4fb6958fe0f19b8f9c0e8220b010a7f8b6dcbbe03a65b018a8d7551ea639423d",
+            "mode": 420
+        },
+        "projects/multi-database-demo/.trellis/spec/frontend/index.md": {
+            "sha256": "fd8d23444e98608e28517d71eed4db9b163e4e20cb619ac6ac5859450eb2bbb8",
+            "mode": 420
+        },
+        "projects/multi-database-demo/.trellis/spec/frontend/shared-dashboard.md": {
+            "sha256": "2f62a2c7ae7586d20881b7c331c38e7d21a71ce92bd5dfe350a31ff3a8ea4d06",
+            "mode": 420
+        },
+        "projects/multi-database-demo/.trellis/spec/guides/code-reuse-thinking-guide.md": {
+            "sha256": "f495cdfc56c283e55b718bae083e030ddac19b178e8276b606aa26389973ece5",
+            "mode": 420
+        },
+        "projects/multi-database-demo/.trellis/spec/guides/cross-layer-thinking-guide.md": {
+            "sha256": "3e45d7b6b7440e3496a05461c2c902c326b8479ccd7937d53fe4e9c9751d5b48",
+            "mode": 420
+        },
+        "projects/multi-database-demo/.trellis/spec/guides/index.md": {
+            "sha256": "93458156eddfd8c339ead1cf88f546890307ed3722d0734dd95eb34e4ac82b14",
+            "mode": 420
+        },
+        "projects/multi-database-demo/.trellis/spec/guides/reuse-guide.md": {
+            "sha256": "3579debd0c57bf8c728a030a404dc4d3585ae1a1cfd4c023037df6f04e70ff5a",
+            "mode": 420
+        },
+        "projects/multi-database-demo/.trellis/spec/guides/task-writing-guide.md": {
+            "sha256": "ef0deb61f8220cbf2f4849cc0bce6e6759e689896b72f4d3b8b77c3d8bd2cca3",
+            "mode": 420
+        },
+        "projects/multi-database-demo/.trellis/spec/guides/tdd-thinking-guide.md": {
+            "sha256": "8a2b90867746cab0c4be97a2301fd3f0b58e7a5d099ed4e839f157ae0e10ec85",
+            "mode": 420
+        },
+        "projects/multi-database-demo/.trellis/spec/index.md": {
+            "sha256": "e1d3a3a1d979b4ef498f2ee63e5fe89d08d716d5ef925cd577370c0c919db405",
+            "mode": 420
+        },
+        "projects/multi-database-demo/.trellis/workflow.md": {
+            "sha256": "14217f49ee44334d3cf441e50719a3d652f64574dc53f7484222767f1aa18493",
+            "mode": 420
+        },
+        "projects/multi-database-demo/AGENTS.md": {
+            "sha256": "3ee42ff18ef55e4aacf42c95324e6429ceadd10d72be91831c1737cd203bbf4b",
+            "mode": 420
+        },
         "projects/multi-database-demo/Dockerfile": {
             "sha256": "6e7b0509830ed97326558851c91ac53795e727a02fb0540bed569e6b34dfff13",
             "mode": 420
         },
         "projects/multi-database-demo/README.md": {
-            "sha256": "042a4cf1714fed573a61086000aca3101b0e8dff2c1c2aed295afb77eace7585",
+            "sha256": "e7f75c8c07cad4e76e4b8e0e9c3986c5a103c1d9ce0a56ab4318f9230238b1bc",
             "mode": 420
         },
         "projects/multi-database-demo/air-web.toml": {
@@ -1210,7 +1690,7 @@
             "mode": 420
         },
         "scripts/dev_processes.py": {
-            "sha256": "248d4862e1a9de53131c692ba3c214673c8c75fb88f436915fcfc4e2fc738f36",
+            "sha256": "ee6dc59883dd5f2b3052d135098ab142001d955eacdd2d39ad04bab0a7d74a9d",
             "mode": 420
         },
         "scripts/dev_reload.py": {
@@ -1233,12 +1713,16 @@
             "sha256": "c8c51867b430a8a60e8eb027b0d777313e0ff85a3c09cc38acbd5cf6d3de6132",
             "mode": 420
         },
+        "scripts/sync-go-demo.py": {
+            "sha256": "7547ab51a5abfa25696b5d661ba3b403ef06f4750070c777fadb99d625dedf27",
+            "mode": 420
+        },
         "scripts/test-dev-reload.py": {
             "sha256": "aba5adda8812f2f98069d67ba70b9c939f8b0488ffd5ce2449b39d73b0989755",
             "mode": 420
         },
         "scripts/test-dev.py": {
-            "sha256": "079c5c7bcd6ad435bce8e7f2da63e51fe0de902837c0fb741270a5b88f7a1b36",
+            "sha256": "591663b43dafea3c6170c9b1251fef5272ad77f74d0d06f8e5e6757811645831",
             "mode": 420
         },
         "scripts/test-format.py": {

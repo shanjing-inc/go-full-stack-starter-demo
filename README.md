@@ -9,6 +9,13 @@
 复制 projects/multi-database-demo/.env.example 为同目录 .env，并填写独立数据库、Redis 和认证密钥。
 依次运行 pnpm generate、pnpm migrate、pnpm dev。
 检查/测试/构建：pnpm check、pnpm test、pnpm build。
+
+Trellis：先读 AGENTS.md、.trellis/spec/index.md。
+根任务管理共享包、工具和发布；projects/multi-database-demo 的独立 Trellis 管理应用。
+在对应目录运行 python3 .trellis/scripts/get_context.py --mode packages
+和 python3 .trellis/scripts/task.py current --source。
+复用替换点见 .trellis/spec/guides/reuse-guide.md，文档在 docs/。
+上游任务、日志、开发者身份、平台配置不随发布；首次使用自行初始化。
 Docker：docker build -f projects/multi-database-demo/Dockerfile .
 同一镜像分别运行 /web 和 /worker；迁移先由独立发布步骤执行。
 

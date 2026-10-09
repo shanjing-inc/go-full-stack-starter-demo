@@ -196,8 +196,22 @@ def takeover_plan(ports, root, module):
 
 
 def same_process(process):
-    current = read_process(process.pid)
-    return current is not None and current.started == process.started
+    """核对已确认归属的进程身份与存活状态，不依赖退出期间消失的 cwd/exe。
+
+    Linux 退出先拆除部分元数据，再释放文件和监听套接字；完整快照读取失败
+    不能当作进程已退出。stat 的启动时钟防止 PID 复用，僵尸/死亡状态表示
+    资源释放已完成；归属仍由 takeover_plan 的完整快照预先核验。
+    """
+    directory = Path(f"/proc/{process.pid}")
+    try:
+        if directory.stat().st_uid != os.getuid():
+            return False
+        fields = (directory / "stat").read_text().rsplit(") ", 1)[1].split()
+        return fields[19] == process.started and fields[0] not in ("Z", "X")
+    except (FileNotFoundError, ProcessLookupError):
+        return False
+    except (OSError, IndexError, ValueError):
+        raise RuntimeError(f"旧开发服务 PID {process.pid} 的退出状态无法核验") from None
 
 
 def send_signal(process, sig):

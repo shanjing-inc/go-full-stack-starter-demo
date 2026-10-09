@@ -637,6 +637,64 @@ finally:
             process.kill()
         process.wait(timeout=5)
 
+    def test_cleanup_waits_for_socket_release_when_exit_metadata_disappears(self):
+        ready = self.root / "delayed-exit.json"
+        program = """
+import json, signal, socket, sys, time
+from pathlib import Path
+def stop(*args):
+    time.sleep(0.2)
+    sys.exit(0)
+signal.signal(signal.SIGTERM, stop)
+listener = socket.socket()
+listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+listener.bind(('127.0.0.1', 0))
+listener.listen()
+Path(sys.argv[1]).write_text(json.dumps(listener.getsockname()[1]))
+while True:
+    time.sleep(0.02)
+"""
+        child = subprocess.Popen([sys.executable, "-c", program, str(ready)])
+        self.addCleanup(self.reap_child, child)
+        deadline = time.monotonic() + 5
+        while not ready.exists():
+            if child.poll() is not None or time.monotonic() > deadline:
+                self.fail("延迟退出夹具启动失败")
+            time.sleep(0.02)
+        port = json.loads(ready.read_text())
+        identity = ownership.read_process(child.pid)
+        self.assertIsNotNone(identity)
+        signalled = False
+        read_process = ownership.read_process
+        send_signal = ownership.send_signal
+
+        def metadata(pid):
+            # Linux 退出期间 cwd/exe 等完整元数据可先于文件/套接字消失。
+            return None if signalled and pid == child.pid else read_process(pid)
+
+        def send(process, sig):
+            nonlocal signalled
+            send_signal(process, sig)
+            signalled = True
+
+        with (
+            patch.object(ownership, "read_process", side_effect=metadata),
+            patch.object(ownership, "send_signal", side_effect=send),
+        ):
+            ownership.stop_owned({child.pid: identity}, set(), grace=2)
+        dev.require_free_port("旧服务", "127.0.0.1", port)
+        self.assertEqual(child.wait(timeout=5), 0)
+
+    def test_unreadable_exit_state_preserves_process(self):
+        identity = ownership.read_process(os.getpid())
+        with (
+            patch.object(Path, "read_text", side_effect=PermissionError("stat 无法读取")),
+            patch.object(ownership.signal, "pidfd_send_signal") as send,
+        ):
+            with self.assertRaisesRegex(RuntimeError, "退出状态无法核验"):
+                ownership.send_signal(identity, signal.SIGTERM)
+            send.assert_not_called()
+
     def test_free_ports_skip_takeover(self):
         with (
             patch.object(dev, "require_free_port"),

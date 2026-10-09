@@ -4,7 +4,13 @@
 
 工程目录与后台展示名称使用 `multi-database-demo`／`Multi Database Demo`。数据库名由连接 URL 决定；默认 `APP_NAMESPACE=go-mysql-demo` 沿用既有 Redis 队列、幂等与调度数据。浏览器偏好键沿用 `go-mysql-demo`，主题与字号继续读取既有设置。现用 `.env` 随目录移动并保持内容，历史迁移、checksum、目标 SQL 和 GraphQL SDL 保持原字节。
 
-## 结构
+## Trellis 与项目复用
+
+本应用已提供 `.trellis/` 和 `AGENTS.md`，从本目录运行 `rtk proxy python3 .trellis/scripts/get_context.py --mode packages`、`rtk proxy python3 .trellis/scripts/task.py current --source`。开发前读 `.trellis/spec/index.md`，复用替换清单见 `.trellis/spec/guides/reuse-guide.md`。
+
+本目录管理应用任务，共享包/工具/发布任务在工作区根管理，不建两份记录。独立 demo 发布保留完整源码工作区，构建命令在含 `go.work` 的工作区根运行；上游任务、日志、身份和平台配置不随发布。规范与代码同步更新。
+
+## 工程结构
 
 ```text
 cmd/                 web、worker、gen、schema
