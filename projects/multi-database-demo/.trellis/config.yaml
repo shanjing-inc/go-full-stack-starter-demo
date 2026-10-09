@@ -1,4 +1,0 @@
-# 本 Trellis 根为应用目录，构建工作区仍在 ../..。
-session_auto_commit: false
-codex:
-    dispatch_mode: inline

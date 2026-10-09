@@ -1,17 +1,12 @@
-# Go Starter 规范入口
+# Demo 规范入口
 
-适用于 Go/Echo/gqlgen/GORM/Gen/Atlas、React/Vite 工作区；按修改范围读取。路径相对含 `go.work` 的工作区根。
+本 Trellis 根为 projects/multi-database-demo；本目录管理应用任务，共享包/脚本/发布变更用工作区根 Trellis。同一任务不建两份。
 
-| 范围           | 规范入口                                                     | 源码                                    |
-| -------------- | ------------------------------------------------------------ | --------------------------------------- |
-| Go 公共能力    | [公共后端](go-server-kit/backend/index.md)                   | `packages/go-server-kit`                |
-| 应用与协议     | [demo 后端](multi-database-demo/backend/index.md)            | `projects/multi-database-demo`          |
-| 公共 Dashboard | [公共前端](shadcnui-dashboard/frontend/index.md)             | `packages/shadcnui-dashboard`           |
-| 示例 SPA       | [demo 前端](multi-database-demo-dashboard/frontend/index.md) | `projects/multi-database-demo/frontend` |
-| 跨层与复用     | [指南](guides/index.md)、[复用清单](guides/reuse-guide.md)   | `scripts`、`tools`、`poc`               |
+- [Go 后端](backend/index.md)
+- [React 前端](frontend/index.md)
+- [通用任务/跨层指南](guides/index.md)
+- [复用与发布清单](guides/reuse-guide.md)
 
-当前只有一个正式应用 demo。`poc/database`、`poc/web`、`poc/realtime`、`poc/worker`、`poc/delivery` 是历史隔离验证工程，由主仓任务管理，按各自 README 和 `scripts/*-poc.py` 入口验证，不当作独立发布应用。
+源码路径相对本应用根；独立发布直接使用同一目录结构、应用命令与固定扩展依赖。
 
-开发前确认最近 `.trellis` 与任务作用域，读相关源码、同目录测试和本包规范。PRD 用中文写目标、范围、可验证 AC、环境依赖、交付位置。新规范必须有代码/测试证据，不照搬 Node 的业务技术栈。
-
-收尾检查 spec 与代码一致；规范/框架变更检查链接、格式、Python 语法及 Trellis 入口；业务变化运行受影响检查。区分通过、环境阻塞和未执行，代码与规范同次交付。
+开发前读源码/同目录测试；代码/命令/接口变化同步 spec；按 backend/quality-guidelines 运行真实命令，明确环境与未覆盖项。

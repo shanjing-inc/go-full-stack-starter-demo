@@ -1,14 +1,4 @@
-# 源码路径与 spec 包名一致；自动提交关闭。
+# 本 Trellis 与命令根均为应用目录，单仓 backend/frontend 规范。
 session_auto_commit: false
 codex:
     dispatch_mode: inline
-packages:
-    go-server-kit:
-        path: packages/go-server-kit
-    shadcnui-dashboard:
-        path: packages/shadcnui-dashboard
-    multi-database-demo:
-        path: projects/multi-database-demo
-    multi-database-demo-dashboard:
-        path: projects/multi-database-demo/frontend
-default_package: multi-database-demo

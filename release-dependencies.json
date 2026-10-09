@@ -1,0 +1,26 @@
+{
+    "go": {
+        "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit": {
+            "version": "v0.0.0-20261008235609-814925db9e59",
+            "sourceCommit": "814925db9e595005130c121797094beab806aabb",
+            "sum": "h1:dYB+kRT0aifvkMwwRtVPFEQvUMvOqgKkdEzXkEAN75Y=",
+            "goModSum": "h1:qgllkepivRlnMQfzDmReboelCXmTIoLCwKzymC6JCr8="
+        }
+    },
+    "npm": {
+        "@shanjing/shadcnui-dashboard": {
+            "version": "0.1.0",
+            "registry": "https://packages.aliyun.com/5eb77c7538076f00011bd238/npm/npm-registry/",
+            "integrity": "sha512-Dur7O9tJzrS6LWFaR1VhFeY99vdgUGYrWP5xiTp7hN5wXSeMdDKzQY1atsqCTMvBwBowCnJpsOfFAtwS+ipebA==",
+            "tarball": "https://packages.aliyun.com/5eb77c7538076f00011bd238/npm/npm-registry/@shanjing/shadcnui-dashboard/-/@shanjing/shadcnui-dashboard-0.1.0.tgz",
+            "shasum": "c1a5e8de4a19d24e7349d9fe87fa8e1fc0899b25"
+        },
+        "@shanjing/go-starter-devtools": {
+            "version": "0.1.0",
+            "registry": "https://packages.aliyun.com/5eb77c7538076f00011bd238/npm/npm-registry/",
+            "integrity": "sha512-XUleZOL7U98D34XdNebjvDUJAaDIFIMWv11RT3Kh42dsyFHWgMl7GWHqq7OIFEcJfZ3AUaewgoUPkCkFcqvY+A==",
+            "tarball": "https://packages.aliyun.com/5eb77c7538076f00011bd238/npm/npm-registry/@shanjing/go-starter-devtools/-/@shanjing/go-starter-devtools-0.1.0.tgz",
+            "shasum": "5ee3b008508a17d99489100550cc3cbffcf644dd"
+        }
+    }
+}

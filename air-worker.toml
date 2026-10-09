@@ -1,0 +1,18 @@
+root = "."
+tmp_dir = "tmp/worker"
+[build]
+cmd = "GOWORK=off go build -o ./tmp/worker/main ./cmd/worker"
+entrypoint = ["./tmp/worker/main"]
+include_ext = ["go", "html", "js", "css"]
+include_dir = ["cmd/worker", "internal"]
+exclude_dir = [".tools", ".runtime", "node_modules", "tmp", "frontend"]
+exclude_regex = ["_test.go$"]
+delay = 300
+stop_on_error = true
+send_interrupt = true
+kill_delay = "6s"
+[log]
+time = true
+[screen]
+clear_on_rebuild = false
+keep_scroll = true

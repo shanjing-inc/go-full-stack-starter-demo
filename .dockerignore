@@ -1,6 +1,8 @@
 .git
 .tools
 .runtime
+.cache
+.trellis
 **/node_modules
 **/dist
 **/tmp
@@ -10,8 +12,5 @@
 **/.env.*
 !**/.env.example
 !**/.env.*.example
-poc
-docs
-
-/bin
-/tools
+bin
+coverage

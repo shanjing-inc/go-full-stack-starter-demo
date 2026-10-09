@@ -1,4 +1,0 @@
-# 保留现有端点的查询名称、参数类型与可空性。
-type Query {
-    getShop(where: ShopFilters!): ShopItem
-}

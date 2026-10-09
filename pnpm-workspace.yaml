@@ -1,3 +1,6 @@
 packages:
-    - packages/shadcnui-dashboard
-    - projects/multi-database-demo/frontend
+    - frontend
+linkWorkspacePackages: false
+minimumReleaseAgeExclude:
+    - "@shanjing/go-starter-devtools@0.1.0"
+    - "@shanjing/shadcnui-dashboard@0.1.0"
