@@ -3,7 +3,7 @@
     "layout": "app-only-v1",
     "application": "projects/multi-database-demo",
     "sourceRepository": "https://codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git",
-    "sourceCommit": "d90b51444078848de27957f787ea1d05e10053d9",
+    "sourceCommit": "4f1b5e2d3d206c97455376213f1667e822f0ff77",
     "dependencies": {
         "go": {
             "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit": {
