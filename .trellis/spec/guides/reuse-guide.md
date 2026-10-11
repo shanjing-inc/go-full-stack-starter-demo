@@ -6,6 +6,8 @@
 
 更新依赖先发布和验收公共包，再更新 package.json/go.mod、独立锁文件及 release-dependencies.json。固定版本、完整性、来源 commit 和逐文件 source/hash 映射由 demo-release.json 记录。旧 source-bundle-v1 可按其管理清单迁移删除；目标独有 CI/文件保留，非管理分支拒绝覆盖，普通 HEAD:branch 推送且重复发布幂等。
 
+2026-10-11 公共能力固定消费：Go kit 使用已合并 main 的 v0.0.0-20261011051254-4d1c52cf70e4；Dashboard 使用正式 0.1.1。精确发布年龄例外仅覆盖两个公司包的固定 0.1.1，不放宽全局依赖策略。功能分支独立验收通过后仍需进入 main，才能同步 GitHub demo。
+
 本目录 Trellis 管应用，主仓共享包/工具/发布任务在根登记，不重复应用任务。验证 get_context.py --mode packages 和 task.py current --source；规范使用本应用相对路径，不沿用主仓工具路径或历史机器绝对路径。
 
 复用时核对模块名、数据模型/迁移、端点/权限、菜单/偏好键、工具版本与数据库运行环境。派生业务仓保留已有迁移和业务提交，依赖与配置逐项升级。

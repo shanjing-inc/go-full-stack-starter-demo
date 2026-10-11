@@ -58,7 +58,7 @@ AGENTS.md 和 .trellis/spec 是应用规范。从本目录运行 `python3 .trell
 
 devtools 0.1.1 已正式发布，涵盖 `internal/web/dist` 资源快照、macOS 工具适配与 Vite 配置测试入口。应用精确依赖、锁文件、minimumReleaseAgeExclude 与 release-dependencies.json 同步记录真实 registry 版本及完整性；独立应用通过常规安装取得同一正式包。
 
-Go kit 固定为 `v0.0.0-20261009054620-e402060eb491`，包含应用使用的 `auth.Config.Development` 字段与 `transport/origin` 包。版本与真实校验值见 go.mod/go.sum 和 release-dependencies.json；主仓工作区联调与独立 `GOWORK=off` 验收分别记录。
+Go kit 固定为 `v0.0.0-20261011051254-4d1c52cf70e4`，来源为已合并的 main，包含密码校验/繁忙错误、队列 Logger 和标准 GraphQL 装配接口。Dashboard 固定正式 0.1.1，支持 Sheet 遮罩定制。版本与真实校验值见 go.mod/go.sum 和 release-dependencies.json；主仓工作区联调与独立 `GOWORK=off` 验收分别记录。
 
 ## 前端 GraphQL Codegen
 
