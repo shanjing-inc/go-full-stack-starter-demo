@@ -1,5 +1,5 @@
-// Package webui 嵌入应用自己的 SPA 构建产物。
-package webui
+// 本文件嵌入应用前端构建产物，并接入后台 SPA Handler。
+package web
 
 import (
     "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit/transport/spa"

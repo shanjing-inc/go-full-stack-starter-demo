@@ -1,4 +1,4 @@
-package server_test
+package web_test
 
 // 本文件覆盖已认证用户查询，以及依赖缺失时的受控错误。
 

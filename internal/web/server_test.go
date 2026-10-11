@@ -1,4 +1,4 @@
-package server_test
+package web_test
 
 // 本文件覆盖REST 与双 GraphQL 协议、批量上下文隔离、取消恢复、来源校验和权限 Schema 契约。
 

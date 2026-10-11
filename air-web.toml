@@ -4,7 +4,7 @@ tmp_dir = "tmp/web"
 cmd = "GOWORK=off go build -o ./tmp/web/main ./cmd/web"
 entrypoint = ["./tmp/web/main"]
 include_ext = ["go", "html", "js", "css"]
-include_dir = ["cmd/web", "internal", "webui"]
+include_dir = ["cmd/web", "internal"]
 exclude_dir = [".tools", ".runtime", "node_modules", "tmp", "frontend"]
 exclude_regex = ["_test.go$"]
 delay = 300

@@ -15,9 +15,9 @@
 
 1. 定义端点、权限、输入、空值/错误契约，读相邻 Schema 和 resolver 测试。
 2. 改 SDL、必要 DTO 与业务 service；通用能力放共享模块。
-3. 根目录 `rtk pnpm generate`，核对两份 gqlgen 和 Gen diff。
+3. 根目录 `rtk pnpm generate`，核对两份 gqlgen、Gen 与前端操作类型 diff。
 4. 实现 resolver 的校验/鉴权/业务调用，不在生成文件或前端重复查询。
-5. frontend adapter 与公共 DashboardAdapter 类型同时核对。
+5. frontend 静态操作、生成的结果/变量类型与公共 DashboardAdapter 同时核对；`rtk pnpm codegen:check` 校验 Admin SDL 与操作产物。
 6. 同目录 `*_test.go` 覆盖允许/拒绝权限、非法输入、空结果和协议回归。
 7. 运行受影响用例/类型检查，代码与 spec 同次交付。
 

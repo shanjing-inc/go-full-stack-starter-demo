@@ -101,13 +101,13 @@ async function request<T>(path: string, init: RequestInit, identity = false): Pr
 export function getJSON<T>(path: string, signal: AbortSignal) {
     return request<T>(path, { signal });
 }
-export async function graphql<T>(
+export async function graphql<TResult, TVariables extends object>(
     query: string,
-    variables: unknown = {},
+    variables: TVariables,
     signal?: AbortSignal,
     identity = false,
-): Promise<T> {
-    const body = await request<{ data?: T }>(
+): Promise<TResult> {
+    const body = await request<{ data?: TResult }>(
         "/api/graphql/admin",
         {
             method: "POST",

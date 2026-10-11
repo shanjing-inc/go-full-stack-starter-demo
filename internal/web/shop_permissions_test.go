@@ -1,4 +1,4 @@
-package server_test
+package web_test
 
 // 本文件覆盖店铺只读权限对应的创建操作拒绝行为。
 

@@ -1,4 +1,4 @@
-package webui
+package web
 
 import (
     "encoding/json"

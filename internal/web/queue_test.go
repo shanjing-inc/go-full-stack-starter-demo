@@ -1,4 +1,4 @@
-package server_test
+package web_test
 
 // 本文件覆盖队列 GraphQL 查询与变更的权限边界。
 

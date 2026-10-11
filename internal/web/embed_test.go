@@ -1,4 +1,4 @@
-package webui
+package web
 
 // 本文件覆盖嵌入后台 SPA 的资源路径与回退行为。
 
@@ -65,5 +65,36 @@ func TestSPA(t *testing.T) {
                 t.Fatal("HEAD 返回响应体")
             }
         })
+    }
+}
+
+// TestWebHandlerServesPublicPagesAndSPA 核验合并后 SSR 与后台共享同一嵌入资源。
+func TestWebHandlerServesPublicPagesAndSPA(t *testing.T) {
+    assets, err := PublicAssets()
+    if err != nil {
+        t.Fatal(err)
+    }
+
+    handler := Handler(New(nil, Config{PublicAssets: assets}))
+    for _, path := range []string{"/", "/test/queue", "/admin/", "/admin/tasks/detail"} {
+        for _, method := range []string{http.MethodGet, http.MethodHead} {
+            t.Run(method+path, func(t *testing.T) {
+                response := httptest.NewRecorder()
+                handler.ServeHTTP(response, httptest.NewRequest(method, path, nil))
+                if response.Code != http.StatusOK || !strings.Contains(response.Header().Get("Content-Type"), "text/html") {
+                    t.Fatal(response.Code, response.Header())
+                }
+                if method == http.MethodHead && response.Body.Len() != 0 {
+                    t.Fatal("HEAD 返回响应体")
+                }
+                if method == http.MethodGet && (path == "/" || path == "/test/queue") {
+                    for _, asset := range append(assets.CSS, assets.Script) {
+                        if !strings.Contains(response.Body.String(), asset) {
+                            t.Fatal("SSR 缺少构建资源引用", asset)
+                        }
+                    }
+                }
+            })
+        }
     }
 }

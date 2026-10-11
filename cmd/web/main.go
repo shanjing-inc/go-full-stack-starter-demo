@@ -26,8 +26,7 @@ import (
     "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/projects/multi-database-demo/internal/config"
     "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/projects/multi-database-demo/internal/realtime"
     "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/projects/multi-database-demo/internal/service"
-    web "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/projects/multi-database-demo/internal/web"
-    "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/projects/multi-database-demo/webui"
+    "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/projects/multi-database-demo/internal/web"
 
     queuerecords "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit/modules/queue"
     "github.com/hibiken/asynq"
@@ -110,6 +109,7 @@ func run() error {
         Secret:         c.AuthSecret,
         BootstrapToken: c.BootstrapToken,
         Secure:         !c.Development,
+        Development:    c.Development,
         Origins:        c.Origins,
         AdminPaths: []string{
             web.QueueTestPath,
@@ -134,7 +134,7 @@ func run() error {
         return err
     }
 
-    publicAssets, err := webui.PublicAssets()
+    publicAssets, err := web.PublicAssets()
     if err != nil {
         return err
     }
@@ -211,7 +211,7 @@ func run() error {
     }
     defer listener.Close()
     httpServer := &http.Server{
-        Handler:           webui.Handler(api),
+        Handler:           web.Handler(api),
         ReadHeaderTimeout: 3 * time.Second,
         ReadTimeout:       10 * time.Second,
         IdleTimeout:       30 * time.Second,

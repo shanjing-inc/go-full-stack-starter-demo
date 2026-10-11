@@ -2,5 +2,5 @@ packages:
     - frontend
 linkWorkspacePackages: false
 minimumReleaseAgeExclude:
-    - "@shanjing/go-starter-devtools@0.1.0"
+    - "@shanjing/go-starter-devtools@0.1.1"
     - "@shanjing/shadcnui-dashboard@0.1.0"

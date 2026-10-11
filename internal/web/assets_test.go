@@ -1,4 +1,4 @@
-package webui
+package web
 
 // 本文件覆盖公开页资源清单与嵌入构建产物的一致性。
 

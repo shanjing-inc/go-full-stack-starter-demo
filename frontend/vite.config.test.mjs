@@ -55,3 +55,11 @@ test("启动前沿用 Vite 原有打印行为", () => {
     plugin.configureServer(server);
     assert.throws(() => server.printUrls(), /服务尚未监听/);
 });
+
+test("前端产物与公开资源清单输出到统一 Web 包", () => {
+    assert.equal(config.build.outDir, "../internal/web/dist");
+    assert.equal(config.build.emptyOutDir, true);
+    assert.equal(config.build.manifest, "manifest.json");
+    assert.deepEqual(Object.keys(config.build.rollupOptions.input).sort(), ["admin", "public"]);
+    assert.equal(config.base, "/admin/");
+});

@@ -6,12 +6,13 @@ WORKDIR /src
 RUN npm install --global pnpm@11.15.1
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml .npmrc ./
 COPY frontend/ frontend/
+COPY schema/ schema/
 RUN --mount=type=secret,id=npmrc,target=/root/.npmrc pnpm install --frozen-lockfile && pnpm build:frontend
 FROM ${GO_IMAGE} AS backend
 ENV CGO_ENABLED=0 GOTOOLCHAIN=local GOWORK=off GOPRIVATE=codeup.aliyun.com/shanjing
 WORKDIR /src
 COPY . ./
-COPY --from=frontend /src/webui/dist/ webui/dist/
+COPY --from=frontend /src/internal/web/dist/ internal/web/dist/
 RUN --mount=type=secret,id=netrc,target=/root/.netrc --mount=type=secret,id=gitconfig,target=/root/.gitconfig --mount=type=secret,id=known_hosts,target=/root/.ssh/known_hosts --mount=type=ssh go mod download && go mod verify
 RUN go build -mod=readonly -trimpath -o /out/web ./cmd/web && go build -mod=readonly -trimpath -o /out/worker ./cmd/worker
 FROM scratch

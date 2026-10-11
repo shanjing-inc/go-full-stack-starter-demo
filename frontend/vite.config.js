@@ -90,7 +90,7 @@ export default defineConfig({
         },
     },
     build: {
-        outDir: "../webui/dist",
+        outDir: "../internal/web/dist",
         emptyOutDir: true,
         manifest: "manifest.json",
         rollupOptions: {

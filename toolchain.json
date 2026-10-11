@@ -2,12 +2,40 @@
     "go": {
         "version": "go1.26.8",
         "url": "https://go.dev/dl/go1.26.8.linux-amd64.tar.gz",
-        "sha256": "d0f743b33e8d8945e6b1f432edd15785c70507121d6e2a723b21285eddf8b57b"
+        "sha256": "d0f743b33e8d8945e6b1f432edd15785c70507121d6e2a723b21285eddf8b57b",
+        "platforms": {
+            "linux-amd64": {
+                "url": "https://go.dev/dl/go1.26.8.linux-amd64.tar.gz",
+                "sha256": "d0f743b33e8d8945e6b1f432edd15785c70507121d6e2a723b21285eddf8b57b"
+            },
+            "darwin-amd64": {
+                "url": "https://go.dev/dl/go1.26.8.darwin-amd64.tar.gz",
+                "sha256": "186be014105aa6542b767d2c6ed5cca10a0214bdff809ef1724022a8c7894150"
+            },
+            "darwin-arm64": {
+                "url": "https://go.dev/dl/go1.26.8.darwin-arm64.tar.gz",
+                "sha256": "a012b25b571bd0138a03dcd25375ceba866fe5ca822f426d2c66a4de56fd3f4b"
+            }
+        }
     },
     "atlas": {
         "version": "v1.3.0",
         "url": "https://atlasbinaries.com/atlas/atlas-community-linux-amd64-v1.3.0",
-        "sha256": "10d7913e3dce43ab99b8d71534a4cbadaf11a16dc293adf3b91d10e83a0ac70b"
+        "sha256": "10d7913e3dce43ab99b8d71534a4cbadaf11a16dc293adf3b91d10e83a0ac70b",
+        "platforms": {
+            "linux-amd64": {
+                "url": "https://atlasbinaries.com/atlas/atlas-community-linux-amd64-v1.3.0",
+                "sha256": "10d7913e3dce43ab99b8d71534a4cbadaf11a16dc293adf3b91d10e83a0ac70b"
+            },
+            "darwin-amd64": {
+                "url": "https://atlasbinaries.com/atlas/atlas-community-darwin-amd64-v1.3.0",
+                "sha256": "650981a024301775ec964e5134e2d5712b7ef1b25fec4b2ec54bad762b4bdf6f"
+            },
+            "darwin-arm64": {
+                "url": "https://atlasbinaries.com/atlas/atlas-community-darwin-arm64-v1.3.0",
+                "sha256": "4e5ffdc10b2b4fd3a06074aba72848150907d5316cacad7b19bae6c6ae3db991"
+            }
+        }
     },
     "mysql": "8.0.46",
     "air": "v1.64.5",
@@ -16,6 +44,20 @@
     "ruff": {
         "version": "0.13.3",
         "url": "https://files.pythonhosted.org/packages/ab/b5/c0feca27d45ae74185a6bacc399f5d8920ab82df2d732a17213fb86a2c4c/ruff-0.13.3-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
-        "sha256": "dc742c50f4ba72ce2a3be362bd359aef7d0d302bf7637a6f942eaa763bd292af"
+        "sha256": "dc742c50f4ba72ce2a3be362bd359aef7d0d302bf7637a6f942eaa763bd292af",
+        "platforms": {
+            "linux-amd64": {
+                "url": "https://files.pythonhosted.org/packages/ab/b5/c0feca27d45ae74185a6bacc399f5d8920ab82df2d732a17213fb86a2c4c/ruff-0.13.3-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+                "sha256": "dc742c50f4ba72ce2a3be362bd359aef7d0d302bf7637a6f942eaa763bd292af"
+            },
+            "darwin-amd64": {
+                "url": "https://files.pythonhosted.org/packages/b0/b5/4a21a4922e5dd6845e91896b0d9ef493574cbe061ef7d00a73c61db531af/ruff-0.13.3-py3-none-macosx_10_12_x86_64.whl",
+                "sha256": "2bdad6512fb666b40fcadb65e33add2b040fc18a24997d2e47fee7d66f7fcae2"
+            },
+            "darwin-arm64": {
+                "url": "https://files.pythonhosted.org/packages/40/90/15649af836d88c9f154e5be87e64ae7d2b1baa5a3ef317cb0c8fafcd882d/ruff-0.13.3-py3-none-macosx_11_0_arm64.whl",
+                "sha256": "fc6fa4637284708d6ed4e5e970d52fc3b76a557d7b4e85a53013d9d201d93286"
+            }
+        }
     }
 }

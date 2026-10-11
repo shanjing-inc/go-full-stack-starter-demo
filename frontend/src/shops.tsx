@@ -1,3 +1,10 @@
+import { LIST_ADMIN_SHOPS, CREATE_ADMIN_SHOP } from "./graphql/admin/operations";
+import type {
+    ListAdminShopsQuery,
+    ListAdminShopsQueryVariables,
+    CreateAdminShopMutation,
+    CreateAdminShopMutationVariables,
+} from "./graphql/admin/generated";
 import { graphql as gql } from "./request";
 import { useSession } from "./session-context";
 import { useEffect, useRef, useState, type SubmitEvent } from "react";
@@ -26,14 +33,7 @@ import {
     type DataTableColumn,
 } from "@shanjing/shadcnui-dashboard";
 
-type Shop = {
-    id: string;
-    name: string;
-    slug: string;
-    status: string;
-    createdAt: string | null;
-    updatedAt: string | null;
-};
+type Shop = NonNullable<ListAdminShopsQuery["listShops"]>[number];
 function pageNumber(value: string | null) {
     const number = Number(value);
     return Number.isSafeInteger(number) && number > 0 && number <= 1000000 ? number : 1;
@@ -83,10 +83,8 @@ export function Shops() {
         // 微任务执行前先经过 effect 清理，StrictMode 首轮重放可提前取消请求。
         queueMicrotask(() => {
             if (controller.signal.aborted) return;
-            gql<{ listShops: Shop[] }>(
-                `query listAdminShops($where:ShopFilters,$limit:Int,$offset:Int){
-                    listShops(where:$where,limit:$limit,offset:$offset,orderBy:{createdAt:{direction:desc,priority:1}}){id name slug status createdAt updatedAt}
-                }`,
+            gql<ListAdminShopsQuery, ListAdminShopsQueryVariables>(
+                LIST_ADMIN_SHOPS,
                 { where, limit: pageSize + 1, offset: (page - 1) * pageSize },
                 controller.signal,
             )
@@ -140,8 +138,8 @@ export function Shops() {
         setCreateError("");
         setMessage("");
         try {
-            await gql<{ createShop: Shop }>(
-                `mutation($set:CreateShopSetInput!){createShop(set:$set){id name slug status createdAt updatedAt}}`,
+            await gql<CreateAdminShopMutation, CreateAdminShopMutationVariables>(
+                CREATE_ADMIN_SHOP,
                 { set: { name, slug } },
                 controller.signal,
             );
@@ -170,13 +168,13 @@ export function Shops() {
             header: "状态",
             render: (shop) => (
                 <StatusBadge
-                    status={shop.status}
+                    status={shop.status ?? ""}
                     label={
                         shop.status === "active"
                             ? "启用"
                             : shop.status === "inactive"
                               ? "停用"
-                              : shop.status
+                              : (shop.status ?? "")
                     }
                 />
             ),
@@ -369,7 +367,7 @@ export function Shops() {
                             "暂无匹配的店铺"
                         )
                     }
-                    getRowKey={(shop) => shop.id}
+                    getRowKey={(shop) => String(shop.id)}
                     items={rows}
                 />
             </div>

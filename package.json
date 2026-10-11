@@ -21,10 +21,12 @@
         "format:check": "go-starter format --check",
         "clean:runtime": "go-starter clean",
         "clean:cache": "go-starter clean --cache-only",
-        "clean:all": "go-starter clean --cache"
+        "clean:all": "go-starter clean --cache",
+        "codegen": "pnpm --filter multi-database-demo-dashboard codegen",
+        "codegen:check": "pnpm --filter multi-database-demo-dashboard codegen:check"
     },
     "devDependencies": {
-        "@shanjing/go-starter-devtools": "0.1.0",
+        "@shanjing/go-starter-devtools": "0.1.1",
         "prettier": "3.6.2"
     }
 }

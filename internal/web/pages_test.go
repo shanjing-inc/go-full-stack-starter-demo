@@ -1,4 +1,4 @@
-package server_test
+package web_test
 
 // 本文件覆盖公开页路由及队列演示入口的读写授权。
 

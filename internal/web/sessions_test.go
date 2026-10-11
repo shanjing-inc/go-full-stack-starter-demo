@@ -1,4 +1,4 @@
-package server_test
+package web_test
 
 // 本文件覆盖后台会话列表和撤销操作的 GraphQL 契约。
 

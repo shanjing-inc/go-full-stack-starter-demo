@@ -1,4 +1,4 @@
-package server_test
+package web_test
 
 // 本文件覆盖后台会话身份解析，以及缺失权限服务时的受控错误。
 

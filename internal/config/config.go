@@ -4,9 +4,9 @@ package config
 import (
     configbase "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit/infra/config"
     "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit/infra/database"
+    "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit/transport/origin"
     "errors"
     "net"
-    "net/url"
     "os"
     "regexp"
     "strconv"
@@ -29,7 +29,7 @@ type Config struct {
 
 var value = configbase.Value
 
-// Load 按进程角色读取并校验环境变量；Web 额外要求认证密钥、监听地址与精确来源。
+// Load 按进程角色读取并校验环境变量；Web 额外要求认证密钥、监听地址与来源规则，开发模式支持本地任意端口。
 func Load(role string) (Config, error) {
     c := Config{Address: value("WEB_ADDR", "127.0.0.1:8080"), Version: value("DB_VERSION", "202610040001")}
     var err error
@@ -98,10 +98,9 @@ func Load(role string) (Config, error) {
             return c, errors.New("Web 需要显式配置 ALLOW_ORIGINS")
         }
 
-        for _, origin := range c.Origins {
-            u, err := url.Parse(origin)
-            if err != nil || u.Host == "" || u.User != nil || u.RawQuery != "" || u.Fragment != "" || u.Path != "" || (u.Scheme != "http" && u.Scheme != "https") || (!c.Development && u.Scheme != "https") {
-                return c, errors.New("ALLOW_ORIGINS 需要精确 origin，生产模式使用 HTTPS")
+        for _, rule := range c.Origins {
+            if !origin.Valid(rule, c.Development) || (!c.Development && !strings.HasPrefix(strings.ToLower(rule), "https://")) {
+                return c, errors.New("ALLOW_ORIGINS 需要完整来源；开发模式支持 localhost:* 和 127.0.0.1:*，生产模式使用精确 HTTPS 来源")
             }
         }
     }

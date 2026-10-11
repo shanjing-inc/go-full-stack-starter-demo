@@ -1,5 +1,5 @@
-// Package server 组装 Echo 与独立 gqlgen Schema，共享同一个业务 Service。
-package server
+// Package web 组装应用 HTTP 路由、独立 GraphQL Schema 与内嵌前端资源。
+package web
 
 import (
     "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit/modules/auth"
@@ -38,16 +38,6 @@ type Config struct {
     Logger           *slog.Logger
     Introspection    bool
     Authentication   *auth.Service
-}
-
-func (c Config) originAllowed(origin string) bool {
-    for _, allowed := range c.AllowedOrigins {
-        if allowed == origin {
-            return true
-        }
-    }
-
-    return false
 }
 
 // New 装配公开页、店铺 REST 和独立双 GraphQL Schema，共享应用业务服务。

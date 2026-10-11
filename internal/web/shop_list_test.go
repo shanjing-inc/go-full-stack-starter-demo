@@ -1,4 +1,4 @@
-package server_test
+package web_test
 
 // 本文件覆盖后台店铺分页协议与数据库重开后的查询。
 
