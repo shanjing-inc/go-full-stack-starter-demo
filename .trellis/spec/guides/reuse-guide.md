@@ -4,6 +4,8 @@
 
 复制应用 AGENTS、Trellis workflow/config/scripts/agents/spec/.version/.gitignore 与业务代码；不复制 tasks/workspace/.developer/.runtime、平台配置、凭据、缓存、日志或构建产物。导出白名单控制 Trellis，.npmrc 只保留 registry 地址。
 
+独立发布的 `.vscode/settings.json` 由同步器从同一提交的主仓根目录读取，应用子目录不维护副本，其他根编辑器配置不导出。工具与缓存路径以 `${workspaceFolder}` 为应用根，先执行 setup 安装本应用 `.tools`；发布清单记录实际根来源和哈希，不引入主仓绝对路径。
+
 更新依赖先发布和验收公共包，再更新 package.json/go.mod、独立锁文件及 release-dependencies.json。固定版本、完整性、来源 commit 和逐文件 source/hash 映射由 demo-release.json 记录。旧 source-bundle-v1 可按其管理清单迁移删除；目标独有 CI/文件保留，非管理分支拒绝覆盖，普通 HEAD:branch 推送且重复发布幂等。
 
 2026-10-11 公共能力固定消费：Go kit 使用已合并 main 的 v0.0.0-20261011051254-4d1c52cf70e4；Dashboard 使用正式 0.1.1。精确发布年龄例外仅覆盖两个公司包的固定 0.1.1，不放宽全局依赖策略。功能分支独立验收通过后仍需进入 main，才能同步 GitHub demo。

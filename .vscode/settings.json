@@ -1,0 +1,27 @@
+{
+    "go.goroot": "${workspaceFolder}/.tools/go",
+    "go.gopath": "${workspaceFolder}/.tools/gopath",
+    "go.alternateTools": {
+        "go": "${workspaceFolder}/.tools/go/bin/go",
+        "customFormatter": "${workspaceFolder}/.tools/bin/format-go"
+    },
+    "go.toolsEnvVars": {
+        "PATH": "${workspaceFolder}/.tools/go/bin:${env:PATH}",
+        "GOTOOLCHAIN": "local",
+        "CGO_ENABLED": "0",
+        "GOPATH": "${workspaceFolder}/.tools/gopath",
+        "GOMODCACHE": "${workspaceFolder}/.tools/gopath/pkg/mod",
+        "GOCACHE": "${workspaceFolder}/.tools/gocache",
+        "GOPROXY": "https://goproxy.cn"
+    },
+    "go.formatTool": "custom",
+    "go.formatFlags": [],
+    "[go]": {
+        "editor.defaultFormatter": "golang.go",
+        "editor.insertSpaces": true,
+        "editor.tabSize": 4
+    },
+    "files.exclude": {
+        "**/*_test.go": true
+    }
+}

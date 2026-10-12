@@ -3,7 +3,7 @@
     "layout": "app-only-v1",
     "application": "projects/multi-database-demo",
     "sourceRepository": "https://codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git",
-    "sourceCommit": "31d8f2368d4e13f8a12a479d5157e1baed3b075c",
+    "sourceCommit": "8f1812f9ac3e2aae2efdacefdb48a43817a10f95",
     "dependencies": {
         "go": {
             "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit": {
@@ -289,7 +289,7 @@
         },
         ".trellis/spec/guides/reuse-guide.md": {
             "source": "projects/multi-database-demo/.trellis/spec/guides/reuse-guide.md",
-            "sha256": "10ef18bcc2760e63494b50abad2bc77386613f4f8ac60dc8123c1bb24b3b6669",
+            "sha256": "b0443a2cfdcd59d7d9b57cefe60eb93f0446530a131d463e92db2e6c3dbb519f",
             "mode": 420
         },
         ".trellis/spec/guides/task-writing-guide.md": {
@@ -310,6 +310,11 @@
         ".trellis/workflow.md": {
             "source": "projects/multi-database-demo/.trellis/workflow.md",
             "sha256": "14217f49ee44334d3cf441e50719a3d652f64574dc53f7484222767f1aa18493",
+            "mode": 420
+        },
+        ".vscode/settings.json": {
+            "source": ".vscode/settings.json",
+            "sha256": "6fa3a9eab194cd47e0a09adeab4c60b75633b109cee8ab4f4c64f9566fc36afa",
             "mode": 420
         },
         "AGENTS.md": {
