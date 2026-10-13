@@ -1,4 +1,8 @@
-import "./style.css";
+import "./styles/global.css";
+import { mountBusPage } from "./features/bus/bus-page";
+
+const busPage = document.querySelector<HTMLElement>("[data-bus-page]");
+if (busPage) mountBusPage(busPage);
 
 /** 公开 SSR 页只增强局部交互，正文与记录由 Go 输出。 */
 const root = document.documentElement;

@@ -1,0 +1,18 @@
+{
+    "miniprogramRoot": "dist/",
+    "projectname": "multi-database-demo-miniprogram",
+    "description": "多数据库 Demo 小程序",
+    "appid": "touristappid",
+    "compileType": "miniprogram",
+    "setting": {
+        "urlCheck": true,
+        "es6": false,
+        "enhance": false,
+        "compileHotReLoad": false,
+        "postcss": false,
+        "minified": false,
+        "minifyWXSS": true,
+        "minifyWXML": true,
+        "packNpmManually": false
+    }
+}

@@ -1,0 +1,472 @@
+{{define "bus"}}
+<section class="space-y-10 pb-12" id="bus-demo-page" data-bus-page data-enabled="{{.CanUseBus}}">
+    <header class="space-y-5">
+        <a
+            class="inline-flex min-h-11 items-center text-sm font-medium text-primary transition hover:text-primary/80 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+            href="/"
+            >← 返回首页</a
+        >
+        <div class="space-y-3">
+            <p class="text-sm font-medium tracking-[0.25em] text-muted-foreground uppercase">
+                Message Bus · Live Demo
+            </p>
+            <h1 class="text-3xl font-semibold tracking-tight sm:text-4xl">Bus 消息总线演示</h1>
+            <p class="max-w-3xl text-base/8 text-muted-foreground">
+                两个可操作的消息链路：REST + WebSocket 实现固定 topic 广播；REST + SSE + WebSocket
+                完成设备查询与逐条回执。切换 Tab 可直接体验两种用法。 当前应用使用 Redis Bus；共享
+                Redis 命名空间的 Web 实例可跨进程投递。
+            </p>
+        </div>
+    </header>
+
+    {{if .Message}}
+    <p
+        role="alert"
+        class="rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive"
+    >
+        {{.Message}}
+    </p>
+    {{end}} {{if not .CanUseBus}}
+    <div class="rounded-xl border bg-muted/40 p-5 text-sm/7">
+        <p>登录后可连接 WebSocket、发布广播与提交查询。</p>
+        <a
+            href="/admin/login?returnTo=%2Ftest%2Fbus"
+            class="font-medium text-primary underline underline-offset-4"
+            >前往登录</a
+        >
+    </div>
+    {{end}}
+    <noscript
+        ><p class="rounded-xl border bg-muted/40 p-4 text-sm">
+            开启 JavaScript 可操作广播、设备模拟器与 SSE 查询。下方链路说明由 Go 服务端直接渲染。
+        </p></noscript
+    >
+    <div class="border-b" role="tablist" aria-label="Bus 演示场景">
+        <button
+            id="broadcast-tab"
+            data-bus-tab="broadcast"
+            type="button"
+            role="tab"
+            aria-controls="broadcast-panel"
+            aria-selected="true"
+            class="min-h-12 cursor-pointer border-b-2 border-transparent px-5 text-sm font-medium text-muted-foreground transition hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring aria-selected:border-primary aria-selected:text-primary"
+        >
+            01 · REST + WebSocket
+        </button>
+        <button
+            id="bus-query-tab"
+            data-bus-tab="query"
+            type="button"
+            role="tab"
+            aria-controls="bus-query-scene"
+            aria-selected="false"
+            tabindex="-1"
+            class="min-h-12 cursor-pointer border-b-2 border-transparent px-5 text-sm font-medium text-muted-foreground transition hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring aria-selected:border-primary aria-selected:text-primary"
+        >
+            02 · REST + SSE + WebSocket
+        </button>
+    </div>
+
+    <section
+        id="broadcast-panel"
+        data-bus-panel="broadcast"
+        role="tabpanel"
+        aria-labelledby="broadcast-tab"
+        tabindex="0"
+    >
+        <section aria-labelledby="broadcast-heading" class="space-y-5" id="bus-broadcast-workbench">
+            <div class="space-y-2">
+                <p class="text-xs font-semibold tracking-[0.2em] text-primary uppercase">
+                    01 · REST + WebSocket · 一对多广播
+                </p>
+                <h2 class="text-2xl font-semibold tracking-tight" id="broadcast-heading">
+                    发布消息，实时接收
+                </h2>
+                <p class="max-w-3xl text-sm/7 text-muted-foreground">
+                    REST 发布到固定 topic
+                    <code class="break-all text-foreground">demo:bus:broadcast</code>；连接
+                    <code class="break-all text-foreground">/api/websocket/bus-broadcast</code>
+                    的标签页都会收到
+                    <code>bus.broadcast.message</code>。可以打开两个标签页观察广播。
+                </p>
+            </div>
+            <div class="grid items-start gap-5 lg:grid-cols-2">
+                <div class="rounded-xl border bg-card p-5 shadow-sm sm:p-6">
+                    <fieldset {{if not .CanUseBus}}disabled{{end}} class="contents space-y-5 disabled:opacity-60">
+                        <div class="space-y-3">
+                            <h3 class="text-base font-semibold">订阅连接</h3>
+                            <p
+                                aria-live="polite"
+                                class="text-sm text-muted-foreground"
+                                id="broadcast-status"
+                                data-broadcast-status
+                                role="status"
+                            >
+                                尚未连接。
+                            </p>
+                            <button
+                                class="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-lg border border-input bg-background px-5 py-2 text-sm font-medium text-foreground transition hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                                id="broadcast-toggle"
+                                data-broadcast-connect
+                                type="button"
+                            >
+                                连接 Bus WebSocket
+                            </button>
+                        </div>
+                        <form
+                            class="space-y-3 border-t pt-5"
+                            id="broadcast-form"
+                            data-broadcast-form
+                        >
+                            <label class="block text-sm font-medium" for="bus-message"
+                                >发布内容</label
+                            >
+                            <input
+                                class="min-h-11 w-full rounded-lg border border-input bg-background px-3 text-base text-foreground outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                                id="bus-message"
+                                maxlength="2000"
+                                required
+                                value="本地 Bus 测试"
+                            />
+                            <button
+                                class="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-lg bg-primary px-5 py-2 text-sm font-medium text-primary-foreground transition hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-50"
+                                id="broadcast-publish"
+                                type="submit"
+                            >
+                                发布到 Bus
+                            </button>
+                            <p
+                                class="text-sm/6 text-muted-foreground"
+                                id="broadcast-publish-result"
+                                data-broadcast-feedback
+                                role="status"
+                                aria-live="polite"
+                            >
+                                发布操作沿用登录会话；发布确认表示 Redis Bus 已接收消息。
+                            </p>
+                        </form>
+                    </fieldset>
+                </div>
+                <div class="min-w-0 rounded-xl border bg-card p-5 shadow-sm sm:p-6">
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                        <h3 class="text-base font-semibold">WebSocket 接收记录</h3>
+                        <button
+                            aria-controls="broadcast-history"
+                            class="min-h-11 cursor-pointer px-2 text-sm font-medium text-primary hover:text-primary/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-50"
+                            disabled
+                            id="broadcast-clear"
+                            data-broadcast-clear
+                            aria-label="清空广播记录"
+                            type="button"
+                        >
+                            清空记录
+                        </button>
+                    </div>
+                    <p
+                        class="mt-3 text-sm/7 text-muted-foreground"
+                        id="broadcast-empty"
+                        data-log-empty
+                    >
+                        连接后，发布消息即可在这里查看每条事件。
+                    </p>
+                    <ol
+                        aria-label="广播接收记录"
+                        aria-live="polite"
+                        class="mt-4 max-h-96 min-w-0 space-y-3 overflow-y-auto"
+                        id="broadcast-history"
+                        data-broadcast-log
+                    ></ol>
+                </div>
+            </div>
+        </section>
+
+        <section
+            class="mt-8 space-y-5 border-t pt-8"
+            id="broadcast-topic-flow"
+            aria-labelledby="broadcast-topic-heading"
+        >
+            <div class="space-y-2">
+                <h2 class="text-xl font-semibold" id="broadcast-topic-heading">Topic 与消息流向</h2>
+                <p class="text-sm/7 text-muted-foreground">
+                    REST 负责发布，WebSocket 负责接收。打开多个标签页可观察同一条消息的广播效果。
+                </p>
+            </div>
+            <ol class="grid gap-3 text-sm/6 sm:grid-cols-3">
+                <li class="min-w-0 rounded-xl border bg-card p-4">
+                    <span class="font-semibold text-primary">01 · REST 发布</span>
+                    <p class="mt-2 text-muted-foreground">
+                        演示页面向
+                        <code class="break-all text-foreground">POST /api/rest/bus/broadcast</code>
+                        提交消息。
+                    </p>
+                </li>
+                <li class="min-w-0 rounded-xl border bg-card p-4">
+                    <span class="font-semibold text-primary">02 · Bus 投递</span>
+                    <p class="mt-2 text-muted-foreground">
+                        服务端发布到固定 topic
+                        <code class="break-all text-foreground">demo:bus:broadcast</code>。
+                    </p>
+                </li>
+                <li class="min-w-0 rounded-xl border bg-card p-4">
+                    <span class="font-semibold text-primary">03 · WebSocket 接收</span>
+                    <p class="mt-2 text-muted-foreground">
+                        连接
+                        <code class="break-all text-foreground">/api/websocket/bus-broadcast</code>
+                        的订阅者收到 <code>bus.broadcast.message</code>。
+                    </p>
+                </li>
+            </ol>
+        </section>
+    </section>
+
+    <section
+        class="space-y-5"
+        id="bus-query-scene"
+        data-bus-panel="query"
+        role="tabpanel"
+        aria-labelledby="bus-query-tab"
+        tabindex="0"
+    >
+        <div class="space-y-2">
+            <p class="text-xs font-semibold tracking-[0.2em] text-primary uppercase">
+                02 · REST + SSE + WebSocket · 请求与回执
+            </p>
+            <h2 class="text-2xl font-semibold tracking-tight" id="bus-query-scene-heading">
+                设备查询，逐条返回结果
+            </h2>
+            <p class="max-w-3xl text-sm/7 text-muted-foreground">
+                连接一个浏览器设备模拟器后提交查询。命令经 Bus 和 WebSocket
+                送达设备；设备回执经独立的结果 topic 路由，再由本次 POST 的 SSE 响应返回。
+                每次成功查询随机回复 1–3 条结果，每条发送前等待 200–700
+                毫秒；回执模式支持成功、错误与超时，服务端查询期限为 5 秒。
+            </p>
+        </div>
+        <section id="bus-query-workbench">
+            <div class="grid items-start gap-6 lg:grid-cols-2">
+                <section
+                    class="min-w-0 rounded-xl border bg-card p-6 text-card-foreground shadow-sm"
+                    aria-labelledby="device-heading"
+                >
+                    <p class="text-sm font-medium tracking-[0.3em] text-muted-foreground uppercase">
+                        device
+                    </p>
+                    <h2 class="mt-3 text-2xl font-semibold" id="device-heading">
+                        设备连接（Websocket）
+                    </h2>
+                    <p class="mt-3 text-sm/7 text-muted-foreground">
+                        当前演示使用一个浏览器设备模拟器；连接就绪后将自动接收并执行查询。
+                    </p>
+
+                    <fieldset {{if not .CanUseBus}}disabled{{end}} class="contents disabled:opacity-60">
+                        <div class="mt-6 space-y-4">
+                            <p class="text-sm text-muted-foreground">
+                                连接状态：
+                                <span
+                                    class="ml-1 inline-block rounded-lg border bg-muted/40 px-3 py-1 text-sm font-medium text-foreground"
+                                    id="device-status"
+                                    data-device-status
+                                    role="status"
+                                    aria-live="polite"
+                                    >未连接</span
+                                >
+                            </p>
+                            <div class="flex flex-wrap items-center gap-3">
+                                <button
+                                    id="device-toggle"
+                                    data-device-connect
+                                    type="button"
+                                    class="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-lg bg-primary px-5 py-2 text-sm font-medium text-primary-foreground transition hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                    连接设备</button
+                                ><label
+                                    class="flex items-center gap-2 text-sm text-muted-foreground"
+                                    for="device-mode"
+                                    >回执模式<select
+                                        id="device-mode"
+                                        data-device-mode
+                                        class="min-h-11 rounded-lg border border-input bg-background px-3 text-sm text-foreground focus-visible:outline-2 focus-visible:outline-ring"
+                                    >
+                                        <option value="success">成功</option>
+                                        <option value="error">错误</option>
+                                        <option value="timeout">超时</option>
+                                    </select></label
+                                >
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <div class="mt-8 border-t pt-6">
+                        <div class="flex items-center justify-between gap-4">
+                            <h3 class="text-base font-semibold">设备记录</h3>
+                            <button
+                                id="clear-device-history"
+                                data-device-clear
+                                type="button"
+                                aria-label="清空设备记录"
+                                aria-controls="device-history"
+                                disabled
+                                class="cursor-pointer text-sm font-medium text-primary hover:text-primary/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                清空记录
+                            </button>
+                        </div>
+                        <p class="mt-2 text-sm text-muted-foreground" data-log-empty>
+                            尚无设备消息。连接后等待查询。
+                        </p>
+                        <ol
+                            class="mt-4 max-h-96 min-w-0 space-y-3 overflow-y-auto"
+                            id="device-history"
+                            data-device-log
+                            aria-label="设备记录"
+                            aria-live="polite"
+                            aria-relevant="additions text"
+                        ></ol>
+                    </div>
+                </section>
+
+                <section
+                    class="min-w-0 rounded-xl border bg-card p-6 text-card-foreground shadow-sm"
+                    aria-labelledby="query-heading"
+                >
+                    <p class="text-sm font-medium tracking-[0.3em] text-muted-foreground uppercase">
+                        request
+                    </p>
+                    <h2 class="mt-3 text-2xl font-semibold" id="query-heading">
+                        用户查询（REST + SSE）
+                    </h2>
+                    <p class="mt-3 text-sm/7 text-muted-foreground">
+                        输入查询后，每笔请求在下方单独显示接收状态和设备执行结果。
+                    </p>
+
+                    <fieldset {{if not .CanUseBus}}disabled{{end}} class="contents disabled:opacity-60">
+                        <form class="mt-6 space-y-4" id="query-form" data-query-form>
+                            <div class="space-y-2">
+                                <label class="block text-sm font-medium" for="bus-query-content"
+                                    >查询内容</label
+                                >
+                                <textarea
+                                    id="bus-query-content"
+                                    maxlength="2000"
+                                    required
+                                    rows="3"
+                                    class="min-h-28 w-full resize-y rounded-lg border border-input bg-background px-3 py-2 text-base text-foreground transition outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                                    placeholder="例如：查询设备状态"
+                                ></textarea>
+                                <p data-query-feedback role="status" aria-live="polite" class="text-sm text-muted-foreground">
+                                    最多 2000 字；回执模式支持成功、错误与超时。
+                                </p>
+                            </div>
+                            <button
+                                id="query-submit"
+                                data-query-submit
+                                type="submit"
+                                class="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-lg bg-primary px-5 py-2 text-sm font-medium text-primary-foreground transition hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                发送查询
+                            </button>
+                        </form>
+                    </fieldset>
+
+                    <div class="mt-8 border-t pt-6">
+                        <div class="flex items-center justify-between gap-4">
+                            <h3 class="text-base font-semibold">查询记录</h3>
+                            <button
+                                id="clear-query-history"
+                                data-query-clear
+                                type="button"
+                                aria-label="清空并取消查询"
+                                title="清空记录并取消正在进行的查询"
+                                aria-controls="query-history"
+                                disabled
+                                class="cursor-pointer text-sm font-medium text-primary hover:text-primary/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                清空记录
+                            </button>
+                        </div>
+                        <p class="mt-2 text-sm text-muted-foreground" data-log-empty>
+                            尚无查询。提交后可在这里查看结果。
+                        </p>
+                        <ol
+                            class="mt-4 max-h-96 min-w-0 space-y-3 overflow-y-auto"
+                            id="query-history"
+                            data-query-log
+                            aria-label="查询记录"
+                            aria-live="polite"
+                            aria-relevant="additions text"
+                        ></ol>
+                    </div>
+                </section>
+            </div>
+        </section>
+
+        <section
+            class="space-y-5 border-t pt-8"
+            id="query-topic-flow"
+            aria-labelledby="query-topic-heading"
+        >
+            <div class="space-y-2">
+                <h2 class="text-xl font-semibold" id="query-topic-heading">Topic 与消息流向</h2>
+                <p class="text-sm/7 text-muted-foreground">
+                    同一次 POST 建立 SSE 结果流；命令和回执分别使用固定与请求专属的 Bus topic。
+                </p>
+            </div>
+            <ol class="grid gap-3 text-sm/6 sm:grid-cols-2 lg:grid-cols-4">
+                <li class="min-w-0 rounded-xl border bg-card p-4">
+                    <span class="font-semibold text-primary">01 · 订阅结果</span>
+                    <p class="mt-2 text-muted-foreground">
+                        <code class="break-all text-foreground">POST /api/rest/bus/query</code>
+                        先订阅本次查询专属 topic。
+                    </p>
+                </li>
+                <li class="min-w-0 rounded-xl border bg-card p-4">
+                    <span class="font-semibold text-primary">02 · 发送命令</span>
+                    <p class="mt-2 text-muted-foreground">
+                        Bus 发布 <code>bus.query.execute</code>，设备通过 WebSocket 接收命令。
+                    </p>
+                </li>
+                <li class="min-w-0 rounded-xl border bg-card p-4">
+                    <span class="font-semibold text-primary">03 · 路由回执</span>
+                    <p class="mt-2 text-muted-foreground">
+                        设备通过 WebSocket 回传 <code>bus.query.result</code> 或
+                        <code>bus.query.error</code>，服务端按请求路由。
+                    </p>
+                </li>
+                <li class="min-w-0 rounded-xl border bg-card p-4">
+                    <span class="font-semibold text-primary">04 · SSE 返回</span>
+                    <p class="mt-2 text-muted-foreground">
+                        本次 POST 的 SSE 响应逐条发送 <code>result</code> 或
+                        <code>error</code>，最后以 <code>done</code> 结束。
+                    </p>
+                </li>
+            </ol>
+            <dl class="grid gap-4 sm:grid-cols-2">
+                <div class="min-w-0 space-y-2 rounded-xl border bg-card p-5">
+                    <dt class="font-semibold">查询命令 · 固定 topic</dt>
+                    <dd class="space-y-2 text-sm/7 text-muted-foreground">
+                        <code class="block break-all text-foreground">demo:bus:query:requests</code>
+                        <p>查询服务发布命令，设备 WebSocket 订阅此 topic。</p>
+                    </dd>
+                </div>
+                <div class="min-w-0 space-y-2 rounded-xl border bg-card p-5">
+                    <dt class="font-semibold">设备回执 · 每次查询独立的 topic</dt>
+                    <dd class="space-y-2 text-sm/7 text-muted-foreground">
+                        <code class="block break-all text-foreground"
+                            >demo:bus:query:results:&#123;responseKey&#125;</code
+                        >
+                        <p>服务端先订阅，再发布命令；设备结果只返回对应的 SSE 请求。</p>
+                    </dd>
+                </div>
+            </dl>
+            <p class="text-xs/6 text-muted-foreground">
+                <code>requestId</code> 标识用户查询；服务端生成的 <code>responseKey</code>
+                隔离本次 Bus 回执，避免不同查询串流。
+            </p>
+        </section>
+    </section>
+    {{if .CanUseBus}}
+    <p class="text-xs/6 text-muted-foreground">
+        当前账号：{{.UserName}} · 操作沿用登录会话和同源校验。
+    </p>
+    {{end}}
+</section>
+{{end}}

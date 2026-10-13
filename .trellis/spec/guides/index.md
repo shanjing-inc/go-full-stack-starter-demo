@@ -55,7 +55,7 @@ These guides help you **ask the right questions before coding**.
 
 - [ ] 正在改动生产行为
 - [ ] Acceptance Criterion 描述了可观察行为
-- [ ] 正在改动 GraphQL schema/resolver/helper
+- [ ] 正在改动 GraphQL share/schema/resolver/helper
 - [ ] 正在改动 UI 交互、路由、状态、queue/runtime 行为、持久化或部署行为
 - [ ] 外部依赖或生产限定依赖需要 manual 验证证据
 

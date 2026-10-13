@@ -441,6 +441,83 @@ test("时间范围组件在桌面和移动端保持可访问", async ({ page }) 
     }
 });
 
+test("日历草稿保留时间与焦点，提交筛选后发送日期范围", async ({ page }) => {
+    const state = await mockQueue(page);
+    await page.goto("/admin/queues/jobs/recent");
+    const range = page.getByRole("group", { name: "时间范围", exact: true });
+    await range.getByRole("textbox", { name: "开始时间", exact: true }).fill("2026-10-05T08:59");
+    await range.getByRole("textbox", { name: "结束时间", exact: true }).fill("2026-10-05T09:01");
+    await expect.poll(() => state.lists.length).toBeGreaterThan(0);
+    const requestCount = state.lists.length;
+    const trigger = range.getByRole("button", { name: "选择日期范围" });
+    await trigger.click();
+    const dialog = page.getByRole("dialog", { name: "选择日期范围" });
+    await dialog.getByRole("button", { name: "重新选择" }).click();
+    await expect(dialog.getByRole("button", { name: "应用日期" })).toBeDisabled();
+    await dialog.getByRole("button", { name: /2026年10月15日/ }).click();
+    await dialog.getByRole("button", { name: /2026年10月17日/ }).click();
+    await dialog.getByRole("button", { name: "应用日期" }).click();
+    await expect(range.getByRole("textbox", { name: "开始时间" })).toHaveValue("2026-10-15T08:59");
+    await expect(range.getByRole("textbox", { name: "结束时间" })).toHaveValue("2026-10-17T09:01");
+    await expect(trigger).toBeFocused();
+    expect(state.lists.length).toBe(requestCount);
+    await trigger.click();
+    await dialog.getByRole("button", { name: /2026年10月20日/ }).click();
+    await page.keyboard.press("Escape");
+    await expect(trigger).toBeFocused();
+    await expect(range.getByRole("textbox", { name: "结束时间" })).toHaveValue("2026-10-17T09:01");
+    await page.getByRole("button", { name: "筛选", exact: true }).click();
+    await expect.poll(() => state.lists.length).toBe(requestCount + 1);
+    const expected = await page.evaluate(() => ({
+        from: new Date("2026-10-15T08:59").getTime(),
+        to: new Date("2026-10-17T09:01").getTime(),
+    }));
+    expect(state.lists.at(-1)).toMatchObject(expected);
+});
+
+test("空范围日历筛选包含结束日秒与毫秒边界，排除次日记录", async ({ page }) => {
+    await page.clock.setFixedTime(new Date("2026-10-11T12:00:00"));
+    const state = await mockQueue(page);
+    const times = await page.evaluate(() => ({
+        from: Date.parse("2026-10-15T00:00"),
+        second: Date.parse("2026-10-17T23:59:30"),
+        to: Date.parse("2026-10-17T23:59:59.999"),
+        next: Date.parse("2026-10-18T00:00"),
+    }));
+    const base = state.rows[0];
+    state.rows = [
+        { ...base, id: "before-start", jobName: "开始日前任务", sortAt: times.from - 1 },
+        { ...base, id: "at-start", jobName: "开始日零点任务", sortAt: times.from },
+        { ...base, id: "last-second", jobName: "日末秒任务", sortAt: times.second },
+        { ...base, id: "last-millisecond", jobName: "日末毫秒任务", sortAt: times.to },
+        { ...base, id: "next-day", jobName: "次日零点任务", sortAt: times.next },
+    ];
+    await page.goto("/admin/queues/jobs/recent");
+    const range = page.getByRole("group", { name: "时间范围", exact: true });
+    await range.getByRole("button", { name: "选择日期范围" }).click();
+    const dialog = page.getByRole("dialog", { name: "选择日期范围" });
+    await dialog.getByRole("button", { name: /2026年10月15日/ }).click();
+    await dialog.getByRole("button", { name: /2026年10月17日/ }).click();
+    await dialog.getByRole("button", { name: "应用日期" }).click();
+    await expect(range.getByRole("textbox", { name: "结束时间" })).toHaveValue(
+        "2026-10-17T23:59:59.999",
+    );
+    await page.getByRole("button", { name: "筛选", exact: true }).click();
+    await expect.poll(() => state.lists.at(-1)?.to).toBe(times.to);
+    expect(state.lists.at(-1)?.from).toBe(times.from);
+    await expect(page.getByRole("link", { name: "开始日零点任务", exact: true })).toBeVisible();
+    await expect(page.getByRole("link", { name: "日末秒任务", exact: true })).toBeVisible();
+    await expect(page.getByRole("link", { name: "日末毫秒任务", exact: true })).toBeVisible();
+    await expect(page.getByRole("link", { name: "开始日前任务", exact: true })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "次日零点任务", exact: true })).toHaveCount(0);
+    await page.reload();
+    await expect(range.getByRole("textbox", { name: "结束时间" })).toHaveValue(
+        "2026-10-17T23:59:59.999",
+    );
+    await expect(page.getByRole("link", { name: "日末毫秒任务", exact: true })).toBeVisible();
+    await expect(page.getByRole("link", { name: "次日零点任务", exact: true })).toHaveCount(0);
+});
+
 test("时间筛选传递毫秒范围，异常范围保留错误反馈", async ({ page }) => {
     const state = await mockQueue(page);
     await page.goto("/admin/queues/jobs/recent");

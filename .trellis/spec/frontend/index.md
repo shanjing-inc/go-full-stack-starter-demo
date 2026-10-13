@@ -1,11 +1,11 @@
 # 示例 React SPA
 
-用于 frontend 路由、菜单、请求和后台接入。先读 `frontend/src/main.tsx`、`frontend/src/app.tsx`（路由/菜单）、`frontend/src/adapter.ts`、`frontend/src/request.ts`；这些路径相对应用目录 projects/multi-database-demo。
+用于 frontend 路由、菜单、请求和后台接入。先读 `frontend/src/main.tsx`、`frontend/src/app/app.tsx`（路由装配）、`frontend/src/app/dashboard-adapter.ts`、`frontend/src/lib/request.ts`；这些路径相对应用目录 projects/multi-database-demo。
 
 - Router 挂载 `/admin/`，复用 @shanjing/shadcnui-dashboard；业务 adapter/菜单留在应用。
-- request.ts 统一同源 fetch、credentials: include、错误与取消，GraphQL 为 `/api/graphql/admin`。操作集中在 graphql/admin，adapter 显式使用生成的结果/变量类型，输入/空值与 SDL 一致。
+- request.ts 使用 Apollo Client 执行 GraphQL，REST 沿用 fetch；统一同源 credentials: include、错误与取消，GraphQL 为 `/api/graphql/admin`。操作集中在 graphql/admin，adapter 显式使用生成的结果/变量类型，输入/空值与 SDL 一致。
 - 沿用 ApiError/响应校验，处理会话未就绪、无权限、失败、取消；服务端同时鉴权。
-- 路由/Vite base 变化同时核对 Go SPA 深链、公开资源和 `internal/web` 内嵌资源；先 Vite 后 Go，不手改 dist。
+- 路由/Vite base 变化同时核对 Go SPA 深链、公开资源和 `backend/internal/web` 内嵌资源；先 Vite 后 Go，不手改 dist。
 - 偏好沿用 go-mysql-demo 等现有 key，目录重命名不重置用户数据。
 
 Vite、Codegen 和请求回归由 `frontend/package.json` 的 `test` 执行；主仓与独立应用的 `pnpm test` 在前端构建后调用该入口，配置测试失败立即终止后续检查。
@@ -14,14 +14,70 @@ Vite、Codegen 和请求回归由 `frontend/package.json` 的 `test` 执行；�
 
 公共组件见 [公共前端](shared-dashboard.md)，接口见 [GraphQL](../backend/graphql-guidelines.md)，完整门禁见后端 quality-guidelines。
 
+## 源码目录与职责
+
+- `frontend/src` 根目录保留 `main.tsx`、`public.ts` 和 `vite-env.d.ts`；两条入口路径同时关联 HTML、Vite 与 Go manifest，移动入口需跨层同步。
+- `app/` 维护应用装配：`app.tsx` 组合顶层路由和会话 Provider，`navigation.ts` 定义菜单，`dashboard-layout.tsx` 维护后台壳层、访问控制、业务路由及旧队列地址重定向，`dashboard-adapter.ts` 接入公共 Dashboard 契约。
+- `features/` 按业务归类页面和专属逻辑：`auth/` 包含登录/安装及会话，`overview/` 包含系统概览，`shops/` 包含店铺页面及输入校验；页面命名采用 `*-page.tsx`，Provider 采用 `*-provider.tsx`。
+- `lib/` 放统一请求、监控等基础能力，依赖保持在基础层；`graphql/admin/` 保留端点隔离的操作文档及生成类型，生成物只通过 Codegen 更新。
+- `styles/global.css` 由两条入口共享，Tailwind 的 `@source` 路径相对样式文件解析；目录移动同步公共 Dashboard 与 Go 模板扫描路径。
+- 前端测试继续集中在 `frontend/tests`，按 `unit/node/types` 分类；源码移动同步测试导入，应用 HMR 验收修改 `frontend/src/app/dashboard-layout.tsx` 并检查窗口标记保持。
+
 ## GraphQL 操作类型生成
 
 - Admin 的操作与共享片段集中在应用 `frontend/src/graphql/admin/operations.ts`；`generated.ts` 由 Codegen 生成并随源码提交。
-- `frontend/codegen.mjs` 直接读取 `schema/common.graphqls`、`schema/admin.graphqls`、`schema/queue.graphqls`，与 `gqlgen-admin.yml` 对齐。Member 增加调用时使用独立文档、配置和产物，保持端点隔离。
-- 使用 `typescript-operations` v6 生成操作结果、变量及所需输入类型；调用 `graphql<TResult, TVariables>` 时显式关联类型。运行时沿用 fetch、Cookie、取消和 ApiError 边界。
+- `frontend/codegen.mjs` 直接读取 `share/schema/common.graphqls`、`share/schema/admin.graphqls`、`share/schema/queue.graphqls`，与 `backend/gqlgen-admin.yml` 对齐。Member 增加调用时使用独立文档、配置和产物，保持端点隔离。
+- 使用 `typescript-operations` v6 生成操作结果、变量及所需输入类型；调用 `graphql<TResult, TVariables>` 时显式关联类型。运行时使用 Apollo Client，保留 Cookie、取消和 ApiError 边界。
 - 含片段的操作先声明独立静态模板，再在导出常量中拼接片段；运行时文档与生成类型的完整性由测试同时校验。
 - DateTime 输入/输出为 `string`，JSON 为 `unknown`；未知 scalar 触发失败。响应字段保留 SDL 空值语义，输入保留可选语义；公共 DashboardAdapter 类型独立维护。
 - `rtk pnpm codegen` 更新产物；`rtk pnpm codegen:check` 在内存重新生成并逐字比较，检查过程只读，支持未提交变更和无 Git 的独立应用。
 - 前端 `build`、`typecheck` 先执行同步检查；主仓 `rtk pnpm generate` 在 Go 与 SQL 生成后更新前端类型。独立应用可直接使用自己的 `rtk pnpm codegen`；devtools 全生成链路的正式分发跟随工具新版本发布。
-- 前端 `test` 同时验证 Vite、生成/只读检查、运行时操作完整性及请求行为；类型契约用 `src/graphql/admin/type-contract.test.ts` 的编译错误断言校验；用户对象与 ID 字段的空值契约分别断言，ID 通过 `NonNullable` 用户直接访问，避免可选链引入的 `undefined` 掩盖字段类型漂移。
+- 前端 `test` 同时验证 Vite、生成/只读检查、运行时操作完整性及请求行为；类型契约用 `tests/types/graphql/admin/type-contract.test.ts` 的编译错误断言校验；用户对象与 ID 字段的空值契约分别断言，ID 通过 `NonNullable` 用户直接访问，避免可选链引入的 `undefined` 掩盖字段类型漂移。
 - Docker 前端构建阶段复制应用 SDL；生成与检查只依赖源码和 npm 工具链。
+
+## GraphQL 查询请求合并
+
+- `lib/request.ts` 使用 Apollo Client v4；`BatchHttpLink` 在 1 ms 窗口合并普通 query，最多 10 条，`batchKey` 按实际 AST 打印与变量的 UTF-8 字节数保留 1 MiB 正文分组限制，与 Go 兼容传输层对齐。Apollo 负责队列、分发与退订；fetch 兼容桥将单条数组转为对象，多条保持操作数组。
+- `gql` 与操作 AST 识别 query/mutation，支持前置注释和片段；mutation 与 `identity=true` 的身份查询走独立 `HttpLink`。读写依赖通过业务调用方 `await mutation` 保证；普通 query 使用 Apollo 窗口调度。现有 `graphql<TResult, TVariables>(query, variables, signal?, identity?)` 与 Codegen 契约保留。
+- 所有操作使用 `no-cache`，关闭 query 去重，使刷新始终读取服务端数据，并保留相同查询的独立生命周期。变量在调用时序列化快照；发送前取消退订移除操作，在途取消只影响该逻辑查询，整批退订中止共享 HTTP；全局退出取消排队与在途操作。
+- 批内 GraphQL 错误、缺失数据和非法成员按操作处理；批响应形状或数量异常整批失败。Apollo 错误统一映射为 ApiError，认证错误优先；共享 HTTP 错误的认证事件按物理请求通知一次，请求从 pending 移除后再通知，保留全局取消触发前的原始错误；监控按逻辑操作通知。
+- 沿用同源 Cookie、`cache: no-store` 与身份权限错误局部处理。服务端顺序执行各操作，数据库访问沿用各 resolver/service 行为。
+- Node 回归 `tests/node/request-batch.test.mjs` 加载真实 Apollo 运行时，覆盖分批、文档识别、刷新、相同查询独立取消、响应、认证和监控；浏览器 `tests/graphql-batch.spec.ts` 从 Vite 加载真实模块，用浏览器 fetch 与隔离 mock 验证数组传输和取消隔离。
+
+## 前端工具与监控契约
+
+- ESLint 使用 flat config、typescript-eslint recommended、Hooks 的 rules-of-hooks/exhaustive-deps 和 jsx-a11y recommended，零 warning 门禁。Input/Button/SelectTrigger 等组件映射到原生元素；角色选择使用自身 aria-label 与普通容器。no-explicit-any 保留现有显式泛型/动态边界，类型正确性由严格 TypeScript 与 Codegen 负责。
+- `typecheck` 先执行 lint；测试统一位于 frontend/tests。Vitest 仅收集 tests/unit 下的 `*.test.ts/tsx`，tests/types 中的编译契约由 tsc 校验；TypeScript 与 ESLint 同时覆盖 src、unit、types 和 tests/setup.ts。DOM 测试按文件启用 jsdom，setup 加载 jest-dom 并在每例结束 cleanup；Node 回归由 `node --test tests/node/*.test.mjs` 单独执行，Playwright 仅匹配 `tests/**/*.spec.ts`；独立 HMR 验收脚本位于 tests/verify-hmr.mjs，由共享验收工具调用。
+- 店铺创建输入在提交请求前通过 Zod 校验，归整空白并按 Unicode 字符验证 1–255 长度；沿用服务器权威校验及操作生成类型。
+- SPA 监控默认关闭，`VITE_SENTRY_*` 为构建时公开配置；事件使用白名单脱敏，关闭 PII/面包屑/Replay/追踪/会话。请求错误订阅者的异常保持隔离，取消与可预期 ApiError 静默，内部错误与非法响应可采集。React ErrorBoundary 提供中文降级页面，未捕获/可恢复错误由根入口接入。
+
+## 依赖安装与类型解析诊断
+
+- 主仓开发在工作区根执行 `rtk proxy env CI=true pnpm install --frozen-lockfile`，独立应用在自己的根目录安装；离线安装须已有缓存，可追加 `--offline`。
+- 第三方 React 组件声明出现 TS2607、TS2786、TS2769 时，先以 TypeScript `--traceResolution` 核对声明文件中的 react 解析路径，并检查 pnpm 安装目录与 hoisted @types/react 的实际文件。2026-10-12 的 Sentry.ErrorBoundary 异常由原锁文件完整安装恢复；业务源码、依赖版本与锁文件保持原值。
+- 修复后分别验证主仓前端类型检查、独立应用原锁文件全新安装和真实监控回归；共享脚本验收继续运行主仓 test/check/test:go:coverage/build。缓存复用、独立候选快照、正式固定提交发布验收分别记录。
+
+## 前端环境文件
+
+`frontend/.env.example` 保存 `SPA_PORT` 与公开 `VITE_*`；Vite 使用自身目录作为 envDir，按 mode 加载 `.env*`，进程变量优先。配置求值通过 `loadEnv` 读取 `SPA_PORT`、`WEB_ORIGIN`；这两个开发服务变量保持配置侧使用。根开发启动器通过应用安装的 Vite `loadEnv` 同步读取 development 端口，前端环境文件支持行尾注释、`export`、多行值与变量展开，由后端 `WEB_ADDR` 派生代理地址并覆盖前端文件中的 `WEB_ORIGIN`。单独启动前端时提供代理地址，缺省为 `http://127.0.0.1:8080`。前端子进程仅继承筛选后的工具环境、公开配置和代理信息。公开变量的文件加载交给 Vite，mode 配置保持原生优先级。
+
+## Bus 页面局部交互
+
+- `features/bus/{bus-page,protocol,query-stream}.ts` 维护 `/test/bus` 的原生 DOM 增强、载荷校验及 POST SSE 增量读取；应用仍保持 Go SSR 公开页与 `/admin/*` React SPA 的入口边界。
+- SSE 支持 UTF-8 跨块、CR/LF/CRLF、多行 data 与注释心跳，事件大小上限 64 KiB；每次查询独立校验 requestId/responseKey、序号与总数，重复结果去重，终止需要匹配 done。提前 EOF、非法载荷、HTTP 错误和客户端等待超时落到当前记录，终止路径取消读取器并释放锁。
+- 浏览器设备等待 `bus.query.ready` 后展示就绪，成功模式返回 1–3 条回执，每条等待 200–700 毫秒以匹配后端 5 秒窗口；另有错误、超时模式。模拟器与页面查询并发上限各 8，广播/设备日志各 30 条，查询历史 20 条；断开和 pagehide 清理计时器、WebSocket 与请求，单笔取消保持其他查询独立。
+- Zod 文本校验显式使用 JavaScript `string.length` 对齐后端 UTF-16 码元；服务器和用户内容使用 textContent，Tab 支持方向键/Home/End。无 JavaScript 时两条链路说明均可读。
+- `tests/unit/bus-page.test.ts` 通过 Vite raw 导入真实 Go 模板；`bus-query-stream.test.ts` 覆盖流与协议边界。`tests/bus.spec.ts` 覆盖匿名 SSR、真实广播、并发回执、错误、取消、超时与登录回跳；跨实例验收使用 `BUS_PEER_ORIGIN`。
+- Bus 视觉以 Astro starter 的 `/test/bus` 为参考：下划线 Tab、单行广播输入、左右两列卡片、卡片内设备／查询记录，以及三步广播／四步查询的 Topic 说明；移动端单列。Inter Variable 字体以 Bus 专属字体别名加载，颜色／圆角复用现有主题，其他公开页和管理后台保持既有字体。清空按钮与独立空状态随记录更新；设备清空只移除显示记录，查询清空同时取消本页查询。
+- 浏览器视觉回归覆盖桌面／移动端与明暗主题；提供 `BUS_REFERENCE_URL` 时，对照 Astro 原页面正文与主题 CSS 的静态渲染，检查关键节点的尺寸、颜色、边框、圆角、内边距和字体属性。该验收范围为参考源码静态渲染，完整 Astro 应用运行验收另行记录。
+
+## React 类型依赖隔离
+
+Web 使用 React 19，小程序使用 React 18。两级 pnpm workspace 为固定 `@sentry/react@11.6.0` 补齐可选 `@types/react` peer，按消费端声明选择类型；两份锁文件记录 Web 的 React 19 类型上下文。回归见主仓 `scripts/test-project.py` 与 Web `tests/unit/observability.test.ts` 的 ErrorBoundary 类型检查和运行时测试。
+
+## Dashboard 源码模式与依赖安装
+
+- 主仓开发以 `DASHBOARD_SOURCE=1` 直接解析 `packages/shadcnui-dashboard/src` 的 JS 与 CSS；Vite 前置转换将全局样式中公共包的源码扫描路径切换到同一目录，覆盖已安装发布包的场景。
+- 独立应用使用包导出与 `dist` 样式扫描；源码别名及样式转换仅在源码模式启用。
+- 主仓与独立应用的 `verifyDepsBeforeRun` 固定为 `warn`，脚本执行提示依赖状态。主仓安装在仓库根执行；独立应用安装在导出应用根执行。嵌套 workspace 的脚本检查保持现有依赖链接。
+- 回归由 `frontend/tests/node/vite.config.test.mjs` 与 `pnpm-workspace.test.mjs` 验证源码／发布包模式、CSS 扫描以及依赖过期时脚本执行的只读边界。

@@ -1,4 +1,4 @@
-# 本 Trellis 与命令根均为应用目录，单仓 backend/frontend 规范。
+# 本 Trellis 与命令根均为应用目录，单仓 backend/frontend/miniprogram 规范。
 session_auto_commit: false
 codex:
     dispatch_mode: inline

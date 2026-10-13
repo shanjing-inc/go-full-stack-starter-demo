@@ -13,3 +13,5 @@
 本目录 Trellis 管应用，主仓共享包/工具/发布任务在根登记，不重复应用任务。验证 get_context.py --mode packages 和 task.py current --source；规范使用本应用相对路径，不沿用主仓工具路径或历史机器绝对路径。
 
 复用时核对模块名、数据模型/迁移、端点/权限、菜单/偏好键、工具版本与数据库运行环境。派生业务仓保留已有迁移和业务提交，依赖与配置逐项升级。
+
+小程序源码 `miniprogram` 与 frontend 同级随应用发布，独立构建产物由微信开发者工具发布。workspace／独立锁文件覆盖两端，codegen 与检查／测试入口覆盖 Admin 前端和 Member 小程序。导出排除微信私有配置、同步归属标记、真实 `.env`、dist 与 `.swc` 编译缓存；保留 `.env.example`。

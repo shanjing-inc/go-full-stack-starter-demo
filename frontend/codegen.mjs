@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 const path = (relative) => fileURLToPath(new URL(relative, import.meta.url));
 
 export default {
-    schema: ["common", "admin", "queue"].map((name) => path(`../schema/${name}.graphqls`)),
+    schema: ["common", "admin", "queue"].map((name) => path(`../share/schema/${name}.graphqls`)),
     documents: [path("src/graphql/admin/operations.ts")],
     silent: true,
     generates: {

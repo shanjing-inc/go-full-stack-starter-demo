@@ -6,7 +6,7 @@
 
 ## 使用时机
 
-任务改动生产行为、公共契约、GraphQL schema/resolver、UI 交互、queue/runtime 行为、持久化逻辑，或带有可观察结果的部署脚本时，使用本指南。
+任务改动生产行为、公共契约、GraphQL share/schema/resolver、UI 交互、queue/runtime 行为、持久化逻辑，或带有可观察结果的部署脚本时，使用本指南。
 
 ---
 
@@ -83,7 +83,7 @@ RED 信号有效后：
 - fixtures 和 mocks 对齐现有测试模式。
 - 运行 RED 阶段同一条命令。
 - 记录通过输出摘要。
-- 变更涉及 generated types、schema、route 行为、queue runtime、部署脚本或 shared helper 时，运行更宽的检查命令。
+- 变更涉及 generated types、share/schema、route 行为、queue runtime、部署脚本或 shared helper 时，运行更宽的检查命令。
 
 证据格式：
 
@@ -129,7 +129,7 @@ GREEN 后：
 | 改动                         | 主测试                     | 额外检查                                  |
 | ---------------------------- | -------------------------- | ----------------------------------------- |
 | Go resolver/service/protocol | 同目录 `*_test.go`         | `rtk pnpm generate`、Go vet、应用类型检查 |
-| React 公共组件/adapter       | 本包既有源码旁单测         | `rtk pnpm test:ui`、应用类型检查          |
+| React 公共组件/adapter       | 本包 tests/unit 单测       | `rtk pnpm test:ui`、应用类型检查          |
 | React 路由/会话交互          | 受影响单测及 Playwright    | 独立服务/浏览器环境                       |
 | Queue/runtime                | 包内 Go 测试               | 隔离 Redis/数据库、退出清理证据           |
 | HTTP/GraphQL 传输            | Go httptest 与协议 fixture | 状态码、响应形状、权限、脱敏              |

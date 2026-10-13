@@ -1,13 +1,13 @@
 # GraphQL 接口
 
-新增接口、输入/DTO 或认证边界变化时使用。装配：应用 `cmd/web/main.go`、`internal/web/server.go`；协议适配：共享包 `transport/graphql`。
+新增接口、输入/DTO 或认证边界变化时使用。装配：应用 `backend/cmd/web/main.go`、`backend/internal/web/server.go`；协议适配：共享包 `transport/graphql`。
 
-| 契约     | 入口                                                                                               |
-| -------- | -------------------------------------------------------------------------------------------------- |
-| Member   | `/api/graphql/member`、应用 `schema/member.graphqls`、`gqlgen-member.yml`、`internal/graph/member` |
-| Admin    | `/api/graphql/admin`、应用 `schema/admin.graphqls`、`gqlgen-admin.yml`、`internal/graph/admin`     |
-| 共用定义 | 应用 `schema/common.graphqls`、`internal/graph/model`、`internal/graph/scalar`                     |
-| 前端请求 | 应用 `frontend/src/request.ts`、`frontend/src/adapter.ts`                                          |
+| 契约     | 入口                                                                                                                     |
+| -------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Member   | `/api/graphql/member`、应用 `share/schema/member.graphqls`、`backend/gqlgen-member.yml`、`backend/internal/graph/member` |
+| Admin    | `/api/graphql/admin`、应用 `share/schema/admin.graphqls`、`backend/gqlgen-admin.yml`、`backend/internal/graph/admin`     |
+| 共用定义 | 应用 `share/schema/common.graphqls`、`backend/internal/graph/model`、`backend/internal/graph/scalar`                     |
+| 前端请求 | 应用 `frontend/src/lib/request.ts`、`frontend/src/app/dashboard-adapter.ts`                                              |
 
 两端 Schema 隔离；Admin 路由认证与 resolver 资源动作权限均核对，不只靠前端隐藏按钮。沿用 camelCase、已有 `get*`/`list*` 和 `create*`/`update*`/`delete*` 命名、where/orderBy/分页契约。DTO 将整数 ID 映射为字符串，时间走 DateTime，保持 nullable/可选输入语义。
 

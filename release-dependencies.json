@@ -17,11 +17,12 @@
             "sourceCommit": "4d1c52cf70e47097a9be82b0e68866b3480daf5a"
         },
         "@shanjing/go-starter-devtools": {
-            "version": "0.1.1",
+            "version": "0.1.3",
             "registry": "https://packages.aliyun.com/5eb77c7538076f00011bd238/npm/npm-registry/",
-            "integrity": "sha512-LW9NTiHmGzAqLPYG21DGmYtAttkU980jv/x/S34QiOa9g+u+pTuFt/Oj5aOyehtOOtV7yX9s7G7YCLO99P9bdw==",
-            "tarball": "https://packages.aliyun.com/5eb77c7538076f00011bd238/npm/npm-registry/@shanjing/go-starter-devtools/-/@shanjing/go-starter-devtools-0.1.1.tgz",
-            "shasum": "4af0848caf0f0c5666d4abae7c7ac70f6d60b2d9"
+            "sourceCommit": "7bdd6ff39cffb53ee445d314bb601b003136a601",
+            "integrity": "sha512-0jTRq+nQDV8QJI9qPIlWaSqSnwD+ZJyun0Jjoo+bqj4Yo5IUiZcHjzPXfzFTpzFfJFoxez0qOM5PCLR0S3V1WA==",
+            "shasum": "7b349fa62b799ee08fb58a57c8a4a1d8fdeff1b2",
+            "tarball": "https://packages.aliyun.com/5eb77c7538076f00011bd238/npm/npm-registry/@shanjing/go-starter-devtools/-/@shanjing/go-starter-devtools-0.1.3.tgz"
         }
     }
 }

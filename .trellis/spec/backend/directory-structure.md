@@ -1,20 +1,20 @@
 # 应用目录
 
-| 入口                                              | 职责                          |
-| ------------------------------------------------- | ----------------------------- |
-| cmd/web、cmd/worker                               | 组装、启动、退出              |
-| internal/config                                   | 环境解析、脱敏                |
-| internal/model、internal/service                  | 模型、业务、事务              |
-| internal/graph/{member,admin,model,scalar}        | Schema/resolver/DTO/标量      |
-| schema、gqlgen-\*.yml、cmd/gen、cmd/schema        | 生成源与目标 Schema           |
-| internal/query、migrations                        | 生成查询与版本迁移            |
-| internal/{realtime,protocol,tasks,pages}          | 实时、队列、SSR               |
-| frontend、internal/web                            | 前端源码、HTTP 路由与内嵌资源 |
-| package.json、starter.config.json、toolchain.json | 应用命令、布局和固定工具      |
-| .trellis、AGENTS.md                               | 应用规范                      |
+| 入口                                                                     | 职责                          |
+| ------------------------------------------------------------------------ | ----------------------------- |
+| backend/cmd/web、backend/cmd/worker                                      | 组装、启动、退出              |
+| backend/internal/config                                                  | 环境解析、脱敏                |
+| backend/internal/model、backend/internal/service                         | 模型、业务、事务              |
+| backend/internal/graph/{member,admin,model,scalar}                       | Schema/resolver/DTO/标量      |
+| share/schema、backend/gqlgen-\*.yml、backend/cmd/gen、backend/cmd/schema | 生成源与目标 Schema           |
+| backend/internal/query、backend/migrations                               | 生成查询与版本迁移            |
+| backend/internal/{realtime,protocol,tasks,pages}                         | 实时、队列、SSR               |
+| frontend、backend/internal/web                                           | 前端源码、HTTP 路由与内嵌资源 |
+| package.json、starter.config.json、toolchain.json                        | 应用命令、布局和固定工具      |
+| .trellis、AGENTS.md                                                      | 应用规范                      |
 
-所有路径相对本应用根。通用能力来自固定 Go kit/Dashboard/devtools 依赖；共享源码维护在主仓，本应用不携带。generated.go、models_gen.go、query/\*.gen.go、schema/generated 从源定义生成，不手改。
+所有路径相对本应用根。通用能力来自固定 Go kit/Dashboard/devtools 依赖；共享源码维护在主仓，本应用不携带。generated.go、models_gen.go、query/\*.gen.go、share/schema/generated 从源定义生成，不手改。
 
 生成在本目录执行 pnpm generate；Go 包加载前先构建 SPA，沿用统一命令顺序。
 
-`internal/web` 统一使用 `package web`；前端构建输出到 `internal/web/dist`，由 `embed.go` 嵌入、`assets.go` 解析资源清单。公开 SSR 模板与渲染保持在 `internal/pages`。
+`backend/internal/web` 统一使用 `package web`；前端构建输出到 `backend/internal/web/dist`，由 `embed.go` 嵌入、`assets.go` 解析资源清单。公开 SSR 模板与渲染保持在 `backend/internal/pages`。
