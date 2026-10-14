@@ -32,7 +32,7 @@
         "test:weapp": "pnpm --filter multi-database-demo-miniprogram test"
     },
     "devDependencies": {
-        "@shanjing/go-starter-devtools": "0.1.3",
+        "@shanjing/go-starter-devtools": "0.1.5",
         "prettier": "3.6.2"
     }
 }
