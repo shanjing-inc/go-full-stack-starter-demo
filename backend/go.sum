@@ -614,10 +614,8 @@ cloud.google.com/go/workflows v1.7.0/go.mod h1:JhSrZuVZWuiDfKEFxU0/F1PQjmpnpcoIS
 cloud.google.com/go/workflows v1.8.0/go.mod h1:ysGhmEajwZxGn1OhGOGKsTXc5PyxOc0vfKf5Af+to4M=
 cloud.google.com/go/workflows v1.9.0/go.mod h1:ZGkj1aFIOd9c8Gerkjjq7OW7I5+l6cSvT3ujaO/WwSA=
 cloud.google.com/go/workflows v1.10.0/go.mod h1:fZ8LmRmZQWacon9UCX1r/g/DfAXx5VcPALq2CxzdePw=
-codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit v0.0.0-20261009054620-e402060eb491 h1:MzJciBI+FphqQfzj6CzL8Hkchsd3kBdmH45iSk38HR4=
-codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit v0.0.0-20261009054620-e402060eb491/go.mod h1:qgllkepivRlnMQfzDmReboelCXmTIoLCwKzymC6JCr8=
-codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit v0.0.0-20261011051254-4d1c52cf70e4 h1:fB259hPi3fxyYVzgdwIwFVoqjDWp2PU9qql/KTSdQ20=
-codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit v0.0.0-20261011051254-4d1c52cf70e4/go.mod h1:qgllkepivRlnMQfzDmReboelCXmTIoLCwKzymC6JCr8=
+codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit v0.1.0 h1:xV6WMaWjz8OqBIUDf+oAg2UlmA8V+YW0a0cG46eMsb4=
+codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit v0.1.0/go.mod h1:qgllkepivRlnMQfzDmReboelCXmTIoLCwKzymC6JCr8=
 dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7gZCb22OMCxBHrMx7a5I7Hp++hsVxbQ4BYO7hU=
 filippo.io/edwards25519 v1.1.0 h1:FNf4tywRC1HmFuKW5xopWpigGjJKiJSV0Cqo0cJWDaA=
 filippo.io/edwards25519 v1.1.0/go.mod h1:BxyFTGdWcka3PhytdK4V28tE5sGfRvvvRV7EaN4VDT4=

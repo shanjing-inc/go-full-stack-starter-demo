@@ -3,13 +3,13 @@
     "layout": "app-layout-v2",
     "application": "projects/multi-database-demo",
     "sourceRepository": "https://codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git",
-    "sourceCommit": "ecabec3e40acfcb46b737abe96b6b23d08d51ea9",
+    "sourceCommit": "93b93b19f1976eee03ed22e94928036036d026ba",
     "dependencies": {
         "go": {
             "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit": {
-                "version": "v0.0.0-20261011051254-4d1c52cf70e4",
-                "sourceCommit": "4d1c52cf70e47097a9be82b0e68866b3480daf5a",
-                "sum": "h1:fB259hPi3fxyYVzgdwIwFVoqjDWp2PU9qql/KTSdQ20=",
+                "version": "v0.1.0",
+                "sourceCommit": "ecabec3e40acfcb46b737abe96b6b23d08d51ea9",
+                "sum": "h1:xV6WMaWjz8OqBIUDf+oAg2UlmA8V+YW0a0cG46eMsb4=",
                 "goModSum": "h1:qgllkepivRlnMQfzDmReboelCXmTIoLCwKzymC6JCr8="
             }
         },
@@ -370,12 +370,12 @@
         },
         "backend/go.mod": {
             "source": "projects/multi-database-demo/backend/go.mod",
-            "sha256": "846ea502f53c2935d0ed27c19432534b8154ba0f5708dd7b92f031e49e854c9b",
+            "sha256": "9f501c622751c4c228350ffb4158f5a23123e4962262ce5dd6690ac231fac00a",
             "mode": 420
         },
         "backend/go.sum": {
             "source": "projects/multi-database-demo/backend/go.sum",
-            "sha256": "7c9d60dc2803f5e58d8986ba71e8abdcb2d73f2147c70c13407461267ac4b2ab",
+            "sha256": "dfed909e54907df64ad28abc41606e8a282a5264edf87436827a8c64f0b17858",
             "mode": 420
         },
         "backend/gqlgen-admin.yml": {
@@ -1370,7 +1370,7 @@
         },
         "release-dependencies.json": {
             "source": "projects/multi-database-demo/release-dependencies.json",
-            "sha256": "07da036e83e3f104def23c62bac98e5c5b9873248bde9cfe8616a559abff1848",
+            "sha256": "8bf8c76b30bf2b6515ecdcd3ad9b6674e7be182091bd537063f7c56316237617",
             "mode": 420
         },
         "ruff.toml": {
