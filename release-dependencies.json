@@ -1,28 +1,28 @@
 {
     "go": {
         "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit": {
-            "version": "v0.1.5",
-            "sourceCommit": "16d3a4be30961af9a31a414b14c2c953798a7df5",
-            "sum": "h1:Mc3NetJCZeNA24Qdq5wE1v3OXE169CDtrS/OPBkXq+o=",
+            "version": "v0.1.6",
+            "sourceCommit": "cc3aa6ce28808bd7ac8454bb3a614bc8c292050b",
+            "sum": "h1:yXc9IJal3zNuwWh033dSLCYRXN14JzD3mymaj13xoB0=",
             "goModSum": "h1:qgllkepivRlnMQfzDmReboelCXmTIoLCwKzymC6JCr8="
         }
     },
     "npm": {
         "@shanjing/shadcnui-dashboard": {
-            "version": "0.1.5",
+            "version": "0.1.6",
             "registry": "https://packages.aliyun.com/5eb77c7538076f00011bd238/npm/npm-registry/",
-            "sourceCommit": "16d3a4be30961af9a31a414b14c2c953798a7df5",
-            "integrity": "sha512-w5QJ2lrUcx/6gITCzkBrgNc7u0murKYXbPGo1IOMMYxCqYAPqgnguX/GhyM3EwDHIgrBJKLF3nt7dxJYGbWm5g==",
-            "shasum": "4086d0656ab7e9b3381246f9fdb49e75854e4e35",
-            "tarball": "https://packages.aliyun.com/5eb77c7538076f00011bd238/npm/npm-registry/@shanjing/shadcnui-dashboard/-/@shanjing/shadcnui-dashboard-0.1.5.tgz"
+            "sourceCommit": "cc3aa6ce28808bd7ac8454bb3a614bc8c292050b",
+            "integrity": "sha512-N1sH2Z+ynG2cy8JMqJZMC5IO0lPs7ihsFflDLdw8VA2nWM85UX5hJUQrslq/2WXQY/3CflFfW0u7XyxSo55YcQ==",
+            "shasum": "98b1e61196c7b00c9c6f38622e5009d0a2200941",
+            "tarball": "https://packages.aliyun.com/5eb77c7538076f00011bd238/npm/npm-registry/@shanjing/shadcnui-dashboard/-/@shanjing/shadcnui-dashboard-0.1.6.tgz"
         },
         "@shanjing/go-starter-devtools": {
-            "version": "0.1.8",
+            "version": "0.1.9",
             "registry": "https://packages.aliyun.com/5eb77c7538076f00011bd238/npm/npm-registry/",
-            "sourceCommit": "16d3a4be30961af9a31a414b14c2c953798a7df5",
-            "integrity": "sha512-UD9cgvmKYL+r1Q70C3O5xUD73EN4l4cWUwLgMX0ije/5/4Iyir+6GlNSZEocCS1rDcWCrZ5n6+jOOQikaCOfCg==",
-            "shasum": "9022e6e46d2238e2f42d3538d2f1b867d8fc8a63",
-            "tarball": "https://packages.aliyun.com/5eb77c7538076f00011bd238/npm/npm-registry/@shanjing/go-starter-devtools/-/@shanjing/go-starter-devtools-0.1.8.tgz"
+            "sourceCommit": "cc3aa6ce28808bd7ac8454bb3a614bc8c292050b",
+            "integrity": "sha512-esmyfiM1baInqD9OPyFzPXAs27gMgHc8Jr/b7Lkvex/1TLOapriEpoxdLAcsIrhAeVLGxYRgFbf8E78KTInGlg==",
+            "shasum": "f085d5f6f9c17706f3fe235ffd4ed1325ca89ade",
+            "tarball": "https://packages.aliyun.com/5eb77c7538076f00011bd238/npm/npm-registry/@shanjing/go-starter-devtools/-/@shanjing/go-starter-devtools-0.1.9.tgz"
         }
     }
 }

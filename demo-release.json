@@ -3,32 +3,32 @@
     "layout": "app-layout-v2",
     "application": "projects/multi-database-demo",
     "sourceRepository": "https://codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git",
-    "sourceCommit": "16d3a4be30961af9a31a414b14c2c953798a7df5",
+    "sourceCommit": "bfdd90027eab9fb6f090e53a626e98647a840f59",
     "dependencies": {
         "go": {
             "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit": {
-                "version": "v0.1.5",
-                "sourceCommit": "16d3a4be30961af9a31a414b14c2c953798a7df5",
-                "sum": "h1:Mc3NetJCZeNA24Qdq5wE1v3OXE169CDtrS/OPBkXq+o=",
+                "version": "v0.1.6",
+                "sourceCommit": "cc3aa6ce28808bd7ac8454bb3a614bc8c292050b",
+                "sum": "h1:yXc9IJal3zNuwWh033dSLCYRXN14JzD3mymaj13xoB0=",
                 "goModSum": "h1:qgllkepivRlnMQfzDmReboelCXmTIoLCwKzymC6JCr8="
             }
         },
         "npm": {
             "@shanjing/shadcnui-dashboard": {
-                "version": "0.1.5",
+                "version": "0.1.6",
                 "registry": "https://packages.aliyun.com/5eb77c7538076f00011bd238/npm/npm-registry/",
-                "sourceCommit": "16d3a4be30961af9a31a414b14c2c953798a7df5",
-                "integrity": "sha512-w5QJ2lrUcx/6gITCzkBrgNc7u0murKYXbPGo1IOMMYxCqYAPqgnguX/GhyM3EwDHIgrBJKLF3nt7dxJYGbWm5g==",
-                "shasum": "4086d0656ab7e9b3381246f9fdb49e75854e4e35",
-                "tarball": "https://packages.aliyun.com/5eb77c7538076f00011bd238/npm/npm-registry/@shanjing/shadcnui-dashboard/-/@shanjing/shadcnui-dashboard-0.1.5.tgz"
+                "sourceCommit": "cc3aa6ce28808bd7ac8454bb3a614bc8c292050b",
+                "integrity": "sha512-N1sH2Z+ynG2cy8JMqJZMC5IO0lPs7ihsFflDLdw8VA2nWM85UX5hJUQrslq/2WXQY/3CflFfW0u7XyxSo55YcQ==",
+                "shasum": "98b1e61196c7b00c9c6f38622e5009d0a2200941",
+                "tarball": "https://packages.aliyun.com/5eb77c7538076f00011bd238/npm/npm-registry/@shanjing/shadcnui-dashboard/-/@shanjing/shadcnui-dashboard-0.1.6.tgz"
             },
             "@shanjing/go-starter-devtools": {
-                "version": "0.1.8",
+                "version": "0.1.9",
                 "registry": "https://packages.aliyun.com/5eb77c7538076f00011bd238/npm/npm-registry/",
-                "sourceCommit": "16d3a4be30961af9a31a414b14c2c953798a7df5",
-                "integrity": "sha512-UD9cgvmKYL+r1Q70C3O5xUD73EN4l4cWUwLgMX0ije/5/4Iyir+6GlNSZEocCS1rDcWCrZ5n6+jOOQikaCOfCg==",
-                "shasum": "9022e6e46d2238e2f42d3538d2f1b867d8fc8a63",
-                "tarball": "https://packages.aliyun.com/5eb77c7538076f00011bd238/npm/npm-registry/@shanjing/go-starter-devtools/-/@shanjing/go-starter-devtools-0.1.8.tgz"
+                "sourceCommit": "cc3aa6ce28808bd7ac8454bb3a614bc8c292050b",
+                "integrity": "sha512-esmyfiM1baInqD9OPyFzPXAs27gMgHc8Jr/b7Lkvex/1TLOapriEpoxdLAcsIrhAeVLGxYRgFbf8E78KTInGlg==",
+                "shasum": "f085d5f6f9c17706f3fe235ffd4ed1325ca89ade",
+                "tarball": "https://packages.aliyun.com/5eb77c7538076f00011bd238/npm/npm-registry/@shanjing/go-starter-devtools/-/@shanjing/go-starter-devtools-0.1.9.tgz"
             }
         }
     },
@@ -370,13 +370,13 @@
         },
         "backend/go.mod": {
             "source": "projects/multi-database-demo/backend/go.mod",
-            "sha256": "2a4c796270b3c93faa325bbcc055e87c53ca026efa08ad3fe107a4a8c67a3086",
+            "sha256": "222cbe315c553198798c8c154aa493f6399725e048f82d9e556c8cc9a44205af",
             "mode": 420,
             "sourceSha256": "67ea893efff92be0172aaa012f39596c52b352ec064b6ec3ad5c8bf05d81cdb7"
         },
         "backend/go.sum": {
             "source": "projects/multi-database-demo/backend/go.sum",
-            "sha256": "89cb06288d9b72d6d443156403894ce87ff6648131e6b05f72f4ca98d940e04e",
+            "sha256": "3bd18dcb3803b17121583beed7188daa61b7c0b94934017323258557a55b1394",
             "mode": 420,
             "sourceSha256": "dfed909e54907df64ad28abc41606e8a282a5264edf87436827a8c64f0b17858"
         },
@@ -887,7 +887,7 @@
         },
         "frontend/package.json": {
             "source": "projects/multi-database-demo/frontend/package.json",
-            "sha256": "f304646d9c7bfa0b5dad7c8738c6bdd95ec9f1c88441ed759704e17372051475",
+            "sha256": "3f3e0914442c9fe8634d479fe6473d4a26f6f523a8c1e676b19cca4b0a70834a",
             "mode": 420,
             "sourceSha256": "d7ceb8b93b72531b715c761776510989d25c5a024d7fbd419a313dcbcc741903"
         },
@@ -1359,25 +1359,25 @@
         },
         "package.json": {
             "source": "projects/multi-database-demo/package.json",
-            "sha256": "54151552986338a041f2374f5830623dbedfaf0792c592c6f6fb16172750968e",
+            "sha256": "909a7b19fec36258ea168bc1c7c1cad9294d671e2a534a0648471f7791b9e05e",
             "mode": 420,
             "sourceSha256": "b499f848f684c25384e6e46bad7cdf7dd6569dd39a5a62fa92a8084788fc26ba"
         },
         "pnpm-lock.yaml": {
             "source": "projects/multi-database-demo/pnpm-lock.yaml",
-            "sha256": "5337183e7cfc0ff3eeffa5497096f12d6b84a3bf6fb7d4c4aac9e59ed1ebcfe3",
+            "sha256": "3411d86cc0c22bd4d7a97d1752dc0675559ea67bfc2663059efc6f08acd55aca",
             "mode": 420,
             "sourceSha256": "8f9c565f30e171be6f90eceafb20f24a4539142cf7695fdee42a3a9bc5a39c21"
         },
         "pnpm-workspace.yaml": {
             "source": "projects/multi-database-demo/pnpm-workspace.yaml",
-            "sha256": "9e60f954600eea819feae9298ddb6720a523fa3863a9f4bd8d3b3c5be1c30be9",
+            "sha256": "7bac945e61e29afe06071b613346c1ed498bfd5039e7148e5f8c2b458f689508",
             "mode": 420,
             "sourceSha256": "dd91ee21bc06ff40fcc79180801db19e2ca5b59ce40fe8ff537e1dadd0dd79c6"
         },
         "release-dependencies.json": {
             "source": "projects/multi-database-demo/release-dependencies.json",
-            "sha256": "dca867b70fab93809614dcd844771679d2065a9e3cefaab64c78a8e8840880ee",
+            "sha256": "20055ee4964ab35dfdc0b939c66d8bf5c3bd110103d807de917827664cbf2678",
             "mode": 420,
             "sourceSha256": "8bf8c76b30bf2b6515ecdcd3ad9b6674e7be182091bd537063f7c56316237617"
         },
