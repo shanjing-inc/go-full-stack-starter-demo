@@ -4,7 +4,7 @@ go 1.26.0
 
 require (
     ariga.io/atlas-provider-gorm v0.6.1
-    codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit v0.1.6
+    codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit v0.1.7
     github.com/99designs/gqlgen v0.17.95
     github.com/coder/websocket v1.8.15
     github.com/getsentry/sentry-go v0.50.0
