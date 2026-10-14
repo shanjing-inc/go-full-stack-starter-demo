@@ -10,8 +10,8 @@ importers:
     .:
         devDependencies:
             "@shanjing/go-starter-devtools":
-                specifier: 0.1.5
-                version: 0.1.5
+                specifier: 0.1.6
+                version: 0.1.6
             prettier:
                 specifier: 3.6.2
                 version: 3.6.2
@@ -28,8 +28,8 @@ importers:
                 specifier: 11.6.0
                 version: 11.6.0(@types/react@19.2.17)(react-router@8.3.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)
             "@shanjing/shadcnui-dashboard":
-                specifier: 0.1.2
-                version: 0.1.2(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react-router@8.3.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)
+                specifier: 0.1.3
+                version: 0.1.3(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react-router@8.3.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)
             graphql:
                 specifier: 17.0.2
                 version: 17.0.2
@@ -4956,19 +4956,19 @@ packages:
             }
         engines: { node: ">=20.19.0 <22.0.0 || >=22.12.0 <23.0.0 || >=23.2.0" }
 
-    "@shanjing/go-starter-devtools@0.1.5":
+    "@shanjing/go-starter-devtools@0.1.6":
         resolution:
             {
-                integrity: sha512-zn5sWd7ItW0jkSeBfxQPa9nhubVw9ZTBU7xJVhaTZkTbsohH+o71ahOu7zuAs4XOdSksX7NmqlzVkI+yk6+BKw==,
-                tarball: https://packages.aliyun.com/5eb77c7538076f00011bd238/npm/npm-registry/@shanjing/go-starter-devtools/-/@shanjing/go-starter-devtools-0.1.5.tgz,
+                integrity: sha512-s+w3W9nyuv1QPYrWFbmRJTbglKCN5md+NxFpXWVY6le7zxuvFcZ4EAXbdoEGgEuFDDzc1auVbQHvg7YAffOXEQ==,
+                tarball: https://packages.aliyun.com/5eb77c7538076f00011bd238/npm/npm-registry/@shanjing/go-starter-devtools/-/@shanjing/go-starter-devtools-0.1.6.tgz,
             }
         hasBin: true
 
-    "@shanjing/shadcnui-dashboard@0.1.2":
+    "@shanjing/shadcnui-dashboard@0.1.3":
         resolution:
             {
-                integrity: sha512-LFkNhni+YE3Z64X9f64kyU+YRHFEcQAji4J1XoFNYNWKr6XLfgVWNHjxmcJzH6jkTbNKVx3AcZr7/5ygWrxKzQ==,
-                tarball: https://packages.aliyun.com/5eb77c7538076f00011bd238/npm/npm-registry/@shanjing/shadcnui-dashboard/-/@shanjing/shadcnui-dashboard-0.1.2.tgz,
+                integrity: sha512-uCWWHcx2qBj/3o3BquWtKKh+VtoWC7FWDcn/FDb3V32y04KNBZKbgZJGt10bzpF+RpLBwO2ger2sM/BJVjeJ5g==,
+                tarball: https://packages.aliyun.com/5eb77c7538076f00011bd238/npm/npm-registry/@shanjing/shadcnui-dashboard/-/@shanjing/shadcnui-dashboard-0.1.3.tgz,
             }
         peerDependencies:
             react: ^19.2.8
@@ -17143,9 +17143,9 @@ snapshots:
             "@sentry/browser-utils": 11.6.0
             "@sentry/core": 11.6.0
 
-    "@shanjing/go-starter-devtools@0.1.5": {}
+    "@shanjing/go-starter-devtools@0.1.6": {}
 
-    "@shanjing/shadcnui-dashboard@0.1.2(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react-router@8.3.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)":
+    "@shanjing/shadcnui-dashboard@0.1.3(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react-router@8.3.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)":
         dependencies:
             class-variance-authority: 0.7.1
             clsx: 2.1.1
