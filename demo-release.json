@@ -3,7 +3,7 @@
     "layout": "app-layout-v2",
     "application": "projects/multi-database-demo",
     "sourceRepository": "https://codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git",
-    "sourceCommit": "2c85b95f457598ac5a47cc563b3ece7cac2ac8d8",
+    "sourceCommit": "5ed29d58af681388e0c829d9f397755dc933bea6",
     "dependencies": {
         "go": {
             "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit": {
@@ -953,7 +953,7 @@
         },
         "frontend/src/features/overview/overview-page.tsx": {
             "source": "projects/multi-database-demo/frontend/src/features/overview/overview-page.tsx",
-            "sha256": "1ebfba33f4d82d8ce2115cafcec498255697bccd85b7e84398ef276a189f46eb",
+            "sha256": "e1ae9bb499629e1cf6ca0fd693373f0c9b0ce0321cca4c2c2f1d8c56136cb3f6",
             "mode": 420
         },
         "frontend/src/features/shops/shop-input.ts": {

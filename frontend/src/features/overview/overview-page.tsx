@@ -48,7 +48,7 @@ export function OverviewPage() {
                     适配。
                 </CardContent>
             </Card>
-            <Link to="/shops">进入店铺列表</Link>
+            <Link to="/shops">查看店铺列表</Link>
         </>
     );
 }
