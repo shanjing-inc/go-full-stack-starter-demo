@@ -3,13 +3,13 @@
     "layout": "app-layout-v2",
     "application": "projects/multi-database-demo",
     "sourceRepository": "https://codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git",
-    "sourceCommit": "a3925e7e68b94fb90c37995af379eadcd7a3f106",
+    "sourceCommit": "c2cbf7c43ae9cd19504a76397b4756811d8306fb",
     "dependencies": {
         "go": {
             "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit": {
-                "version": "v0.1.10",
-                "sourceCommit": "a3925e7e68b94fb90c37995af379eadcd7a3f106",
-                "sum": "h1:4UsxIi1y4V408/kqkyv2VggOq7xcCxQbVtKJhlt5hwA=",
+                "version": "v0.1.11",
+                "sourceCommit": "c2cbf7c43ae9cd19504a76397b4756811d8306fb",
+                "sum": "h1:cAQIX3md0p1JfeJUHS7We7hjAv6ZmqsMETk+RhsQ1OQ=",
                 "goModSum": "h1:qgllkepivRlnMQfzDmReboelCXmTIoLCwKzymC6JCr8="
             }
         },
@@ -352,13 +352,13 @@
         },
         "backend/go.mod": {
             "source": "projects/multi-database-demo/backend/go.mod",
-            "sha256": "a375fb4f6e5123cd238e06faa3a057e4633d232ff5f5ca663ce9f7d279a8f160",
+            "sha256": "927674d24da6eacd904cb85644c498cd5da422f76d64f6fd646f208fc21664a0",
             "mode": 420,
             "sourceSha256": "67ea893efff92be0172aaa012f39596c52b352ec064b6ec3ad5c8bf05d81cdb7"
         },
         "backend/go.sum": {
             "source": "projects/multi-database-demo/backend/go.sum",
-            "sha256": "d1c34412216903c2c979ccdff580f735062fa22e68f599345ca50dbc4eee2713",
+            "sha256": "22a14312e1d3057a4fbad00d0cc6b995c2d9c2962ed477a2180063cbbe63e96a",
             "mode": 420,
             "sourceSha256": "dfed909e54907df64ad28abc41606e8a282a5264edf87436827a8c64f0b17858"
         },
@@ -1383,7 +1383,7 @@
         },
         "release-dependencies.json": {
             "source": "projects/multi-database-demo/release-dependencies.json",
-            "sha256": "5531de62f7fef6943a5d3ce0a7499bf631d79dd07c8a0eb4fecd43634825b5b7",
+            "sha256": "a564a3ae838edda187c7ec4c246a7ce3c45acf2ad929206cb431ce38b32da7c6",
             "mode": 420,
             "sourceSha256": "4b7ceaf4e17dd690679e98989d8f0fc10721dfe9fa4eb0fee5abf57f88ec6e2a"
         },
