@@ -18,6 +18,11 @@ export type IntFilters = {
     notInArray?: Array<number> | null | undefined;
 };
 
+export type MemberSignInInput = {
+    email: string;
+    password: string;
+};
+
 export type ShopFilters = {
     id?: IntFilters | null | undefined;
     slug?: StringFilters | null | undefined;
@@ -55,3 +60,13 @@ export type GetMemberShopQuery = {
         updatedAt: string | null;
     } | null;
 };
+
+export type MemberSignInMutationVariables = Exact<{
+    input: MemberSignInInput;
+}>;
+
+export type MemberSignInMutation = { signInWithEmail: { token: string } };
+
+export type MemberSignOutMutationVariables = Exact<{ [key: string]: never }>;
+
+export type MemberSignOutMutation = { signOut: boolean };

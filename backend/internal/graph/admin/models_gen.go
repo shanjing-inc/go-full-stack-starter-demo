@@ -27,9 +27,27 @@ type CreateUserSetInput struct {
     Role     *string `json:"role,omitempty"`
 }
 
+type DashboardOverview struct {
+    Shops   int    `json:"shops"`
+    Backend string `json:"backend"`
+    Mode    string `json:"mode"`
+}
+
+type InitializeAdminInput struct {
+    BootstrapToken string `json:"bootstrapToken"`
+    Name           string `json:"name"`
+    Email          string `json:"email"`
+    Password       string `json:"password"`
+}
+
 type InnerOrder struct {
     Direction OrderDirection `json:"direction"`
     Priority  int            `json:"priority"`
+}
+
+type InstallStatus struct {
+    Installed bool `json:"installed"`
+    Enabled   bool `json:"enabled"`
 }
 
 type Mutation struct {
@@ -55,6 +73,11 @@ type ShopOrderBy struct {
     Slug      *InnerOrder `json:"slug,omitempty"`
     Status    *InnerOrder `json:"status,omitempty"`
     UpdatedAt *InnerOrder `json:"updatedAt,omitempty"`
+}
+
+type SignInWithEmailInput struct {
+    Email    string `json:"email"`
+    Password string `json:"password"`
 }
 
 type UpdateUserSetInput struct {

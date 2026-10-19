@@ -1,6 +1,6 @@
 # 数据库与迁移
 
-用于模型、查询、连接或迁移变化。入口：应用 share/schema/migrate 命令、固定 devtools 的 URL/迁移工具、Go kit 的 infra/database、应用 backend/internal/model、backend/internal/schema 和 migrations。
+用于模型、查询、连接或迁移变化。入口：应用 share/schema/migrate 命令、应用 scripts 的 URL/迁移工具、Go kit 的 infra/database、应用 backend/internal/model、backend/internal/schema 和 migrations。
 
 - `DB_DSN` 是连接 URL，方言由 mysql、postgres/postgresql、sqlite 协议推导；不增加 `DB_DRIVER` 环境开关。
 - `MIGRATION_URL` 可选，缺省、空字符串或纯空白时使用 `DB_DSN`；显式配置时优先使用并校验方言一致。执行迁移的账户需要建表与改表权限，生产环境推荐独立迁移账户。`ATLAS_DEV_URL` 必填且指向同方言、可清空的隔离开发库；清理范围限定在隔离开发库。

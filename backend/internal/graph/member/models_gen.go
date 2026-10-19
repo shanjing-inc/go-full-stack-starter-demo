@@ -2,5 +2,17 @@
 
 package member
 
+type MemberSignInInput struct {
+    Email    string `json:"email"`
+    Password string `json:"password"`
+}
+
+type MemberSignInPayload struct {
+    Token string `json:"token"`
+}
+
+type Mutation struct {
+}
+
 type Query struct {
 }

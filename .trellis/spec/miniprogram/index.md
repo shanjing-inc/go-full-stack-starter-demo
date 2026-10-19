@@ -12,9 +12,9 @@
 
 ## 登录与会话
 
-- 批量测试页迁移参考工程同页邮箱密码登录／退出区域；复用同源 `POST /api/auth/sign-in/email`（返回 token）与 `POST /api/auth/sign-out`（返回 success），后端协议、认证门禁与模型保持原样。
+- 批量测试页保留同页邮箱密码登录／退出区域；调用 Member GraphQL `signInWithEmail(input: MemberSignInInput!) { token }` 与 `signOut`。认证操作与类型统一放入 Member operations／generated；原生请求使用 POST、无 Cookie，Bearer token 沿用现有存储与会话模型。
 - `src/auth/session.ts` 统一输入／响应校验、15 秒超时及脱敏网络错误。token 存储键为 `go-starter:member-auth:<后端 origin>`，按协议／主机／端口隔离，读取异常或无效值视为空会话；密码只在表单内存中，登录成功后清空。
-- fetch 只向已配置的 Member 端点携带 Bearer token。401 清除发出该请求的对应 token 并提示重新登录；403 保留会话；旧响应保留后续登录的新 token。保持 10ms 合并窗口和每批十项，页面单次／五条并发模式与逐项诊断保持原样。
+- fetch 只向已配置的 Member 端点携带 Bearer token。HTTP 401 或 GraphQL `errors[].extensions.code=UNAUTHORIZED`（单条／batch）清除发出该请求的对应 token 并提示重新登录；403 保留会话；旧响应保留后续登录的新 token。保持 10ms 合并窗口和每批十项，页面单次／五条并发模式与逐项诊断保持原样。
 - 本地缺少 token 时页面提示先登录；已保存 token 在业务请求时由服务端验证。登录、退出、店铺查询共享互斥锁并禁用控件，保留重复点击、错误重试及卸载后的状态更新保护。
 - 退出成功或 401 清理本地 token，网络／服务错误保留会话供重试。回归覆盖同源 URL／Bearer、token 校验及存储隔离、真实 Apollo 批量鉴权与 401／403、UI 登录／查询／退出及卸载；真实账号／微信开发者工具另作专项验收。
 

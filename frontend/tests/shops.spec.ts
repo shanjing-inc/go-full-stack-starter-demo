@@ -33,8 +33,21 @@ async function mockShops(page: Page, permissions = ["demo:read", "demo:write", "
     };
     await page.route("**/api/**", async (route) => {
         const path = new URL(route.request().url()).pathname;
-        if (path === "/api/rest/demo/overview") {
-            await route.fulfill({ json: { shops: state.rows.length, backend: "mock" } });
+        if (
+            path === "/api/graphql/admin" &&
+            route.request().postDataJSON().query.includes("getDashboardOverview")
+        ) {
+            await route.fulfill({
+                json: {
+                    data: {
+                        getDashboardOverview: {
+                            shops: state.rows.length,
+                            backend: "mock",
+                            mode: "development",
+                        },
+                    },
+                },
+            });
             return;
         }
         if (path !== "/api/graphql/admin") throw new Error(`意外请求 ${path}`);

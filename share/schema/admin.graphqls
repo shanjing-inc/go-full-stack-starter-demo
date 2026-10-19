@@ -1,6 +1,8 @@
 type Query {
+    getInstallStatus: InstallStatus!
     getCurrentUser: UserItem
     getCurrentPermissions: [String!]!
+    getDashboardOverview: DashboardOverview!
     getUser(where: UserFilters!): UserItem
     listUsers(limit: Int, offset: Int, orderBy: UserOrderBy, where: UserFilters): [UserItem!]
     listUserSessions(userId: ID!, limit: Int, offset: Int): [UserSessionItem!]!
@@ -8,7 +10,16 @@ type Query {
     listShops(limit: Int, offset: Int, orderBy: ShopOrderBy, where: ShopFilters): [ShopItem!]
 }
 
+type DashboardOverview {
+    shops: Int!
+    backend: String!
+    mode: String!
+}
+
 type Mutation {
+    initializeAdmin(input: InitializeAdminInput!): UserItem!
+    signInWithEmail(input: SignInWithEmailInput!): UserItem!
+    signOut: Boolean!
     createUser(set: CreateUserSetInput!): [UserItem!]!
     updateUser(set: UpdateUserSetInput!, where: UserFilters!): [UserItem!]!
     revokeUserSessions(userId: ID!): Boolean!
@@ -97,4 +108,20 @@ type UserSessionItem {
     updatedAt: DateTime!
     expiresAt: DateTime!
     current: Boolean!
+}
+
+# 认证字段允许匿名调用；凭据仅通过 POST variables 传入，Cookie 由 HTTP 层管理。
+type InstallStatus {
+    installed: Boolean!
+    enabled: Boolean!
+}
+input InitializeAdminInput {
+    bootstrapToken: String!
+    name: String!
+    email: String!
+    password: String!
+}
+input SignInWithEmailInput {
+    email: String!
+    password: String!
 }

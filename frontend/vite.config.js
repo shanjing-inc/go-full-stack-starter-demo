@@ -56,9 +56,7 @@ export default defineConfig(({ mode }) => {
         existsSync(marker) &&
         JSON.parse(readFileSync(marker, "utf8")).name === "go-full-stack-starter";
     const dashboardSource =
-        process.env.DASHBOARD_SOURCE !== undefined
-            ? process.env.DASHBOARD_SOURCE === "1"
-            : local && process.env.STARTER_TOOL_MODE !== "package";
+        process.env.DASHBOARD_SOURCE !== undefined ? process.env.DASHBOARD_SOURCE === "1" : local;
     const dashboardDirectory = new URL(
         "../../../packages/shadcnui-dashboard/src/",
         import.meta.url,
@@ -130,7 +128,9 @@ export default defineConfig(({ mode }) => {
             outDir: "../backend/internal/web/dist",
             emptyOutDir: true,
             manifest: "manifest.json",
-            rollupOptions: {
+            // 后台同步加载，公开页保持独立入口，单文件预算 1 MB。
+            chunkSizeWarningLimit: 1000,
+            rolldownOptions: {
                 input: {
                     admin: fileURLToPath(new URL("./index.html", import.meta.url)),
                     public: fileURLToPath(new URL("./src/public.ts", import.meta.url)),

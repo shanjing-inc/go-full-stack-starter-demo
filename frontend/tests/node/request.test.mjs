@@ -13,14 +13,14 @@ function response(body, status = 200) {
     return new Response(JSON.stringify(body), { status });
 }
 
-test("14 条运行时操作各自携带所需片段并通过 Admin SDL 校验", async () => {
+test("19 条运行时操作各自携带所需片段并通过 Admin SDL 校验", async () => {
     const sources = await Promise.all(
         ["common", "admin", "queue"].map((name) =>
             readFile(new URL(`../../../share/schema/${name}.graphqls`, import.meta.url), "utf8"),
         ),
     );
     const schema = buildSchema(sources.join("\n"));
-    assert.equal(Object.keys(operations).length, 14);
+    assert.equal(Object.keys(operations).length, 19);
     const generated = await readFile(
         new URL("../../src/graphql/admin/generated.ts", import.meta.url),
         "utf8",

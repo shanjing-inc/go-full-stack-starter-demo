@@ -3,7 +3,8 @@
 用于 frontend 路由、菜单、请求和后台接入。先读 `frontend/src/main.tsx`、`frontend/src/app/app.tsx`（路由装配）、`frontend/src/app/dashboard-adapter.ts`、`frontend/src/lib/request.ts`；这些路径相对应用目录 projects/multi-database-demo。
 
 - Router 挂载 `/admin/`，复用 @shanjing/shadcnui-dashboard；业务 adapter/菜单留在应用。
-- request.ts 使用 Apollo Client 执行 GraphQL，REST 沿用 fetch；统一同源 credentials: include、错误与取消，GraphQL 为 `/api/graphql/admin`。操作集中在 graphql/admin，adapter 显式使用生成的结果/变量类型，输入/空值与 SDL 一致。
+- request.ts 使用 Apollo Client 执行后台全部 GraphQL 请求，公开演示页继续沿用现有传输；统一同源 credentials: include、错误与取消，GraphQL 为 `/api/graphql/admin`。操作集中在 graphql/admin，adapter 显式使用生成的结果/变量类型，输入/空值与 SDL 一致。
+- 首页系统概览通过 Admin `getDashboardOverview` 读取店铺总数、后端栈与模式；adapter 保留 `getSystemData("overview", signal)` 契约，并校验返回结构。
 - 沿用 ApiError/响应校验，处理会话未就绪、无权限、失败、取消；服务端同时鉴权。
 - 路由/Vite base 变化同时核对 Go SPA 深链、公开资源和 `backend/internal/web` 内嵌资源；先 Vite 后 Go，不手改 dist。
 - 偏好沿用 go-mysql-demo 等现有 key，目录重命名不重置用户数据。
@@ -14,11 +15,22 @@ Vite、Codegen 和请求回归由 `frontend/package.json` 的 `test` 执行；�
 
 公共组件见 [公共前端](shared-dashboard.md)，接口见 [GraphQL](../backend/graphql-guidelines.md)，完整门禁见后端 quality-guidelines。
 
+## 生产构建分包
+
+- 登录、初始化与完整后台同步加载。`app.tsx` 静态导入 `dashboard-layout.tsx` 的默认导出，组合会话 Provider、布局和全部后台业务；用户页直接复用公共 `UserList`，队列路由静态组合。
+- 登录、后台路由与后台内部切页复用同一静态依赖闭包，导航新增 JS 请求为零；登录回跳、权限与旧队列深链沿用现有行为。运行时渲染异常由 `main.tsx` 的 Sentry ErrorBoundary 提供兜底。
+- `lib/request.ts` 维护请求错误订阅，`observability.ts` 直接订阅。认证及业务统一通过 Apollo 请求后台 GraphQL。
+- `vite.config.js` 使用 Vite 8 默认自动分包，保留 admin 与 public 两个独立入口；后台模块静态导入。`build.chunkSizeWarningLimit: 1000` 为 minify 后、gzip 前的单文件告警阈值。
+- JS 请求按入口静态依赖闭包去重计数，CSS/字体另计。登录和后台各最多 2 个 JS、闭包总量 1,000,000 字节；全部构建 JS 最多 3 个，每个 minify JS 最多 1,000,000 字节。
+- Zod 等跨入口共享依赖由自动分包处理；公开页闭包保持后台框架、GraphQL、监控与应用模块隔离，最多 2 个 JS、总量 120,000 字节。静态 chunk 图保持无环，manifest 资源引用全部可解析。
+- `tests/node/vite.config.test.mjs` 使用 `write: false` 真实构建，覆盖源码与安装包导出模式、静态后台闭包、零异步入口、体积及资源完整性。`tests/chunk-loading.spec.ts` 通过 `TEST_PRODUCTION_CHUNKS=1` 验证生产产物登录跳转、匿名回跳、后台切页零新增 JS；预览服务器设置 `preview.proxy: {}`。
+- 变更后先构建前端，再验证 Go 内嵌资源与生产产物浏览器行为。独立 registry 安装、真实后端与线上传输压缩分别验收。
+
 ## 源码目录与职责
 
 - `frontend/src` 根目录保留 `main.tsx`、`public.ts` 和 `vite-env.d.ts`；两条入口路径同时关联 HTML、Vite 与 Go manifest，移动入口需跨层同步。
-- `app/` 维护应用装配：`app.tsx` 组合顶层路由和会话 Provider，`navigation.ts` 定义菜单，`dashboard-layout.tsx` 维护后台壳层、访问控制、业务路由及旧队列地址重定向，`dashboard-adapter.ts` 接入公共 Dashboard 契约。
-- `features/` 按业务归类页面和专属逻辑：`auth/` 包含登录/安装及会话，`overview/` 包含系统概览，`shops/` 包含店铺页面及输入校验；页面命名采用 `*-page.tsx`，Provider 采用 `*-provider.tsx`。
+- `app/` 维护应用装配：`app.tsx` 组合顶层路由和后台同步入口，`dashboard-layout.tsx` 默认导出组合会话 Provider 与布局，`navigation.ts` 定义菜单，`dashboard-layout.tsx` 维护后台壳层、访问控制、业务路由及旧队列地址重定向，`dashboard-adapter.ts` 接入公共 Dashboard 契约。
+- `features/` 按业务归类页面和专属逻辑：`auth/` 包含登录/安装及会话，`overview/` 包含系统概览，`shops/` 包含店铺页面及输入校验，`queues/` 组合队列子路由；用户页由布局直接复用公共组件；页面命名采用 `*-page.tsx`，Provider 采用 `*-provider.tsx`。
 - `lib/` 放统一请求、监控等基础能力，依赖保持在基础层；`graphql/admin/` 保留端点隔离的操作文档及生成类型，生成物只通过 Codegen 更新。
 - `styles/global.css` 由两条入口共享，Tailwind 的 `@source` 路径相对样式文件解析；目录移动同步公共 Dashboard 与 Go 模板扫描路径。
 - 前端测试继续集中在 `frontend/tests`，按 `unit/node/types` 分类；源码移动同步测试导入，应用 HMR 验收修改 `frontend/src/app/dashboard-layout.tsx` 并检查窗口标记保持。
@@ -31,7 +43,7 @@ Vite、Codegen 和请求回归由 `frontend/package.json` 的 `test` 执行；�
 - 含片段的操作先声明独立静态模板，再在导出常量中拼接片段；运行时文档与生成类型的完整性由测试同时校验。
 - DateTime 输入/输出为 `string`，JSON 为 `unknown`；未知 scalar 触发失败。响应字段保留 SDL 空值语义，输入保留可选语义；公共 DashboardAdapter 类型独立维护。
 - `rtk pnpm codegen` 更新产物；`rtk pnpm codegen:check` 在内存重新生成并逐字比较，检查过程只读，支持未提交变更和无 Git 的独立应用。
-- 前端 `build`、`typecheck` 先执行同步检查；主仓 `rtk pnpm generate` 在 Go 与 SQL 生成后更新前端类型。独立应用可直接使用自己的 `rtk pnpm codegen`；devtools 全生成链路的正式分发跟随工具新版本发布。
+- 前端 `build`、`typecheck` 先执行同步检查；主仓 `rtk pnpm multi-database-demo:generate` 在 Go 与 SQL 生成后更新前端类型。独立应用可直接使用自己的 `rtk pnpm codegen`；全生成链路随应用 scripts 源码交付。
 - 前端 `test` 同时验证 Vite、生成/只读检查、运行时操作完整性及请求行为；类型契约用 `tests/types/graphql/admin/type-contract.test.ts` 的编译错误断言校验；用户对象与 ID 字段的空值契约分别断言，ID 通过 `NonNullable` 用户直接访问，避免可选链引入的 `undefined` 掩盖字段类型漂移。
 - Docker 前端构建阶段复制应用 SDL；生成与检查只依赖源码和 npm 工具链。
 
@@ -81,3 +93,9 @@ Web 使用 React 19，小程序使用 React 18。两级 pnpm workspace 为固定
 - 独立应用使用包导出与 `dist` 样式扫描；源码别名及样式转换仅在源码模式启用。
 - 主仓与独立应用的 `verifyDepsBeforeRun` 固定为 `warn`，脚本执行提示依赖状态。主仓安装在仓库根执行；独立应用安装在导出应用根执行。嵌套 workspace 的脚本检查保持现有依赖链接。
 - 回归由 `frontend/tests/node/vite.config.test.mjs` 与 `pnpm-workspace.test.mjs` 验证源码／发布包模式、CSS 扫描以及依赖过期时脚本执行的只读边界。
+
+## 后台认证 GraphQL
+
+- 安装状态、初始化、登录与退出分别使用 `getInstallStatus`、`initializeAdmin`、`signInWithEmail`、`signOut`；操作集中在 `graphql/admin/operations.ts`，结果和变量使用生成类型。初始化成功后显式登录，服务端通过签名 HttpOnly Cookie 建立会话。
+- 认证操作使用 `identity=true` 的独立 HTTP 请求；业务请求继续沿用批量查询、错误事件、取消与权限语义。后台源码中的认证和业务调用统一经过 `/api/graphql/admin`；公开 Bus/Queue 演示页的 REST/SSE/WebSocket 保持各自传输边界。
+- 数量与体积预算集中在 Node 构建测试；浏览器根据 manifest 静态依赖闭包核对实际请求、增量与复用。匿名直接访问后台深链会先加载完整后台闭包进行会话检查，再跳转登录；直接访问登录页加载相同的后台静态闭包。

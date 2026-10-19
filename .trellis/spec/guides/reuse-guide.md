@@ -1,6 +1,6 @@
 # 应用复用与发布
 
-独立仓根只对应主仓 projects/multi-database-demo。Go kit、Dashboard、devtools 为固定版本扩展依赖；源码不复制到 packages/vendor，不依赖相邻 checkout。应用命令在本目录运行，生成/构建 GOWORK=off；主仓开发可使用根 workspace 本地公共包。
+独立仓根只对应主仓 projects/multi-database-demo。Go kit、Dashboard 为固定版本扩展依赖；应用命令实现保存在自己的 scripts 与 tools，随源码导出。公共源码保持包消费边界。应用命令在本目录运行，生成/构建 GOWORK=off；主仓开发可使用根 workspace 本地公共包。
 
 复制应用 AGENTS、Trellis workflow/config/scripts/agents/spec/.version/.gitignore 与业务代码；不复制 tasks/workspace/.developer/.runtime、平台配置、凭据、缓存、日志或构建产物。导出白名单控制 Trellis，.npmrc 只保留 registry 地址。
 
@@ -15,3 +15,5 @@
 复用时核对模块名、数据模型/迁移、端点/权限、菜单/偏好键、工具版本与数据库运行环境。派生业务仓保留已有迁移和业务提交，依赖与配置逐项升级。
 
 小程序源码 `miniprogram` 与 frontend 同级随应用发布，独立构建产物由微信开发者工具发布。workspace／独立锁文件覆盖两端，codegen 与检查／测试入口覆盖 Admin 前端和 Member 小程序。导出排除微信私有配置、同步归属标记、真实 `.env`、dist 与 `.swc` 编译缓存；保留 `.env.example`。
+
+公共支持脚本与 formatter 在主仓单点维护，工作区通过 scripts/shared_scripts.py 复用根实现；独立导出展开完整本地脚本并交付白名单 tools 源码和同目录单测。派生项目直接修改本地实现，命令保持应用自己的 GOWORK=off 与 .tools/.runtime；应用开发监管源码在应用 scripts 自持。

@@ -46,11 +46,15 @@ test.describe("Bus 登录后的真实 Redis 与浏览器链路", () => {
     test.skip(!email || !password, "需要隔离 Bus 验收账号 BUS_TEST_EMAIL / BUS_TEST_PASSWORD");
     let cookies: Awaited<ReturnType<BrowserContext["cookies"]>>;
     test.beforeAll(async ({ request, baseURL }) => {
-        const response = await request.post("/api/auth/sign-in/email", {
+        const response = await request.post("/api/graphql/admin", {
             headers: { Origin: baseURL! },
-            data: { email, password },
+            data: {
+                query: "mutation($input:SignInWithEmailInput!){signInWithEmail(input:$input){id}}",
+                variables: { input: { email, password } },
+            },
         });
         expect(response.status()).toBe(200);
+        expect((await response.json()).errors).toBeUndefined();
         cookies = (await request.storageState()).cookies;
     });
     test.beforeEach(async ({ context }) => {

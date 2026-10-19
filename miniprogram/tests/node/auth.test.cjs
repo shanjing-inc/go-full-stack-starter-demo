@@ -25,11 +25,11 @@ test("邮箱密码登录使用同源接口，仅保存有效 token，密码保�
     const auth = h.source("auth/session.ts");
     await auth.signIn(" user@example.test ", " password ");
     assert.equal(auth.getAuthToken(), "test-session");
-    assert.equal(h.state.requests[0].url, "https://test.invalid/api/auth/sign-in/email");
+    assert.equal(h.state.requests[0].url, "https://test.invalid/api/graphql/member");
     assert.equal(h.state.requests[0].method, "POST");
     assert.equal(h.state.requests[0].timeout, 15000);
     assert.equal(
-        JSON.stringify(h.state.requests[0].data),
+        JSON.stringify(JSON.parse(h.state.requests[0].data).variables.input),
         '{"email":"user@example.test","password":" password "}',
     );
     assert.equal(h.state.requests[0].header["Content-Type"], "application/json");
@@ -48,13 +48,18 @@ test("登录校验、缺少端点、无效 token 与网络错误保持本地会�
         await assert.rejects(auth.signIn(email, password));
     assert.equal(h.state.requests.length, 0);
     for (const data of [{}, { token: {} }, { token: " " }, { token: "bad token" }]) {
-        h.state.authResponses["sign-in/email"] = { statusCode: 200, data };
+        h.state.authResponses["signInWithEmail"] = {
+            statusCode: 200,
+            data: { data: { signInWithEmail: data } },
+        };
         await assert.rejects(auth.signIn("a@b.test", "password"));
         assert.equal(auth.getAuthToken(), "existing-session");
     }
-    h.state.authResponses["sign-in/email"] = {
-        statusCode: 401,
-        data: { message: "邮箱或密码错误" },
+    h.state.authResponses["signInWithEmail"] = {
+        statusCode: 200,
+        data: {
+            errors: [{ message: "邮箱或密码错误", extensions: { code: "INVALID_CREDENTIALS" } }],
+        },
     };
     await assert.rejects(auth.signIn("a@b.test", "password"), /邮箱或密码错误/);
     h.state.mode = "timeout";
@@ -68,12 +73,24 @@ test("登录校验、缺少端点、无效 token 与网络错误保持本地会�
     assert.equal(empty.state.requests.length, 0);
 });
 
+test("认证空响应保留会话并提示重试", async (t) => {
+    const h = fixture(t, { token: "existing-session" });
+    const auth = h.source("auth/session.ts");
+    for (const data of [null, undefined, {}, { data: null }]) {
+        h.state.authResponses.signInWithEmail = { statusCode: 200, data };
+        await assert.rejects(auth.signIn("user@example.test", "password"), /登录失败/);
+        h.state.authResponses.signOut = { statusCode: 200, data };
+        await assert.rejects(auth.signOut(), /退出登录失败/);
+        assert.equal(auth.getAuthToken(), "existing-session");
+    }
+});
+
 test("登录沿用后端邮箱边界，存储写入失败保持原会话并提示重试", async (t) => {
     const h = fixture(t, { token: "existing-session" });
     const auth = h.source("auth/session.ts");
     h.state.storageWriteError = true;
     await assert.rejects(auth.signIn("owner@localhost", "password"), /保存登录会话失败/);
-    assert.equal(h.state.requests[0].data.email, "owner@localhost");
+    assert.equal(JSON.parse(h.state.requests[0].data).variables.input.email, "owner@localhost");
     assert.equal(auth.getAuthToken(), "existing-session");
     h.state.storageWriteError = false;
     await auth.signIn("owner@localhost", "password");
@@ -83,18 +100,21 @@ test("登录沿用后端邮箱边界，存储写入失败保持原会话并提�
 test("退出撤销同源会话，失败保留 token，成功及 401 清理 token", async (t) => {
     const h = fixture(t, { token: "existing-session" });
     const auth = h.source("auth/session.ts");
-    h.state.authResponses["sign-out"] = { statusCode: 503, data: { message: "服务暂不可用" } };
+    h.state.authResponses["signOut"] = {
+        statusCode: 503,
+        data: { errors: [{ message: "服务暂不可用" }] },
+    };
     await assert.rejects(auth.signOut(), /服务暂不可用/);
     assert.equal(auth.getAuthToken(), "existing-session");
     assert.equal(h.state.requests[0].header.Authorization, "Bearer existing-session");
-    h.state.authResponses["sign-out"] = { statusCode: 200, data: { success: false } };
+    h.state.authResponses["signOut"] = { statusCode: 200, data: { data: { signOut: false } } };
     await assert.rejects(auth.signOut(), /退出登录失败/);
     assert.equal(auth.getAuthToken(), "existing-session");
-    h.state.authResponses["sign-out"] = { statusCode: 200, data: { success: true } };
+    h.state.authResponses["signOut"] = { statusCode: 200, data: { data: { signOut: true } } };
     await auth.signOut();
     assert.equal(auth.getAuthToken(), "");
     const expired = fixture(t, { token: "expired-session" });
-    expired.state.authResponses["sign-out"] = { statusCode: 401, data: {} };
+    expired.state.authResponses["signOut"] = { statusCode: 401, data: {} };
     await expired.source("auth/session.ts").signOut();
     assert.equal(expired.source("auth/session.ts").getAuthToken(), "");
 });
@@ -112,6 +132,21 @@ test("真实 Apollo 五条查询携带 token，401 清理会话并提示重登�
     const rows = await api.diagnoseBatch({ id: { eq: 1 } });
     assert.ok(rows.every((row) => /登录已失效.*重新登录/u.test(row.error)));
     assert.equal(h.source("auth/session.ts").getAuthToken(), "");
+});
+
+test("HTTP 200 的 GraphQL 失效会话支持批量清理与重新登录提示", async (t) => {
+    const h = fixture(t, { token: "expired-session" });
+    h.state.mode = "unauthorized";
+    const rows = await h.source("graphql/member/shop.ts").diagnoseBatch({ id: { eq: 1 } });
+    assert.ok(rows.every((row) => /登录已失效.*重新登录/u.test(row.error)));
+    assert.equal(h.source("auth/session.ts").getAuthToken(), "");
+    const logout = fixture(t, { token: "expired-session" });
+    logout.state.authResponses.signOut = {
+        statusCode: 200,
+        data: { errors: [{ extensions: { code: "UNAUTHORIZED" } }] },
+    };
+    await logout.source("auth/session.ts").signOut();
+    assert.equal(logout.source("auth/session.ts").getAuthToken(), "");
 });
 
 test("token 按服务端点隔离，异源请求保持无会话，旧 401 保留新 token", async (t) => {
@@ -180,15 +215,20 @@ test("页面失败可重试、过期恢复登录表单、卸载后保持原 UI",
     const h = fixture(t);
     input(h, "邮箱", "a@b.test");
     input(h, "密码", "password");
-    h.state.authResponses["sign-in/email"] = {
-        statusCode: 401,
-        data: { message: "邮箱或密码错误" },
+    h.state.authResponses["signInWithEmail"] = {
+        statusCode: 200,
+        data: {
+            errors: [{ message: "邮箱或密码错误", extensions: { code: "INVALID_CREDENTIALS" } }],
+        },
     };
     button(h, "登录").props.onClick();
     await settle();
     assert.match(texts(h.render()), /邮箱或密码错误/);
     assert.equal(button(h, "登录").props.disabled, false);
-    h.state.authResponses["sign-in/email"] = { statusCode: 200, data: { token: "test-session" } };
+    h.state.authResponses["signInWithEmail"] = {
+        statusCode: 200,
+        data: { data: { signInWithEmail: { token: "test-session" } } },
+    };
     button(h, "登录").props.onClick();
     await settle();
     input(h, "店铺 ID 或 slug", "1");

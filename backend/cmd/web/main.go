@@ -113,28 +113,25 @@ func run() (runErr error) {
     sqlDB, _ := db.DB()
     defer sqlDB.Close()
     authentication, err := auth.New(db, auth.Config{
-        Secret:         c.AuthSecret,
-        BootstrapToken: c.BootstrapToken,
-        Secure:         !c.Development,
-        Development:    c.Development,
-        Origins:        c.Origins,
+        Secret:            c.AuthSecret,
+        BootstrapToken:    c.BootstrapToken,
+        Secure:            !c.Development,
+        Development:       c.Development,
+        Origins:           c.Origins,
+        OptionalAuthPaths: []string{web.AdminPath, web.MemberPath},
         AdminPaths: []string{
             web.QueueTestPath,
             "/api/graphql/admin",
-            "/api/rest/demo/overview",
             "/api/rest/demo/tasks",
             "/api/rest/poc/tasks",
-            "/api/rest/demo/session",
         },
         PathPermissions: map[string]auth.Permission{
             web.QueueTestPath:          {Resource: "queue", Action: "retry"},
             "/api/rest/demo/shops/:id": {Resource: "shop", Action: "list"},
             "/api/rest/poc/shops/:id":  {Resource: "shop", Action: "list"},
-            "/api/rest/demo/overview":  {Resource: "shop", Action: "list"},
             "/api/rest/demo/tasks":     {Resource: "queue", Action: "retry"},
             "/api/rest/poc/tasks":      {Resource: "queue", Action: "retry"},
         },
-        DashboardPath:        "/api/rest/demo/session",
         DashboardPermissions: dashboardPermissions,
     })
     if err != nil {
@@ -206,13 +203,6 @@ func run() (runErr error) {
     api.POST("/api/rest/demo/tasks", taskHandler)
     api.POST("/api/rest/poc/tasks", taskHandler)
 
-    api.GET("/api/rest/demo/overview", func(e *echo.Context) error {
-        var count int64
-        if db.WithContext(e.Request().Context()).Table("shop").Count(&count).Error != nil {
-            return e.JSON(503, map[string]string{"error": "数据读取失败"})
-        }
-        return e.JSON(200, map[string]any{"shops": count, "backend": "Go / Echo", "mode": "development"})
-    })
     listener, err := net.Listen("tcp", c.Address)
     if err != nil {
         return errors.New("Web 监听失败")

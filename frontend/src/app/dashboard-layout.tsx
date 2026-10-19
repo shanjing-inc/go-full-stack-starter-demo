@@ -3,16 +3,16 @@ import { Routes, Route, Navigate, useLocation, useSearchParams } from "react-rou
 import {
     Dashboard,
     SessionLoading,
-    UserList,
-    QueuePage,
-    QueueSchedulesPage,
     Button,
+    UserList as UsersPage,
 } from "@shanjing/shadcnui-dashboard";
 import { adapter } from "./dashboard-adapter";
 import { nav } from "./navigation";
+import { SessionProvider } from "../features/auth/session-provider";
 import { useSession } from "../features/auth/session-context";
 import { OverviewPage } from "../features/overview/overview-page";
 import { ShopsPage } from "../features/shops/shops-page";
+import QueueRoutes from "../features/queues/queue-routes";
 
 /** 保留首批单页地址中的筛选、页码与详情深链。 */
 function LegacyQueueRedirect() {
@@ -81,14 +81,19 @@ export function DashboardLayout() {
             <Routes>
                 <Route path="/" element={<OverviewPage />} />
                 <Route path="/queue" element={<LegacyQueueRedirect />} />
-                <Route path="/queues" element={<QueuePage />} />
-                <Route path="/queues/schedules" element={<QueueSchedulesPage />} />
-                <Route path="/queues/jobs/:status" element={<QueuePage />} />
-                <Route path="/queues/jobs/:status/:recordId" element={<QueuePage />} />
+                <Route path="/queues/*" element={<QueueRoutes />} />
                 <Route path="/shops" element={<ShopsPage />} />
-                <Route path="/users" element={<UserList onCurrentUserChange={refresh} />} />
+                <Route path="/users" element={<UsersPage onCurrentUserChange={refresh} />} />
                 <Route path="*" element={<h1>页面不存在</h1>} />
             </Routes>
         </Dashboard>
+    );
+}
+
+export default function DashboardEntry() {
+    return (
+        <SessionProvider>
+            <DashboardLayout />
+        </SessionProvider>
     );
 }

@@ -13,7 +13,7 @@
 | package.json、starter.config.json、toolchain.json                        | 应用命令、布局和固定工具      |
 | .trellis、AGENTS.md                                                      | 应用规范                      |
 
-所有路径相对本应用根。通用能力来自固定 Go kit/Dashboard/devtools 依赖；共享源码维护在主仓，本应用不携带。generated.go、models_gen.go、query/\*.gen.go、share/schema/generated 从源定义生成，不手改。
+所有路径相对本应用根。公共后端与 UI 能力来自固定 Go kit/Dashboard 依赖；应用命令随本地 scripts 与受控 tools 源码交付，共享工具由主仓维护并按白名单导出。generated.go、models_gen.go、query/\*.gen.go、share/schema/generated 从源定义生成，不手改。
 
 生成在本目录执行 pnpm generate；Go 包加载前先构建 SPA，沿用统一命令顺序。
 

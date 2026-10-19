@@ -46,9 +46,9 @@ WSL 构建源位于本包 `dist/`。直接开发时，微信开发者工具导�
 
 批量测试页提供邮箱、密码、登录状态及退出按钮。使用当前 demo 已有的邮箱账号登录，成功后输入店铺 ID 或 slug，再发送单次或五条并发请求。
 
-- 登录调用与 Member 端点同源的 `POST /api/auth/sign-in/email`，退出调用 `POST /api/auth/sign-out`；使用 Go kit 现有会话协议。
+- 登录与退出统一调用 Member GraphQL 的 `signInWithEmail`／`signOut` mutation；无 Cookie 的原生客户端从登录响应获取 Bearer token。
 - `src/auth/session.ts` 仅保存服务端返回的有效 token，键名为 `go-starter:member-auth:<后端 origin>`，按协议／主机／端口隔离环境。密码仅存在表单内存中，登录成功后清空。
-- `taro-fetch.ts` 仅向配置的 Member 端点注入 `Authorization: Bearer <token>`。五条并发查询仍合并为一次 HTTP 请求；HTTP 401 清除对应 token、恢复登录表单并提示重新登录，HTTP 403 保留会话。旧请求的 401 仅清理自身会话。
+- `taro-fetch.ts` 仅向配置的 Member 端点注入 `Authorization: Bearer <token>`。五条并发查询仍合并为一次 HTTP 请求；HTTP HTTP 401 或 GraphQL UNAUTHORIZED 清除对应 token、恢复登录表单并提示重新登录，HTTP 403 保留会话。旧请求的 401 仅清理自身会话。
 - 登录、退出与店铺请求共用互斥保护，支持错误后重试及页面卸载保护；本地缺少 token 时提示先登录。退出成功或服务端返回 401 后清理本地 token；网络或服务端错误保留 token 供重试。
 - 本地 token 表示已保存会话，服务端在每次业务请求时验证会话有效性。更新端点后重新构建；微信开发者工具中的登录状态与 Web 浏览器会话分别保存。
 

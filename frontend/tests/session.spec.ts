@@ -21,8 +21,12 @@ async function mockSession(page: Page) {
     };
     page.on("request", (request) => {
         const path = new URL(request.url()).pathname;
-        if (path === "/api/rest/demo/session") state.restSessions++;
-        if (path === "/api/auth/install-status") state.installChecks++;
+        if (path.startsWith("/api/rest/") || path.startsWith("/api/auth/")) state.restSessions++;
+        if (
+            path === "/api/graphql/admin" &&
+            request.postDataJSON().query.includes("getInstallStatus")
+        )
+            state.installChecks++;
         if (path === "/api/graphql/admin") {
             const query = request.postDataJSON().query;
             if (query.includes("getDashboardSession")) state.identities++;
@@ -32,19 +36,32 @@ async function mockSession(page: Page) {
     });
     await page.route("**/api/**", async (route) => {
         const path = new URL(route.request().url()).pathname;
-        if (path === "/api/auth/install-status") {
-            await route.fulfill({ json: { installed: true, enabled: false } });
+        if (
+            path === "/api/graphql/admin" &&
+            route.request().postDataJSON().query.includes("getInstallStatus")
+        ) {
+            await route.fulfill({
+                json: { data: { getInstallStatus: { installed: true, enabled: false } } },
+            });
             return;
         }
-        if (path === "/api/auth/sign-in/email") {
+        if (
+            path === "/api/graphql/admin" &&
+            route.request().postDataJSON().query.includes("signInWithEmail")
+        ) {
             state.identityStatus = 200;
-            await route.fulfill({ json: { success: true } });
+            await route.fulfill({
+                json: { data: { signInWithEmail: { id: "1", email: "session@example.test" } } },
+            });
             return;
         }
-        if (path === "/api/auth/sign-out") {
+        if (
+            path === "/api/graphql/admin" &&
+            route.request().postDataJSON().query.includes("signOut")
+        ) {
             await route.fulfill({
                 status: state.logoutStatus,
-                json: { success: state.logoutStatus === 200 },
+                json: { data: { signOut: state.logoutStatus === 200 } },
             });
             return;
         }
@@ -153,8 +170,18 @@ async function mockSession(page: Page) {
             });
         } else if (query.includes("listAdminShops")) {
             await route.fulfill({ json: { data: { listShops: [] } } });
-        } else if (path === "/api/rest/demo/overview") {
-            await route.fulfill({ json: { shops: 1, backend: "会话验收后端" } });
+        } else if (query.includes("getDashboardOverview")) {
+            await route.fulfill({
+                json: {
+                    data: {
+                        getDashboardOverview: {
+                            shops: 1,
+                            backend: "会话验收后端",
+                            mode: "development",
+                        },
+                    },
+                },
+            });
         } else throw new Error(`意外请求 ${path} ${query}`);
     });
     return state;
@@ -202,7 +229,7 @@ for (const failure of [
         expect(state.identities).toBe(1);
     });
 
-test("概览 REST 401 使用统一登录失效边界", async ({ page }) => {
+test("概览 GraphQL HTTP 401 使用统一登录失效边界", async ({ page }) => {
     const state = await mockSession(page);
     await ready(page);
     state.businessStatus = 401;

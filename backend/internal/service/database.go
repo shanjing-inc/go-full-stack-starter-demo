@@ -142,3 +142,8 @@ func (s *Database) List(ctx context.Context, input ListQuery) ([]*Shop, error) {
 
     return rows, nil
 }
+
+// Count 在数据库执行总数统计，沿用请求上下文。
+func (s *Database) Count(ctx context.Context) (int64, error) {
+    return s.query.Shop.WithContext(ctx).Count()
+}

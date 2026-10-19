@@ -2,7 +2,12 @@
 import { describe, expect, it, afterEach, vi } from "vitest";
 import { createElement } from "react";
 import { render, screen } from "@testing-library/react";
-import { ApiError, graphql } from "../../src/lib/request";
+import {
+    ApiError,
+    graphql,
+    notifyRequestError,
+    subscribeRequestErrors,
+} from "../../src/lib/request";
 import * as Sentry from "@sentry/react";
 import { initializeMonitoring, sanitizeEvent, shouldCapture } from "../../src/lib/observability";
 
@@ -15,6 +20,19 @@ afterEach(async () => {
 describe("前端错误监控", () => {
     it("默认关闭，业务错误与取消保持静默", () => {
         expect(initializeMonitoring({})).toBe(false);
+        expect(shouldCapture(new ApiError("认证服务暂时不可用", 200, "SERVICE_UNAVAILABLE"))).toBe(
+            true,
+        );
+        for (const code of [
+            "INVALID_CREDENTIALS",
+            "UNAUTHORIZED",
+            "USER_BANNED",
+            "ALREADY_INSTALLED",
+            "INSTALL_DISABLED",
+            "RATE_LIMITED",
+        ]) {
+            expect(shouldCapture(new ApiError("预期认证错误", 200, code))).toBe(false);
+        }
         expect(shouldCapture(new DOMException("cancel", "AbortError"))).toBe(false);
         expect(
             shouldCapture(
@@ -154,5 +172,38 @@ describe("前端错误监控", () => {
         await Sentry.flush(1000);
         expect(envelopes).toHaveLength(2);
         expect(JSON.stringify(envelopes)).not.toContain("component secret");
+    });
+});
+
+describe("请求错误订阅", () => {
+    it("请求错误通知与取消订阅保持一致", () => {
+        const listener = vi.fn();
+        const unsubscribe = subscribeRequestErrors(listener);
+        const error = new Error("请求失败");
+        try {
+            notifyRequestError(error);
+            expect(listener).toHaveBeenCalledExactlyOnceWith(error);
+            unsubscribe();
+            notifyRequestError(error);
+            expect(listener).toHaveBeenCalledTimes(1);
+        } finally {
+            unsubscribe();
+        }
+    });
+
+    it("订阅者故障保持后续通知和原始错误身份", () => {
+        const error = new Error("原始请求错误");
+        const listener = vi.fn();
+        const removeFailure = subscribeRequestErrors(() => {
+            throw new Error("监控故障");
+        });
+        const removeListener = subscribeRequestErrors(listener);
+        try {
+            expect(() => notifyRequestError(error)).not.toThrow();
+            expect(listener).toHaveBeenCalledExactlyOnceWith(error);
+        } finally {
+            removeFailure();
+            removeListener();
+        }
     });
 });

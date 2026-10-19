@@ -223,10 +223,11 @@ test("退出撤销服务端会话与失效会话保护", async ({ page, context 
     expect(session).toBeDefined();
     await signOutFromSidebar(page);
     await expect(page).toHaveURL(/\/admin\/login(?:\?returnTo=.*)?$/);
-    const revoked = await page.request.get("/api/rest/demo/session", {
+    const revoked = await page.request.post("/api/graphql/admin", {
+        data: { query: "{getCurrentUser{id}}" },
         headers: { Cookie: `${session!.name}=${session!.value}` },
     });
-    expect(revoked.status()).toBe(401);
+    expect((await revoked.json()).errors[0].extensions.code).toBe("UNAUTHORIZED");
     await context.clearCookies();
     await page.goto("/admin/shops");
     await expect(page).toHaveURL(/\/admin\/login(?:\?returnTo=.*)?$/);
@@ -257,6 +258,8 @@ test("真实用户查询、创建、编辑、角色、封禁与会话撤销", as
     await dialog.getByLabel("名称", { exact: true }).fill("真实新增用户");
     await dialog.getByLabel("邮箱", { exact: true }).fill(email);
     await dialog.getByLabel("初始密码", { exact: true }).fill("12345678");
+    await dialog.getByRole("combobox").click();
+    await page.getByRole("option", { name: "viewer", exact: true }).click();
     await dialog.getByRole("button", { name: "确认创建", exact: true }).click();
     await expect(dialog).toHaveCount(0);
     const row = page.getByRole("row").filter({ has: page.getByText(email, { exact: true }) });
@@ -265,13 +268,24 @@ test("真实用户查询、创建、编辑、角色、封禁与会话撤销", as
     const origin = new URL(page.url()).origin;
     const member = await browser.newContext();
     const login = async () => {
-        const response = await member.request.post(`${origin}/api/auth/sign-in/email`, {
+        const response = await member.request.post(`${origin}/api/graphql/admin`, {
             headers: { Origin: origin },
-            data: { email, password: "12345678" },
+            data: {
+                query: "mutation($input:SignInWithEmailInput!){signInWithEmail(input:$input){id}}",
+                variables: { input: { email, password: "12345678" } },
+            },
         });
-        return response.status();
+        const result = await response.json();
+        return result.errors?.[0]?.extensions?.code ?? response.status();
     };
-    const current = async () => (await member.request.get(`${origin}/api/auth/get-session`)).json();
+    const current = async () => {
+        const response = await member.request.post(`${origin}/api/graphql/admin`, {
+            headers: { Origin: origin },
+            data: { query: "{getCurrentUser{id name email}}" },
+        });
+        const body = await response.json();
+        return body.errors ? null : { user: body.data.getCurrentUser };
+    };
     try {
         expect(await login()).toBe(200);
         expect((await current()).user.email).toBe(email);
@@ -295,7 +309,7 @@ test("真实用户查询、创建、编辑、角色、封禁与会话撤销", as
         await expect(dialog).toHaveCount(0);
         await expect(row.getByText("已封禁", { exact: true })).toBeVisible();
         expect(await current()).toBeNull();
-        expect(await login()).toBe(403);
+        expect(await login()).toBe("USER_BANNED");
         await selectUserAction(page, row, "解封");
         await dialog.getByRole("button", { name: "确认", exact: true }).click();
         await expect(dialog).toHaveCount(0);

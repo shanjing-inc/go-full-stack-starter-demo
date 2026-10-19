@@ -1,4 +1,7 @@
 import Taro from "@tarojs/taro";
+import { print } from "graphql";
+import { MEMBER_SIGN_IN, MEMBER_SIGN_OUT } from "../graphql/member/operations";
+import type { MemberSignInMutation, MemberSignOutMutation } from "../graphql/member/generated";
 import { GRAPHQL_ENDPOINT } from "../config/endpoint";
 
 const AUTH_ORIGIN = GRAPHQL_ENDPOINT.replace(/\/api\/graphql\/member$/u, "");
@@ -22,24 +25,27 @@ export function clearAuthToken(expectedToken: string): void {
     if (getAuthToken() === expectedToken) Taro.removeStorageSync(AUTH_TOKEN_STORAGE_KEY);
 }
 
-function responseMessage(data: unknown, fallback: string): string {
-    if (data && typeof data === "object" && "message" in data && typeof data.message === "string")
-        return data.message || fallback;
-    return fallback;
+interface AuthResult {
+    data?: Partial<MemberSignInMutation & MemberSignOutMutation>;
+    errors?: { message?: string; extensions?: { code?: string } }[];
+}
+function responseMessage(data: AuthResult | null | undefined, fallback: string): string {
+    return data?.errors?.[0]?.message || fallback;
 }
 async function authRequest(
-    path: string,
+    operation: "signInWithEmail" | "signOut",
     token?: string,
-    data?: { email: string; password: string },
+    input?: { email: string; password: string },
 ) {
-    if (!AUTH_ORIGIN)
+    if (!GRAPHQL_ENDPOINT)
         throw new Error("请在 miniprogram/.env 配置 TARO_APP_GRAPHQL_ENDPOINT 后重新构建");
+    const query = print(operation === "signInWithEmail" ? MEMBER_SIGN_IN : MEMBER_SIGN_OUT);
     try {
-        return await Taro.request<unknown>({
-            url: `${AUTH_ORIGIN}/api/auth/${path}`,
+        return await Taro.request<AuthResult | null>({
+            url: GRAPHQL_ENDPOINT,
             method: "POST",
             timeout: 15000,
-            data,
+            data: JSON.stringify({ query, ...(input ? { variables: { input } } : {}) }),
             header: {
                 "Content-Type": "application/json",
                 ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -59,10 +65,18 @@ export async function signIn(email: string, password: string): Promise<void> {
     const normalized = email.trim();
     if (!normalized || normalized.length > 255) throw new Error("请输入邮箱（最多 255 字符）");
     if (!password) throw new Error("请输入密码");
-    const response = await authRequest("sign-in/email", undefined, { email: normalized, password });
+    const response = await authRequest("signInWithEmail", undefined, {
+        email: normalized,
+        password,
+    });
     const data = response.data;
-    const token = data && typeof data === "object" && "token" in data ? data.token : undefined;
-    if (response.statusCode < 200 || response.statusCode >= 300 || !validToken(token))
+    const token = data?.data?.signInWithEmail?.token;
+    if (
+        response.statusCode < 200 ||
+        response.statusCode >= 300 ||
+        data?.errors?.length ||
+        !validToken(token)
+    )
         throw new Error(responseMessage(data, `登录失败（${response.statusCode}），请重试`));
     try {
         Taro.setStorageSync(AUTH_TOKEN_STORAGE_KEY, token);
@@ -73,15 +87,14 @@ export async function signIn(email: string, password: string): Promise<void> {
 export async function signOut(): Promise<void> {
     const token = getAuthToken();
     if (!token) return;
-    const response = await authRequest("sign-out", token);
+    const response = await authRequest("signOut", token);
     if (
         response.statusCode === 401 ||
+        response.data?.errors?.some((error) => error?.extensions?.code === "UNAUTHORIZED") ||
         (response.statusCode >= 200 &&
             response.statusCode < 300 &&
-            response.data &&
-            typeof response.data === "object" &&
-            "success" in response.data &&
-            response.data.success === true)
+            !response.data?.errors?.length &&
+            response.data?.data?.signOut === true)
     ) {
         clearAuthToken(token);
         return;

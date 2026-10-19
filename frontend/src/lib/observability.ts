@@ -15,7 +15,9 @@ export function shouldCapture(error: unknown): boolean {
         if (candidate.name === "ApiError") {
             return (
                 (candidate.status ?? 0) >= 500 ||
-                ["INTERNAL_SERVER_ERROR", "INVALID_RESPONSE"].includes(candidate.code ?? "")
+                ["INTERNAL_SERVER_ERROR", "INVALID_RESPONSE", "SERVICE_UNAVAILABLE"].includes(
+                    candidate.code ?? "",
+                )
             );
         }
     }

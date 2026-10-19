@@ -1,5 +1,8 @@
+import { SIGN_OUT } from "../graphql/admin/operations";
+import type { SignOutMutation, SignOutMutationVariables } from "../graphql/admin/generated";
 import {
     GET_DASHBOARD_SESSION,
+    GET_DASHBOARD_OVERVIEW,
     DASHBOARD_QUEUE_SCHEDULES,
     DASHBOARD_QUEUE,
     DASHBOARD_QUEUE_RECORDS,
@@ -13,6 +16,8 @@ import {
     REVOKE_DASHBOARD_USER_SESSION,
 } from "../graphql/admin/operations";
 import type {
+    GetDashboardOverviewQuery,
+    GetDashboardOverviewQueryVariables,
     GetDashboardSessionQuery,
     GetDashboardSessionQueryVariables,
     DashboardQueueSchedulesQuery,
@@ -39,7 +44,7 @@ import type {
     RevokeDashboardUserSessionMutationVariables,
 } from "../graphql/admin/generated";
 import type { DashboardAdapter, DashboardSession } from "@shanjing/shadcnui-dashboard";
-import { ApiError, cancelDashboardRequests, getJSON, graphql } from "../lib/request";
+import { ApiError, cancelDashboardRequests, graphql } from "../lib/request";
 export const adapter: DashboardAdapter = {
     async getSession(signal) {
         const data = await graphql<GetDashboardSessionQuery, GetDashboardSessionQueryVariables>(
@@ -69,9 +74,24 @@ export const adapter: DashboardAdapter = {
             mode: "authenticated",
         } satisfies DashboardSession;
     },
-    getSystemData<T>(resource: string, signal: AbortSignal) {
+    async getSystemData<T>(resource: string, signal: AbortSignal) {
         if (resource !== "overview") throw new Error("系统数据资源无效");
-        return getJSON<T>("/api/rest/demo/overview", signal);
+        const data = await graphql<GetDashboardOverviewQuery, GetDashboardOverviewQueryVariables>(
+            GET_DASHBOARD_OVERVIEW,
+            {},
+            signal,
+        );
+        const overview = data.getDashboardOverview;
+        if (
+            !overview ||
+            !Number.isInteger(overview.shops) ||
+            overview.shops < 0 ||
+            typeof overview.backend !== "string" ||
+            typeof overview.mode !== "string"
+        ) {
+            throw new ApiError("概览响应无效", 200, "INVALID_RESPONSE");
+        }
+        return overview as T;
     },
     async getQueueSchedules(signal) {
         const data = await graphql<
@@ -176,13 +196,13 @@ export const adapter: DashboardAdapter = {
         if (data.revokeUserSession !== true) throw new Error("撤销会话响应无效");
     },
     async signOut() {
-        const response = await fetch("/api/auth/sign-out", {
-            method: "POST",
-            credentials: "include",
-            headers: { "Content-Type": "application/json" },
-            body: "{}",
-        });
-        if (!response.ok) throw new Error("退出失败，请重试");
+        const data = await graphql<SignOutMutation, SignOutMutationVariables>(
+            SIGN_OUT,
+            {},
+            undefined,
+            true,
+        );
+        if (data.signOut !== true) throw new Error("退出失败，请重试");
         cancelDashboardRequests();
         location.assign("/admin/login");
     },

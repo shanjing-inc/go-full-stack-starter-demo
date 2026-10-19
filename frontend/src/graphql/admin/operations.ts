@@ -43,6 +43,16 @@ const QUEUE_RECORD_FIELDS = /* GraphQL */ `
         stacktrace
     }
 `;
+export const GET_DASHBOARD_OVERVIEW = /* GraphQL */ `
+    query getDashboardOverview {
+        getDashboardOverview {
+            shops
+            backend
+            mode
+        }
+    }
+`;
+
 export const GET_DASHBOARD_SESSION = /* GraphQL */ `
     query getDashboardSession {
         getCurrentUser {
@@ -306,5 +316,35 @@ export const LIST_ADMIN_SHOPS = /* GraphQL */ `
             createdAt
             updatedAt
         }
+    }
+`;
+
+export const GET_INSTALL_STATUS = /* GraphQL */ `
+    query getInstallStatus {
+        getInstallStatus {
+            installed
+            enabled
+        }
+    }
+`;
+export const INITIALIZE_ADMIN = /* GraphQL */ `
+    mutation initializeAdmin($input: InitializeAdminInput!) {
+        initializeAdmin(input: $input) {
+            id
+            email
+        }
+    }
+`;
+export const SIGN_IN_WITH_EMAIL = /* GraphQL */ `
+    mutation signInWithEmail($input: SignInWithEmailInput!) {
+        signInWithEmail(input: $input) {
+            id
+            email
+        }
+    }
+`;
+export const SIGN_OUT = /* GraphQL */ `
+    mutation signOut {
+        signOut
     }
 `;

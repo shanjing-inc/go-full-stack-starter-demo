@@ -2,3 +2,18 @@
 type Query {
     getShop(where: ShopFilters!): ShopItem
 }
+
+# 小程序认证通过独立 Bearer 会话工作，响应仅包含新登录的 token。
+type MemberSignInPayload {
+    token: String!
+}
+
+input MemberSignInInput {
+    email: String!
+    password: String!
+}
+
+type Mutation {
+    signInWithEmail(input: MemberSignInInput!): MemberSignInPayload!
+    signOut: Boolean!
+}

@@ -6,8 +6,13 @@ async function mockPreferences(page: Page) {
     await page.route("**/api/**", async (route) => {
         state.requests++;
         const path = new URL(route.request().url()).pathname;
-        if (path === "/api/auth/install-status") {
-            await route.fulfill({ json: { installed: true, enabled: false } });
+        if (
+            path === "/api/graphql/admin" &&
+            route.request().postDataJSON().query.includes("getInstallStatus")
+        ) {
+            await route.fulfill({
+                json: { data: { getInstallStatus: { installed: true, enabled: false } } },
+            });
             return;
         }
         expect(path).toBe("/api/graphql/admin");

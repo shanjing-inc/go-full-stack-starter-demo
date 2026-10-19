@@ -3,28 +3,44 @@ import { test, expect, type Page } from "@playwright/test";
 // 页面回归拦截认证接口，保留人工验收库与账号原状。
 async function mockAuthentication(page: Page, installed = false, initializationEnabled = true) {
     const initialized: Record<string, string>[] = [];
-    await page.route("**/api/auth/**", async (route) => {
-        const path = new URL(route.request().url()).pathname;
-        if (path === "/api/auth/install-status") {
+    await page.route("**/api/graphql/admin", async (route) => {
+        const { query, variables } = route.request().postDataJSON();
+        if (query.includes("getInstallStatus")) {
             await route.fulfill({
-                json: { installed, enabled: !installed && initializationEnabled },
+                json: {
+                    data: {
+                        getInstallStatus: {
+                            installed,
+                            enabled: !installed && initializationEnabled,
+                        },
+                    },
+                },
             });
-        } else if (path === "/api/auth/initialize") {
-            const input = route.request().postDataJSON();
+        } else if (query.includes("initializeAdmin")) {
+            const input = variables.input;
             initialized.push(input);
             if (input.bootstrapToken === "invalid-token") {
-                await route.fulfill({ status: 401, json: { message: "请重新登录" } });
+                await route.fulfill({
+                    json: {
+                        errors: [{ message: "请重新登录", extensions: { code: "UNAUTHORIZED" } }],
+                    },
+                });
                 return;
             }
             installed = true;
             await route.fulfill({
-                status: 201,
-                json: { user: { email: input.email.toLowerCase(), name: input.name } },
+                json: { data: { initializeAdmin: { id: "1", email: input.email.toLowerCase() } } },
             });
-        } else if (path === "/api/auth/sign-in/email") {
-            await route.fulfill({ status: 401, json: { message: "邮箱或密码错误" } });
+        } else if (query.includes("signInWithEmail")) {
+            await route.fulfill({
+                json: {
+                    errors: [
+                        { message: "邮箱或密码错误", extensions: { code: "INVALID_CREDENTIALS" } },
+                    ],
+                },
+            });
         } else {
-            throw new Error(`意外认证请求 ${path}`);
+            throw new Error(`意外认证请求 ${query}`);
         }
     });
     return initialized;
@@ -109,9 +125,17 @@ test("初始化入口关闭时跳转安装页并显示关闭提示", async ({ pa
 test("旧多字节密码登录保持完整输入与独立长度门禁", async ({ page }) => {
     await mockAuthentication(page, true);
     const passwords: string[] = [];
-    await page.route("**/api/auth/sign-in/email", async (route) => {
-        passwords.push(route.request().postDataJSON().password);
-        await route.fulfill({ status: 401, json: { message: "邮箱或密码错误" } });
+    await page.route("**/api/graphql/admin", async (route) => {
+        if (!route.request().postDataJSON().query.includes("signInWithEmail"))
+            return route.fallback();
+        passwords.push(route.request().postDataJSON().variables.input.password);
+        await route.fulfill({
+            json: {
+                errors: [
+                    { message: "邮箱或密码错误", extensions: { code: "INVALID_CREDENTIALS" } },
+                ],
+            },
+        });
     });
     await page.goto("/admin/login");
     await page.getByLabel("邮箱", { exact: true }).fill("legacy@example.com");

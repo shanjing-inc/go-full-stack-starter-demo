@@ -499,6 +499,24 @@ func TestSchemaProjection(t *testing.T) {
                 t.Fatal(err)
             }
 
+            if endpoint == "member" {
+                for name, fields := range map[string]map[string]string{
+                    "MemberSignInPayload": {"token": "String!"},
+                    "MemberSignInInput":   {"email": "String!", "password": "String!"},
+                } {
+                    definition := target.Types[name]
+                    if definition == nil || len(definition.Fields) != len(fields) {
+                        t.Fatalf("成员认证类型字段失配：%s", name)
+                    }
+                    for fieldName, fieldType := range fields {
+                        field := definition.Fields.ForName(fieldName)
+                        if field == nil || field.Type.String() != fieldType {
+                            t.Fatalf("成员认证字段类型失配：%s.%s", name, fieldName)
+                        }
+                    }
+                }
+            }
+
             for _, name := range []string{
                 "ShopItem",
                 "ShopFilters",
@@ -522,13 +540,64 @@ func TestSchemaProjection(t *testing.T) {
                 }
 
                 baseline := source.Types[name]
-                if baseline == nil {
+                if baseline == nil && !(endpoint == "member" && name == "Mutation") {
                     t.Fatalf("参考类型缺失：%s", name)
                 }
 
                 for _, field := range current.Fields {
+                    if endpoint == "member" && name == "Mutation" {
+                        expectedType := map[string]string{"signInWithEmail": "MemberSignInPayload!", "signOut": "Boolean!"}[field.Name]
+                        if expectedType == "" || field.Type.String() != expectedType {
+                            t.Fatalf("成员认证字段失配：%s", field.Name)
+                        }
+                        if field.Name == "signInWithEmail" && (len(field.Arguments) != 1 || field.Arguments[0].Name != "input" || field.Arguments[0].Type.String() != "MemberSignInInput!") {
+                            t.Fatal("成员登录参数失配")
+                        }
+                        if field.Name == "signOut" && len(field.Arguments) != 0 {
+                            t.Fatal("成员退出参数失配")
+                        }
+                        continue
+                    }
+                    // 认证是 Go 后台扩展，按公开 SDL 契约核对根字段。
+                    authFields := map[string]string{
+                        "Query.getInstallStatus":   "InstallStatus!",
+                        "Mutation.initializeAdmin": "UserItem!",
+                        "Mutation.signInWithEmail": "UserItem!",
+                        "Mutation.signOut":         "Boolean!",
+                    }
+                    if expected, ok := authFields[name+"."+field.Name]; endpoint == "admin" && ok {
+                        if field.Type.String() != expected {
+                            t.Fatalf("认证字段类型失配：%s.%s", name, field.Name)
+                        }
+                        expectedInput := map[string]string{"initializeAdmin": "InitializeAdminInput!", "signInWithEmail": "SignInWithEmailInput!"}[field.Name]
+                        if expectedInput == "" {
+                            if len(field.Arguments) != 0 {
+                                t.Fatalf("认证字段参数失配：%s", field.Name)
+                            }
+                        } else if len(field.Arguments) != 1 || field.Arguments[0].Name != "input" || field.Arguments[0].Type.String() != expectedInput {
+                            t.Fatalf("认证输入失配：%s", field.Name)
+                        }
+                        continue
+                    }
                     // admin 权限查询扩展已通过存在性、类型和参数契约检查。
                     if endpoint == "admin" && name == "Query" && field.Name == "getCurrentPermissions" {
+                        continue
+                    }
+                    // 首页概览是 Go 后台扩展，单独核对完整字段与参数契约。
+                    if endpoint == "admin" && name == "Query" && field.Name == "getDashboardOverview" {
+                        if field.Type.String() != "DashboardOverview!" || len(field.Arguments) != 0 {
+                            t.Fatal("概览查询契约失配")
+                        }
+                        overview := target.Types["DashboardOverview"]
+                        if overview == nil || len(overview.Fields) != 3 {
+                            t.Fatal("概览类型字段失配")
+                        }
+                        for fieldName, fieldType := range map[string]string{"shops": "Int!", "backend": "String!", "mode": "String!"} {
+                            value := overview.Fields.ForName(fieldName)
+                            if value == nil || value.Type.String() != fieldType {
+                                t.Fatalf("概览字段失配：%s", fieldName)
+                            }
+                        }
                         continue
                     }
                     // 会话管理是明确登记的 Go 后台扩展，参考用户 CRUD 契约继续逐字段核对。

@@ -13,8 +13,11 @@ function createHarness({ endpoint = "https://test.invalid/api/graphql/member", t
             token,
         );
     state.authResponses = {
-        "sign-in/email": { statusCode: 200, data: { token: "test-session" } },
-        "sign-out": { statusCode: 200, data: { success: true } },
+        signInWithEmail: {
+            statusCode: 200,
+            data: { data: { signInWithEmail: { token: "test-session" } } },
+        },
+        signOut: { statusCode: 200, data: { data: { signOut: true } } },
     };
     const slots = [];
     let cursor = 0;
@@ -72,18 +75,32 @@ function createHarness({ endpoint = "https://test.invalid/api/graphql/member", t
                     fail({ errMsg: "request:fail " + state.mode });
                     return;
                 }
-                const authPath = options.url.split("/api/auth/")[1];
-                if (authPath) {
-                    success(state.authResponses[authPath] ?? { statusCode: 404, data: {} });
+                const operations = JSON.parse(options.data);
+                const authOperation =
+                    !Array.isArray(operations) &&
+                    /\b(signInWithEmail|signOut)\b/u.exec(operations.query)?.[1];
+                if (authOperation) {
+                    success(state.authResponses[authOperation] ?? { statusCode: 404, data: {} });
                     return;
                 }
-                const operations = JSON.parse(options.data);
                 const rows = (Array.isArray(operations) ? operations : [operations]).map(
                     (operation, index) => {
-                        if (state.mode === "graphql" || (state.mode === "partial" && index === 1))
+                        if (
+                            state.mode === "unauthorized" ||
+                            state.mode === "graphql" ||
+                            (state.mode === "partial" && index === 1)
+                        )
                             return {
                                 errors: [
-                                    { message: "查询失败", extensions: { code: "BAD_USER_INPUT" } },
+                                    {
+                                        message: "查询失败",
+                                        extensions: {
+                                            code:
+                                                state.mode === "unauthorized"
+                                                    ? "UNAUTHORIZED"
+                                                    : "BAD_USER_INPUT",
+                                        },
+                                    },
                                 ],
                             };
                         if (state.mode === "missing") return { data: {} };

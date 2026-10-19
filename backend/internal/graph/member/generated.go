@@ -29,6 +29,7 @@ func NewExecutableSchema(cfg Config) graphql.ExecutableSchema {
 type Config = graphql.Config[ResolverRoot, DirectiveRoot, ComplexityRoot]
 
 type ResolverRoot interface {
+    Mutation() MutationResolver
     Query() QueryResolver
 }
 
@@ -36,6 +37,15 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+    MemberSignInPayload struct {
+        Token func(childComplexity int) int
+    }
+
+    Mutation struct {
+        SignInWithEmail func(childComplexity int, input MemberSignInInput) int
+        SignOut         func(childComplexity int) int
+    }
+
     Query struct {
         GetShop func(childComplexity int, where model.ShopFilters) int
     }
@@ -54,6 +64,10 @@ type ComplexityRoot struct {
 
 // region    ************************** generated!.gotpl **************************
 
+type MutationResolver interface {
+    SignInWithEmail(ctx context.Context, input MemberSignInInput) (*MemberSignInPayload, error)
+    SignOut(ctx context.Context) (bool, error)
+}
 type QueryResolver interface {
     GetShop(ctx context.Context, where model.ShopFilters) (*model.ShopItem, error)
 }
@@ -75,6 +89,31 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
     ec := newExecutionContext(nil, e, nil)
     _ = ec
     switch typeName + "." + field {
+
+    case "MemberSignInPayload.token":
+        if e.ComplexityRoot.MemberSignInPayload.Token == nil {
+            break
+        }
+
+        return e.ComplexityRoot.MemberSignInPayload.Token(childComplexity), true
+
+    case "Mutation.signInWithEmail":
+        if e.ComplexityRoot.Mutation.SignInWithEmail == nil {
+            break
+        }
+
+        args, err := ec.field_Mutation_signInWithEmail_args(ctx, rawArgs)
+        if err != nil {
+            return 0, false
+        }
+
+        return e.ComplexityRoot.Mutation.SignInWithEmail(childComplexity, args["input"].(MemberSignInInput)), true
+    case "Mutation.signOut":
+        if e.ComplexityRoot.Mutation.SignOut == nil {
+            break
+        }
+
+        return e.ComplexityRoot.Mutation.SignOut(childComplexity), true
 
     case "Query.getShop":
         if e.ComplexityRoot.Query.GetShop == nil {
@@ -134,6 +173,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
     ec := newExecutionContext(opCtx, e, make(chan graphql.DeferredResult))
     inputUnmarshalMap := graphql.BuildUnmarshalerMap(
         ec.unmarshalInputIntFilters,
+        ec.unmarshalInputMemberSignInInput,
         ec.unmarshalInputShopFilters,
         ec.unmarshalInputStringFilters,
     )
@@ -169,6 +209,21 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
             }
 
             return &response
+        }
+    case ast.Mutation:
+        return func(ctx context.Context) *graphql.Response {
+            if !first {
+                return nil
+            }
+            first = false
+            ctx = graphql.WithUnmarshalerMap(ctx, inputUnmarshalMap)
+            data := ec._Mutation(ctx, opCtx.Operation.SelectionSet)
+            var buf bytes.Buffer
+            data.MarshalGQL(&buf)
+
+            return &graphql.Response{
+                Data: buf.Bytes(),
+            }
         }
 
     default:
@@ -248,6 +303,21 @@ type ShopItem {
 type Query {
     getShop(where: ShopFilters!): ShopItem
 }
+
+# 小程序认证通过独立 Bearer 会话工作，响应仅包含新登录的 token。
+type MemberSignInPayload {
+    token: String!
+}
+
+input MemberSignInInput {
+    email: String!
+    password: String!
+}
+
+type Mutation {
+    signInWithEmail(input: MemberSignInInput!): MemberSignInPayload!
+    signOut: Boolean!
+}
 `, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -255,6 +325,14 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // childFields_* functions provide shared child field context lookups.
 // Each function is generated once per unique object type, deduplicating the
 // switch statements that were previously inlined in every fieldContext_* function.
+
+func (ec *executionContext) childFields_MemberSignInPayload(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+    switch field.Name {
+    case "token":
+        return ec.fieldContext_MemberSignInPayload_token(ctx, field)
+    }
+    return nil, fmt.Errorf("no field named %q was found under type MemberSignInPayload", field.Name)
+}
 
 func (ec *executionContext) childFields_ShopItem(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
     switch field.Name {
@@ -390,6 +468,20 @@ func (ec *executionContext) childFields___Type(ctx context.Context, field graphq
 
 // region    ***************************** args.gotpl *****************************
 
+func (ec *executionContext) field_Mutation_signInWithEmail_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+    var err error
+    args := map[string]any{}
+    arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input",
+        func(ctx context.Context, v any) (MemberSignInInput, error) {
+            return ec.unmarshalNMemberSignInInput2codeupᚗaliyunᚗcomᚋshanjingᚋlabsᚋgoᚑfullᚑstackᚑstarterᚗgitᚋprojectsᚋmultiᚑdatabaseᚑdemoᚋinternalᚋgraphᚋmemberᚐMemberSignInInput(ctx, v)
+        })
+    if err != nil {
+        return nil, err
+    }
+    args["input"] = arg0
+    return args, nil
+}
+
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
     var err error
     args := map[string]any{}
@@ -477,6 +569,96 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ***************************** args.gotpl *****************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _MemberSignInPayload_token(ctx context.Context, field graphql.CollectedField, obj *MemberSignInPayload) (ret graphql.Marshaler) {
+    return graphql.ResolveField(
+        ctx,
+        ec.OperationContext,
+        field,
+        func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+            return ec.fieldContext_MemberSignInPayload_token(ctx, field)
+        },
+        func(ctx context.Context) (any, error) {
+            return obj.Token, nil
+        },
+        nil,
+        func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+            return ec.marshalNString2string(ctx, selections, v)
+        },
+        true,
+        true,
+    )
+}
+func (ec *executionContext) fieldContext_MemberSignInPayload_token(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+    return graphql.NewScalarFieldContext("MemberSignInPayload", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _Mutation_signInWithEmail(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+    return graphql.ResolveField(
+        ctx,
+        ec.OperationContext,
+        field,
+        func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+            return ec.fieldContext_Mutation_signInWithEmail(ctx, field)
+        },
+        func(ctx context.Context) (any, error) {
+            fc := graphql.GetFieldContext(ctx)
+            return ec.Resolvers.Mutation().SignInWithEmail(ctx, fc.Args["input"].(MemberSignInInput))
+        },
+        nil,
+        func(ctx context.Context, selections ast.SelectionSet, v *MemberSignInPayload) graphql.Marshaler {
+            return ec.marshalNMemberSignInPayload2ᚖcodeupᚗaliyunᚗcomᚋshanjingᚋlabsᚋgoᚑfullᚑstackᚑstarterᚗgitᚋprojectsᚋmultiᚑdatabaseᚑdemoᚋinternalᚋgraphᚋmemberᚐMemberSignInPayload(ctx, selections, v)
+        },
+        true,
+        true,
+    )
+}
+func (ec *executionContext) fieldContext_Mutation_signInWithEmail(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+    fc = &graphql.FieldContext{
+        Object:     "Mutation",
+        Field:      field,
+        IsMethod:   true,
+        IsResolver: true,
+        Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+            return ec.childFields_MemberSignInPayload(ctx, field)
+        },
+    }
+    defer func() {
+        if r := recover(); r != nil {
+            err = ec.Recover(ctx, r)
+            ec.Error(ctx, err)
+        }
+    }()
+    ctx = graphql.WithFieldContext(ctx, fc)
+    if fc.Args, err = ec.field_Mutation_signInWithEmail_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+        ec.Error(ctx, err)
+        return fc, err
+    }
+    return fc, nil
+}
+
+func (ec *executionContext) _Mutation_signOut(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+    return graphql.ResolveField(
+        ctx,
+        ec.OperationContext,
+        field,
+        func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+            return ec.fieldContext_Mutation_signOut(ctx, field)
+        },
+        func(ctx context.Context) (any, error) {
+            return ec.Resolvers.Mutation().SignOut(ctx)
+        },
+        nil,
+        func(ctx context.Context, selections ast.SelectionSet, v bool) graphql.Marshaler {
+            return ec.marshalNBoolean2bool(ctx, selections, v)
+        },
+        true,
+        true,
+    )
+}
+func (ec *executionContext) fieldContext_Mutation_signOut(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+    return graphql.NewScalarFieldContext("Mutation", field, true, true, errors.New("field of type Boolean does not have child fields"))
+}
 
 func (ec *executionContext) _Query_getShop(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
     return graphql.ResolveField(
@@ -1888,6 +2070,43 @@ func (ec *executionContext) unmarshalInputIntFilters(ctx context.Context, obj an
     return it, nil
 }
 
+func (ec *executionContext) unmarshalInputMemberSignInInput(ctx context.Context, obj any) (MemberSignInInput, error) {
+    var it MemberSignInInput
+    if obj == nil {
+        return it, nil
+    }
+
+    asMap := map[string]any{}
+    for k, v := range obj.(map[string]any) {
+        asMap[k] = v
+    }
+
+    fieldsInOrder := [...]string{"email", "password"}
+    for _, k := range fieldsInOrder {
+        v, ok := asMap[k]
+        if !ok {
+            continue
+        }
+        switch k {
+        case "email":
+            ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+            data, err := ec.unmarshalNString2string(ctx, v)
+            if err != nil {
+                return it, err
+            }
+            it.Email = data
+        case "password":
+            ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
+            data, err := ec.unmarshalNString2string(ctx, v)
+            if err != nil {
+                return it, err
+            }
+            it.Password = data
+        }
+    }
+    return it, nil
+}
+
 func (ec *executionContext) unmarshalInputShopFilters(ctx context.Context, obj any) (model.ShopFilters, error) {
     var it model.ShopFilters
     if obj == nil {
@@ -2060,6 +2279,99 @@ func (ec *executionContext) unmarshalInputStringFilters(ctx context.Context, obj
 // endregion ************************** interface.gotpl ***************************
 
 // region    **************************** object.gotpl ****************************
+
+var memberSignInPayloadImplementors = []string{"MemberSignInPayload"}
+
+func (ec *executionContext) _MemberSignInPayload(ctx context.Context, sel ast.SelectionSet, obj *MemberSignInPayload) graphql.Marshaler {
+    fields := graphql.CollectFields(ec.OperationContext, sel, memberSignInPayloadImplementors)
+
+    out := graphql.NewFieldSet(fields)
+    deferredFieldSet := graphql.NewFieldSet(nil)
+    deferLabelToView := make(map[string]*graphql.FieldSetView)
+    for i, field := range fields {
+        switch field.Name {
+        case "__typename":
+            out.Values[i] = graphql.MarshalString("MemberSignInPayload")
+        case "token":
+            out.Values[i] = ec._MemberSignInPayload_token(ctx, field, obj)
+            if out.Values[i] == graphql.Null {
+                out.Invalids++
+            }
+        default:
+            panic("unknown field " + strconv.Quote(field.Name))
+        }
+    }
+    out.Dispatch(ctx)
+    if out.Invalids > 0 {
+        return graphql.Null
+    }
+
+    atomic.AddInt32(&ec.Deferred, int32(min(len(deferLabelToView), math.MaxInt32)))
+
+    ec.ProcessDeferredGroup(graphql.DeferredGroup{
+        Defers:   deferLabelToView,
+        Path:     graphql.GetPath(ctx),
+        FieldSet: deferredFieldSet,
+        Context:  ctx,
+    })
+
+    return out
+}
+
+var mutationImplementors = []string{"Mutation"}
+
+func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
+    fields := graphql.CollectFields(ec.OperationContext, sel, mutationImplementors)
+    ctx = graphql.WithFieldContext(ctx, &graphql.FieldContext{
+        Object: "Mutation",
+    })
+
+    out := graphql.NewFieldSet(fields)
+    deferredFieldSet := graphql.NewFieldSet(nil)
+    deferLabelToView := make(map[string]*graphql.FieldSetView)
+    for i, field := range fields {
+        innerCtx := graphql.WithRootFieldContext(ctx, &graphql.RootFieldContext{
+            Object: field.Name,
+            Field:  field,
+        })
+
+        switch field.Name {
+        case "__typename":
+            out.Values[i] = graphql.MarshalString("Mutation")
+        case "signInWithEmail":
+            out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+                return ec._Mutation_signInWithEmail(ctx, field)
+            })
+            if out.Values[i] == graphql.Null {
+                out.Invalids++
+            }
+        case "signOut":
+            out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+                return ec._Mutation_signOut(ctx, field)
+            })
+            if out.Values[i] == graphql.Null {
+                out.Invalids++
+            }
+        default:
+            panic("unknown field " + strconv.Quote(field.Name))
+        }
+    }
+    out.Dispatch(ctx)
+    if out.Invalids > 0 {
+        return graphql.Null
+    }
+
+    atomic.AddInt32(&ec.Deferred, int32(min(len(deferLabelToView), math.MaxInt32)))
+
+    ec.ProcessDeferredGroup(graphql.DeferredGroup{
+        Defers:   deferLabelToView,
+        Path:     graphql.GetPath(ctx),
+        FieldSet: deferredFieldSet,
+        Context:  ctx,
+    })
+
+    return out
+}
 
 var queryImplementors = []string{"Query"}
 
@@ -2623,6 +2935,21 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
         }
     }
     return res
+}
+
+func (ec *executionContext) unmarshalNMemberSignInInput2codeupᚗaliyunᚗcomᚋshanjingᚋlabsᚋgoᚑfullᚑstackᚑstarterᚗgitᚋprojectsᚋmultiᚑdatabaseᚑdemoᚋinternalᚋgraphᚋmemberᚐMemberSignInInput(ctx context.Context, v any) (MemberSignInInput, error) {
+    res, err := ec.unmarshalInputMemberSignInInput(ctx, v)
+    return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNMemberSignInPayload2ᚖcodeupᚗaliyunᚗcomᚋshanjingᚋlabsᚋgoᚑfullᚑstackᚑstarterᚗgitᚋprojectsᚋmultiᚑdatabaseᚑdemoᚋinternalᚋgraphᚋmemberᚐMemberSignInPayload(ctx context.Context, sel ast.SelectionSet, v *MemberSignInPayload) graphql.Marshaler {
+    if v == nil {
+        if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+            graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+        }
+        return graphql.Null
+    }
+    return ec._MemberSignInPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNShopFilters2codeupᚗaliyunᚗcomᚋshanjingᚋlabsᚋgoᚑfullᚑstackᚑstarterᚗgitᚋprojectsᚋmultiᚑdatabaseᚑdemoᚋinternalᚋgraphᚋmodelᚐShopFilters(ctx context.Context, v any) (model.ShopFilters, error) {

@@ -11,6 +11,9 @@ import (
     "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/projects/multi-database-demo/internal/graph/member"
     "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/projects/multi-database-demo/internal/pages"
     "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/projects/multi-database-demo/internal/service"
+    "context"
+    gql "github.com/99designs/gqlgen/graphql"
+    "github.com/99designs/gqlgen/graphql/handler/transport"
     "github.com/labstack/echo/v5"
     "log/slog"
     "strconv"
@@ -82,15 +85,43 @@ func New(shops service.Shops, config Config) *echo.Echo {
     e.GET("/api/rest/demo/shops/:id", shopHandler)
     e.GET(ProbePath, shopHandler)
 
-    e.Any(MemberPath, echo.WrapHandler(graphqltransport.Handler(member.NewExecutableSchema(member.Config{Resolvers: &member.Resolver{Shops: shops}}), graphqltransport.Config{
+    memberServer := graphqltransport.NewServer(member.NewExecutableSchema(member.Config{Resolvers: &member.Resolver{Shops: shops, Users: config.Authentication}}), graphqltransport.Config{
         AllowedOrigins: config.AllowedOrigins,
         Logger:         config.Logger,
         Introspection:  config.Introspection,
-    })))
-    e.Any(AdminPath, echo.WrapHandler(graphqltransport.Handler(admin.NewExecutableSchema(admin.Config{Resolvers: &admin.Resolver{Shops: shops, Users: config.Authentication, Queue: config.Queue}}), graphqltransport.Config{
+    })
+    memberServer.AroundFields(func(ctx context.Context, next gql.Resolver) (any, error) {
+        field := gql.GetFieldContext(ctx)
+        if config.Authentication != nil && field != nil && (field.Object == "Query" || field.Object == "Mutation") && !(field.Object == "Mutation" && (field.Field.Name == "signInWithEmail" || field.Field.Name == "signOut")) {
+            if err := config.Authentication.RequireUser(ctx); err != nil {
+                return nil, err
+            }
+        }
+        return next(ctx)
+    })
+    memberServer.AddTransport(transport.GET{})
+    memberServer.AddTransport(transport.POST{})
+    e.Any(MemberPath, echo.WrapHandler(graphqltransport.CompatibleTransport(memberServer, graphqltransport.Config{AllowedOrigins: config.AllowedOrigins})))
+    adminServer := graphqltransport.NewServer(admin.NewExecutableSchema(admin.Config{Resolvers: &admin.Resolver{Shops: shops, Users: config.Authentication, Queue: config.Queue}}), graphqltransport.Config{
         AllowedOrigins: config.AllowedOrigins,
         Logger:         config.Logger,
         Introspection:  config.Introspection,
-    })))
+    })
+    // 按实际 Schema 字段执行门禁，覆盖别名、fragment 和每个 batch 成员。
+    adminServer.AroundFields(func(ctx context.Context, next gql.Resolver) (any, error) {
+        field := gql.GetFieldContext(ctx)
+        if config.Authentication != nil && field != nil && (field.Object == "Query" || field.Object == "Mutation") {
+            public := field.Object == "Query" && field.Field.Name == "getInstallStatus" || field.Object == "Mutation" && (field.Field.Name == "initializeAdmin" || field.Field.Name == "signInWithEmail" || field.Field.Name == "signOut")
+            if !public {
+                if err := config.Authentication.RequireAdmin(ctx); err != nil {
+                    return nil, err
+                }
+            }
+        }
+        return next(ctx)
+    })
+    adminServer.AddTransport(transport.GET{})
+    adminServer.AddTransport(transport.POST{})
+    e.Any(AdminPath, echo.WrapHandler(graphqltransport.CompatibleTransport(adminServer, graphqltransport.Config{AllowedOrigins: config.AllowedOrigins})))
     return e
 }

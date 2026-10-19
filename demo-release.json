@@ -3,32 +3,24 @@
     "layout": "app-layout-v2",
     "application": "projects/multi-database-demo",
     "sourceRepository": "https://codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git",
-    "sourceCommit": "c4e2d7c8d4416c863bfa19bb526329acf5c789c4",
+    "sourceCommit": "a3925e7e68b94fb90c37995af379eadcd7a3f106",
     "dependencies": {
         "go": {
             "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit": {
-                "version": "v0.1.9",
-                "sourceCommit": "c4e2d7c8d4416c863bfa19bb526329acf5c789c4",
-                "sum": "h1:YzJ1aWjS0alw+veGpZIkp1MkMRf0O4jUieWVC0IEHH4=",
+                "version": "v0.1.10",
+                "sourceCommit": "a3925e7e68b94fb90c37995af379eadcd7a3f106",
+                "sum": "h1:4UsxIi1y4V408/kqkyv2VggOq7xcCxQbVtKJhlt5hwA=",
                 "goModSum": "h1:qgllkepivRlnMQfzDmReboelCXmTIoLCwKzymC6JCr8="
             }
         },
         "npm": {
             "@shanjing/shadcnui-dashboard": {
-                "version": "0.1.8",
+                "version": "0.1.9",
                 "registry": "https://packages.aliyun.com/5eb77c7538076f00011bd238/npm/npm-registry/",
-                "sourceCommit": "2c85b95f457598ac5a47cc563b3ece7cac2ac8d8",
-                "integrity": "sha512-jmrYfmQuJ9NuDWHwMnTxKe/Ddw8uVbC/VhSVShsHrsnByP4YSEX8x4Ox7zJDmpweLHo/9oTz+ZR6BFepXmArOA==",
-                "shasum": "f51f57f99b56249f69be501b99ee128efc47444f",
-                "tarball": "https://packages.aliyun.com/5eb77c7538076f00011bd238/npm/npm-registry/@shanjing/shadcnui-dashboard/-/@shanjing/shadcnui-dashboard-0.1.8.tgz"
-            },
-            "@shanjing/go-starter-devtools": {
-                "version": "0.1.11",
-                "registry": "https://packages.aliyun.com/5eb77c7538076f00011bd238/npm/npm-registry/",
-                "sourceCommit": "2c85b95f457598ac5a47cc563b3ece7cac2ac8d8",
-                "integrity": "sha512-FPQO7mdunSNwvrISNFOIJcyWRSQABWh2M9YsaC7uycVMnSb5VLKxqmI1GMLAfaMNbz3x3hMeywbloBOGXxyz9g==",
-                "shasum": "5eae851536b6fd2b1c386ad21708cdd05481d030",
-                "tarball": "https://packages.aliyun.com/5eb77c7538076f00011bd238/npm/npm-registry/@shanjing/go-starter-devtools/-/@shanjing/go-starter-devtools-0.1.11.tgz"
+                "sourceCommit": "a3925e7e68b94fb90c37995af379eadcd7a3f106",
+                "integrity": "sha512-i7yLka1ZAys27davasAFF0F2P5ueC2bK0VO3+Xaa8JcrL1jPoR6coiLyv5otfpxN9ElVwGdR8g7gQg+v9tM2zg==",
+                "shasum": "3bf17abb815ba1ce4c0e0ef3bce9fc95fa767736",
+                "tarball": "https://packages.aliyun.com/5eb77c7538076f00011bd238/npm/npm-registry/@shanjing/shadcnui-dashboard/-/@shanjing/shadcnui-dashboard-0.1.9.tgz"
             }
         }
     },
@@ -230,12 +222,12 @@
         },
         ".trellis/spec/backend/database-guidelines.md": {
             "source": "projects/multi-database-demo/.trellis/spec/backend/database-guidelines.md",
-            "sha256": "7efb8cb98c0d8707e1082dbab6ab71cf1cf7f087cf831f6f382c14015c15e03f",
+            "sha256": "cec051a1b67aee2570ac270b3ef8788163221837e8e610ed5f6d248e6bbf4cad",
             "mode": 420
         },
         ".trellis/spec/backend/directory-structure.md": {
             "source": "projects/multi-database-demo/.trellis/spec/backend/directory-structure.md",
-            "sha256": "ede2b01267a9a36e74e38d854dda563f0b95809681133d0dfa9ca0a2b96cf8a6",
+            "sha256": "dcab1b7c3c1289d456b3d12ac5daef6bcc5c125256848235509bc4f13b66c7fa",
             "mode": 420
         },
         ".trellis/spec/backend/error-handling.md": {
@@ -245,22 +237,22 @@
         },
         ".trellis/spec/backend/graphql-guidelines.md": {
             "source": "projects/multi-database-demo/.trellis/spec/backend/graphql-guidelines.md",
-            "sha256": "967252e530d7aa0f26e778ea774ad0d197111e23280fcfeb5110f5a5e19105a8",
+            "sha256": "7fd3971894fcdbacdd29955a079718140fa3e0e1a8d5bb41c1889f21e5116bd6",
             "mode": 420
         },
         ".trellis/spec/backend/index.md": {
             "source": "projects/multi-database-demo/.trellis/spec/backend/index.md",
-            "sha256": "99e8b69ffbeb76d0ec1c1b1423db1fffb49665e246149d818063008cee5690d2",
+            "sha256": "9744a0f9bb6e07ee7e216712f15bb9959521996a8f6685b137922c33677bcf3c",
             "mode": 420
         },
         ".trellis/spec/backend/quality-guidelines.md": {
             "source": "projects/multi-database-demo/.trellis/spec/backend/quality-guidelines.md",
-            "sha256": "4caaba4fbf81ebeac1251a9faced09e300b218b0dec37a9f07fff703587baddb",
+            "sha256": "b1f361c2dea92badf06bf94bd83e4376b8a2a761663b949bfb38c6f8f36d2d4d",
             "mode": 420
         },
         ".trellis/spec/frontend/index.md": {
             "source": "projects/multi-database-demo/.trellis/spec/frontend/index.md",
-            "sha256": "78c022415cbc70d7589966924da0cc9ecd4ff1968c173cdc1caf6a1d88320228",
+            "sha256": "777c94dbb1c4327120659f927cd6ea47ec9ba73310dd0282b72a794d3fa085cb",
             "mode": 420
         },
         ".trellis/spec/frontend/shared-dashboard.md": {
@@ -285,7 +277,7 @@
         },
         ".trellis/spec/guides/reuse-guide.md": {
             "source": "projects/multi-database-demo/.trellis/spec/guides/reuse-guide.md",
-            "sha256": "b50bef898bef445539c20d794b873a513b09c8f652d36e28d9cdcbb9ac6c50e4",
+            "sha256": "4f9dfc298f8d89d2f952c37700ce887de8f932d8e5a5aa940a4b851dc2ff631d",
             "mode": 420
         },
         ".trellis/spec/guides/task-writing-guide.md": {
@@ -300,12 +292,12 @@
         },
         ".trellis/spec/index.md": {
             "source": "projects/multi-database-demo/.trellis/spec/index.md",
-            "sha256": "23f0b0aa0f2dd26cbcbcaea345350a9f9892f26ed25da7b697a96e1864eef7fe",
+            "sha256": "ce73afd7de2748fee5130bee322d046d531c7dc7d30e7ac7f01e24c1ad420461",
             "mode": 420
         },
         ".trellis/spec/miniprogram/index.md": {
             "source": "projects/multi-database-demo/.trellis/spec/miniprogram/index.md",
-            "sha256": "be3cddc31c7414523428a07e2445ce8cde79ec735a160f6514c9b647f8a5653b",
+            "sha256": "a783250f33330ba9685a1d91600185a5f955d85121589ecd904bb14436329b16",
             "mode": 420
         },
         ".trellis/workflow.md": {
@@ -320,27 +312,17 @@
         },
         "AGENTS.md": {
             "source": "projects/multi-database-demo/AGENTS.md",
-            "sha256": "44176126817354eb9c1fa2249fa303d13622afbfa8870f66c7c0add0a2b41aaa",
+            "sha256": "b63a1945efaf9e089a76b9fc4787bf1f54f989eac5fe816420b38953ca40a65d",
             "mode": 420
         },
         "README.md": {
             "source": "projects/multi-database-demo/README.md",
-            "sha256": "f536c88a5a23a8b70052d467eee5b197037800f69a1cfc37e396351e242f1437",
+            "sha256": "bd1696b5ed46cb5e4a03a0dedcc07a59c24d612de1b1176d5e2942760cf4c71e",
             "mode": 420
         },
         "backend/.env.example": {
             "source": "projects/multi-database-demo/backend/.env.example",
             "sha256": "75cdb5f496f071a11cb6c63e64845f777968d02c25e1be7a9459ce070a11a9f8",
-            "mode": 420
-        },
-        "backend/air-web.toml": {
-            "source": "projects/multi-database-demo/backend/air-web.toml",
-            "sha256": "0f814a64ff2f789c290f837f64032de0f34593b2704511ac0f963ff87e2f42f5",
-            "mode": 420
-        },
-        "backend/air-worker.toml": {
-            "source": "projects/multi-database-demo/backend/air-worker.toml",
-            "sha256": "07883a185611bbed54b6bb49ad46fac92bafd5b9a7462cc915e3d044537ad047",
             "mode": 420
         },
         "backend/cmd/gen/main.go": {
@@ -355,7 +337,7 @@
         },
         "backend/cmd/web/main.go": {
             "source": "projects/multi-database-demo/backend/cmd/web/main.go",
-            "sha256": "4eb115b6a4dbc20b23101d798864f3b693b54d1f664dd47b3af69fbd97d15180",
+            "sha256": "73fe21a5563c373236536b783bf1dc9f236ef4921daeb38d3ee2ab509d53e444",
             "mode": 420
         },
         "backend/cmd/web/main_test.go": {
@@ -370,13 +352,13 @@
         },
         "backend/go.mod": {
             "source": "projects/multi-database-demo/backend/go.mod",
-            "sha256": "2b499d235289dc288fb9f025e4b6a3a9045142242388080ca9ca1a2d432cb3f3",
+            "sha256": "a375fb4f6e5123cd238e06faa3a057e4633d232ff5f5ca663ce9f7d279a8f160",
             "mode": 420,
             "sourceSha256": "67ea893efff92be0172aaa012f39596c52b352ec064b6ec3ad5c8bf05d81cdb7"
         },
         "backend/go.sum": {
             "source": "projects/multi-database-demo/backend/go.sum",
-            "sha256": "2af56d298d6829e8abb805207e5d17bb96348357fed4d8e8a0c5a9069d02aaf2",
+            "sha256": "d1c34412216903c2c979ccdff580f735062fa22e68f599345ca50dbc4eee2713",
             "mode": 420,
             "sourceSha256": "dfed909e54907df64ad28abc41606e8a282a5264edf87436827a8c64f0b17858"
         },
@@ -432,17 +414,17 @@
         },
         "backend/internal/graph/admin/admin.resolvers.go": {
             "source": "projects/multi-database-demo/backend/internal/graph/admin/admin.resolvers.go",
-            "sha256": "b624e15ad9cd1d1d39b50bcfa3e4ac39058c1aa89c54a5da66c44d2a17d13548",
+            "sha256": "9a1e12c41c77c8dbdc0851fa367fa3dc1ab22de47b796af67cb83b11a4600d66",
             "mode": 420
         },
         "backend/internal/graph/admin/generated.go": {
             "source": "projects/multi-database-demo/backend/internal/graph/admin/generated.go",
-            "sha256": "0150d8c9eb4c6cb2a9119b6cc1f8173b9aa1c4b5ae3cc0d34852c400f2eda182",
+            "sha256": "e332e816c365c45b5124e4c399b9ed1211a7c817332675757b7f0dd906ed7fb9",
             "mode": 420
         },
         "backend/internal/graph/admin/models_gen.go": {
             "source": "projects/multi-database-demo/backend/internal/graph/admin/models_gen.go",
-            "sha256": "9823f32e36d0802ae042bab15ab1d429d2782f248e3f4739e8734567bbf38a20",
+            "sha256": "641c46cff8e31af452c08b9c4f963a50f511da6d4786b656f54142ef18340db8",
             "mode": 420
         },
         "backend/internal/graph/admin/queue.resolvers.go": {
@@ -472,22 +454,22 @@
         },
         "backend/internal/graph/member/generated.go": {
             "source": "projects/multi-database-demo/backend/internal/graph/member/generated.go",
-            "sha256": "e969db505837061e37e49e9ae35b3177b67fd38c711f3a18a2e446ac48ee4443",
+            "sha256": "2d656b6dfaefd379a28669eb5ec8ea472f578aaccae9a134bfc057ba5f46caa1",
             "mode": 420
         },
         "backend/internal/graph/member/member.resolvers.go": {
             "source": "projects/multi-database-demo/backend/internal/graph/member/member.resolvers.go",
-            "sha256": "d12ef9bbf58d0e31e3207dcce5cb3b7ecb5dd04384bd4b862e2a620c2a1d30c2",
+            "sha256": "c22e7fca33b5b773a24cfde32be53121da099cdb35fdd6fbc2b74e7c2e0eafc8",
             "mode": 420
         },
         "backend/internal/graph/member/models_gen.go": {
             "source": "projects/multi-database-demo/backend/internal/graph/member/models_gen.go",
-            "sha256": "55a657378b004cfa0c717f45de6d15142a69878e246d5eeeeef1436ee9775091",
+            "sha256": "fbcba53ad19fa6bf14e124ab6daa64d7f5fb18d9c948d57730a2b28f3501cdd6",
             "mode": 420
         },
         "backend/internal/graph/member/resolver.go": {
             "source": "projects/multi-database-demo/backend/internal/graph/member/resolver.go",
-            "sha256": "f38f9d21332a2e7d5e4b6a94ca8f2780b3ec670c333dcf51576f766e7f364a27",
+            "sha256": "713223dc9fa83c44761d4a9fff9ffb67ccb0a7c005d55585e918085aa3d5d32d",
             "mode": 420
         },
         "backend/internal/graph/model/adapter.go": {
@@ -660,9 +642,14 @@
             "sha256": "cf0bfb0b091633a2345ae638054fd194da6997c3ab9011126595eeeb0a5e2d81",
             "mode": 420
         },
+        "backend/internal/service/count_test.go": {
+            "source": "projects/multi-database-demo/backend/internal/service/count_test.go",
+            "sha256": "7ce798f038b6eb35b9899ab9f22325ca0f2127a85fb73ec2a947f7da117ba330",
+            "mode": 420
+        },
         "backend/internal/service/database.go": {
             "source": "projects/multi-database-demo/backend/internal/service/database.go",
-            "sha256": "619d169214f084cba16237ab69857a17ad2446e2a592ed4b5b00b02887378549",
+            "sha256": "e3ff0db89e39f759c89ebad824f0803c53e991e75d7e9fbcd26790f45658be9a",
             "mode": 420
         },
         "backend/internal/service/database_test.go": {
@@ -687,7 +674,7 @@
         },
         "backend/internal/service/shop.go": {
             "source": "projects/multi-database-demo/backend/internal/service/shop.go",
-            "sha256": "441f27d3b743ec19bada77cf2cfddf2b066371d3313988c63783408b26039850",
+            "sha256": "6285874f6f0bebf84553297fcdd7d25024ab6ce67578ab9cbf362d217ec862fb",
             "mode": 420
         },
         "backend/internal/service/shop_test.go": {
@@ -745,6 +732,11 @@
             "sha256": "f35dd657a4787bc98d3b490f4f4e5182747f259d1b5159cbe41c3909eff0ab35",
             "mode": 420
         },
+        "backend/internal/web/overview_test.go": {
+            "source": "projects/multi-database-demo/backend/internal/web/overview_test.go",
+            "sha256": "18a884b3afa3f4969621051adf6c2a28acc513aaa995a3be1160ce8d15739ee3",
+            "mode": 420
+        },
         "backend/internal/web/pages.go": {
             "source": "projects/multi-database-demo/backend/internal/web/pages.go",
             "sha256": "866e8049f758be99980b1637e4e1feb68fef12e5797fc80d9a00ce511a08fb13",
@@ -762,17 +754,17 @@
         },
         "backend/internal/web/server.go": {
             "source": "projects/multi-database-demo/backend/internal/web/server.go",
-            "sha256": "c70aef8d04074482a2c0ec7bd6a50a93d1e82ffbd34a62a6754e0e89439dc3c2",
+            "sha256": "bfec617cfcd74a93804caaaf809ba4b9d5cee8fbce342b888f81b56911418090",
             "mode": 420
         },
         "backend/internal/web/server_test.go": {
             "source": "projects/multi-database-demo/backend/internal/web/server_test.go",
-            "sha256": "0c2bb72c982e0cfe1065f09bdfee306a5dd1b3d7fa8e70cb80041abb1c3e5ae8",
+            "sha256": "655a266d5af9a09f62a28cdde7a0c96eca630606c89fefaf27f8a947ed570eca",
             "mode": 420
         },
         "backend/internal/web/session_test.go": {
             "source": "projects/multi-database-demo/backend/internal/web/session_test.go",
-            "sha256": "9f9bc2a09e5ddd03aec018f2e9c02f61818fa894b4f154b49ba04a3d5cc95060",
+            "sha256": "9cd9edad69927e69ee493804bd6c9626788c3fe57b9c3193c32233a7565f0906",
             "mode": 420
         },
         "backend/internal/web/sessions_test.go": {
@@ -787,7 +779,7 @@
         },
         "backend/internal/web/shop_permissions_test.go": {
             "source": "projects/multi-database-demo/backend/internal/web/shop_permissions_test.go",
-            "sha256": "1123434606246a0314646e33a3c3def8c6d9f3808e73e410cb057db056d5c562",
+            "sha256": "2044cc77da83df6c9c01ebb351fbcf2e1dc37692d4eecc2d392b99f13126d0de",
             "mode": 420
         },
         "backend/internal/web/static_cache.go": {
@@ -887,7 +879,7 @@
         },
         "frontend/package.json": {
             "source": "projects/multi-database-demo/frontend/package.json",
-            "sha256": "f0e4e1aaade3c9a484ab7b7f08bbde6466248aa19ddd376e14966c73ceff512a",
+            "sha256": "f91f8b81c40bc26d3d430d00456f5b1b96c29271c492a3e4f987ac5c512471fa",
             "mode": 420,
             "sourceSha256": "d7ceb8b93b72531b715c761776510989d25c5a024d7fbd419a313dcbcc741903"
         },
@@ -903,17 +895,17 @@
         },
         "frontend/src/app/app.tsx": {
             "source": "projects/multi-database-demo/frontend/src/app/app.tsx",
-            "sha256": "41645c698f1bb01aa603ae8d510654da38f84df3ffb1494662b0bd3407bc012c",
+            "sha256": "75afb89d82c9133aad2fb7e58ae67764f11fadb6bdac62157a31aa6d9a6b015e",
             "mode": 420
         },
         "frontend/src/app/dashboard-adapter.ts": {
             "source": "projects/multi-database-demo/frontend/src/app/dashboard-adapter.ts",
-            "sha256": "768c5b3786833dd5d33a247198269a1e86baac1266f5ae5245fd4466b4161887",
+            "sha256": "eaba029156ad25a78e9d823d08c4b6972310bab9b6625be9c922734ee4a388f0",
             "mode": 420
         },
         "frontend/src/app/dashboard-layout.tsx": {
             "source": "projects/multi-database-demo/frontend/src/app/dashboard-layout.tsx",
-            "sha256": "cf6fe0823b50bded89be364f066219cae069a7f641c2c7d308a136ce822d8b46",
+            "sha256": "2991e5cfe9fe630a79c2eb2970b7b5dde55e3e18fbcada78a807a57dffee745c",
             "mode": 420
         },
         "frontend/src/app/navigation.ts": {
@@ -923,7 +915,7 @@
         },
         "frontend/src/features/auth/auth-page.tsx": {
             "source": "projects/multi-database-demo/frontend/src/features/auth/auth-page.tsx",
-            "sha256": "311a3a5f435a9c53ae3db10d1d58e9f2912b86f806ae6242d756491c289ad8f6",
+            "sha256": "834818748d3c340b8e503bad026317c03a0e2676e2a61822784c12d703911356",
             "mode": 420
         },
         "frontend/src/features/auth/session-context.ts": {
@@ -956,6 +948,11 @@
             "sha256": "e1ae9bb499629e1cf6ca0fd693373f0c9b0ce0321cca4c2c2f1d8c56136cb3f6",
             "mode": 420
         },
+        "frontend/src/features/queues/queue-routes.tsx": {
+            "source": "projects/multi-database-demo/frontend/src/features/queues/queue-routes.tsx",
+            "sha256": "5ccb992712fa77dad64a371bcf73e2c48be31d79bec3ff65045e457db2fe16dd",
+            "mode": 420
+        },
         "frontend/src/features/shops/shop-input.ts": {
             "source": "projects/multi-database-demo/frontend/src/features/shops/shop-input.ts",
             "sha256": "791a5860fe4ca34fc58c85e63f8ceb6dc85911be25497ca714abe32bff5978e8",
@@ -968,22 +965,22 @@
         },
         "frontend/src/graphql/admin/generated.ts": {
             "source": "projects/multi-database-demo/frontend/src/graphql/admin/generated.ts",
-            "sha256": "e40b07a866de0aa9801dc539550005009ed8012373d1c44b8932bc1f49e3c0ef",
+            "sha256": "629ac8946e976ffc84558aa88ae62496da49e9fdcaaecae06c2789b57b4f7f7c",
             "mode": 420
         },
         "frontend/src/graphql/admin/operations.ts": {
             "source": "projects/multi-database-demo/frontend/src/graphql/admin/operations.ts",
-            "sha256": "238a0f9a4ad8312b532713b26bfe82fa20528b16f7fff907957aafa0b757404a",
+            "sha256": "e0abe4fdd3ef24345d279b73c97453137705a75b03ee6bcdb7a7d24b054144da",
             "mode": 420
         },
         "frontend/src/lib/observability.ts": {
             "source": "projects/multi-database-demo/frontend/src/lib/observability.ts",
-            "sha256": "036da0e14a2eb528f42708413f50cb7e77b5ced91ca817ea4cde7dabe4663bfe",
+            "sha256": "901c87c2786d12964edc59c0bc8f107855ea8dd54c09d947debba9f1eea06bd2",
             "mode": 420
         },
         "frontend/src/lib/request.ts": {
             "source": "projects/multi-database-demo/frontend/src/lib/request.ts",
-            "sha256": "5ca225e78f7b716d24b9b2b94856dd7ce8bbec60536eb6e8236f9dc2b0481175",
+            "sha256": "982b3c45ba935cce22d91c35eb4f5f8ed18f6598cdada22c669ee822fdde6257",
             "mode": 420
         },
         "frontend/src/main.tsx": {
@@ -1008,17 +1005,22 @@
         },
         "frontend/tests/authentication.spec.ts": {
             "source": "projects/multi-database-demo/frontend/tests/authentication.spec.ts",
-            "sha256": "a0113be3bc876ec1a92191b6cbfe711516e2afa24773ebba5ff5eff1528cd7e2",
+            "sha256": "e57f99739adbd3ee0c771e3d2b126955cc098aa8438acaf8314c92d345f1aa88",
             "mode": 420
         },
         "frontend/tests/bus.spec.ts": {
             "source": "projects/multi-database-demo/frontend/tests/bus.spec.ts",
-            "sha256": "e337f77c81fec6e64fb7625deaff2b98bd5fab2a2d07f966eec6cc14d022346a",
+            "sha256": "e5e0fafedc4e4690e562916408f16085d1e8424e94678d6574d1b8e0b9a1d817",
+            "mode": 420
+        },
+        "frontend/tests/chunk-loading.spec.ts": {
+            "source": "projects/multi-database-demo/frontend/tests/chunk-loading.spec.ts",
+            "sha256": "8fd6513844981636dbbc52c676b1d7302c84706f4aa174a701bc590043573a66",
             "mode": 420
         },
         "frontend/tests/dashboard.spec.ts": {
             "source": "projects/multi-database-demo/frontend/tests/dashboard.spec.ts",
-            "sha256": "54899922677e85e3cf4d2410c17042ec850e2e8624fadcdcad918b0323a7fce4",
+            "sha256": "c022a2a7d6c3f0d65644c292d1d2ff6564333323336b103778cc2c554ebd42af",
             "mode": 420
         },
         "frontend/tests/graphql-batch.spec.ts": {
@@ -1028,7 +1030,7 @@
         },
         "frontend/tests/navigation-requests.spec.ts": {
             "source": "projects/multi-database-demo/frontend/tests/navigation-requests.spec.ts",
-            "sha256": "23258fc92c98c813b948cc1783fa76fc57e323cafc70de3bda096e45159cd15e",
+            "sha256": "7a3173b585c877ecbc1f3737336a9f6129c953949d371472cb1e82f989e8be80",
             "mode": 420
         },
         "frontend/tests/node/codegen.test.mjs": {
@@ -1053,17 +1055,17 @@
         },
         "frontend/tests/node/request.test.mjs": {
             "source": "projects/multi-database-demo/frontend/tests/node/request.test.mjs",
-            "sha256": "360042ab49d8e644ab2733e8920aa7c9dd5ab619e153ded37a94dd4f1b0f8be3",
+            "sha256": "91b5bfad90c2f4a89fd8b7cde28150ae1ca41cef616ed75642e2ac218c02a12a",
             "mode": 420
         },
         "frontend/tests/node/vite.config.test.mjs": {
             "source": "projects/multi-database-demo/frontend/tests/node/vite.config.test.mjs",
-            "sha256": "464e0459ceb3301ff784347161fe5c9a060702fa80b3ce8df3dfde08001b8cf2",
+            "sha256": "f6187d27db8d05ce3d2036db244c0424986d40d5afa78af1e7a071789ef7a9d2",
             "mode": 420
         },
         "frontend/tests/preferences.spec.ts": {
             "source": "projects/multi-database-demo/frontend/tests/preferences.spec.ts",
-            "sha256": "2daa71d73f73886618551ceb986eb827e857876a694ff62587e13f46f796f86b",
+            "sha256": "2fe7a38d30a6845fba77e5d81f6e85ae7f4efba66500c7c44b3133d62571d459",
             "mode": 420
         },
         "frontend/tests/public.spec.ts": {
@@ -1073,12 +1075,12 @@
         },
         "frontend/tests/queue.spec.ts": {
             "source": "projects/multi-database-demo/frontend/tests/queue.spec.ts",
-            "sha256": "b8521292e6fcb20edab6e970d7f8222d78d7d6916c2ad4433670452e8a7d75f2",
+            "sha256": "087cafe73954fed0f4fdb70a270fa1a8be83f14b67ff85e92a4cea87882c1dae",
             "mode": 420
         },
         "frontend/tests/session.spec.ts": {
             "source": "projects/multi-database-demo/frontend/tests/session.spec.ts",
-            "sha256": "b2e37b2b5dbe962c9219aa9be913e95503fa67d3e3ac46e71cacd60cbf7f588b",
+            "sha256": "7449ef520c3a094bdfd3ec021c38c1a04713d4453ea306ea5e984cae002599ab",
             "mode": 420
         },
         "frontend/tests/setup.ts": {
@@ -1088,7 +1090,7 @@
         },
         "frontend/tests/shops.spec.ts": {
             "source": "projects/multi-database-demo/frontend/tests/shops.spec.ts",
-            "sha256": "cfbe4cd79f14aaff458de6d6d37ee4e624dcec5311be1aaa9e1f11b681d3c386",
+            "sha256": "12649b180bed179c32c4193bd089e81580ad5c7c51238923d8a7d9ad46c20fa4",
             "mode": 420
         },
         "frontend/tests/sidebar-helpers.ts": {
@@ -1098,7 +1100,7 @@
         },
         "frontend/tests/sidebar.spec.ts": {
             "source": "projects/multi-database-demo/frontend/tests/sidebar.spec.ts",
-            "sha256": "822335af084346398da36f0f5f666467c1c446c44080937e4078f7e868e707f0",
+            "sha256": "524ea431ee2984f247b235038285e90eae9dbe07412ab1c9dffb788614713e88",
             "mode": 420
         },
         "frontend/tests/types/graphql/admin/type-contract.test.ts": {
@@ -1108,7 +1110,12 @@
         },
         "frontend/tests/unit/app/app.test.tsx": {
             "source": "projects/multi-database-demo/frontend/tests/unit/app/app.test.tsx",
-            "sha256": "1b624c16f5048868bfe3d2b98982f819b08957de10c4a3b75bd27a5ce9e108c5",
+            "sha256": "b956ab56896519320e29db0a25c01debcb09c700cd86198c723589a3fd31eb0c",
+            "mode": 420
+        },
+        "frontend/tests/unit/app/dashboard-overview.test.ts": {
+            "source": "projects/multi-database-demo/frontend/tests/unit/app/dashboard-overview.test.ts",
+            "sha256": "bec5220a0a3d03abbcdf7110bcbe768006075df6106ec4f51448bf9e86ccaf36",
             "mode": 420
         },
         "frontend/tests/unit/bus-page.test.ts": {
@@ -1123,7 +1130,7 @@
         },
         "frontend/tests/unit/observability.test.ts": {
             "source": "projects/multi-database-demo/frontend/tests/unit/observability.test.ts",
-            "sha256": "f42d5e7698e74458923d488688a024aa1592fe71876ab8d1f3ea99ef5e78586b",
+            "sha256": "1427960e22fd7330e3d1af31601852297e3328377dc5f73ccae97f3e1b458aff",
             "mode": 420
         },
         "frontend/tests/unit/shop-input.test.ts": {
@@ -1138,12 +1145,12 @@
         },
         "frontend/tests/user-management.spec.ts": {
             "source": "projects/multi-database-demo/frontend/tests/user-management.spec.ts",
-            "sha256": "3d310cb142dd0f427de571fd5ca9dc15b16ffcd962b5d5afba94576ee80e74eb",
+            "sha256": "aacc8b5c31d4db72531481710ab816987fb8e72a3bdc5a766407ef31b3c331ae",
             "mode": 420
         },
         "frontend/tests/user-sessions.spec.ts": {
             "source": "projects/multi-database-demo/frontend/tests/user-sessions.spec.ts",
-            "sha256": "8d9aa6bac4c5fb4bb8037d3f94cb9370117576972242c5e723781866b7bbd53b",
+            "sha256": "92b1a5c175491450084624dd88998160371d53568d10be25f861bfa73b677fd6",
             "mode": 420
         },
         "frontend/tests/users.spec.ts": {
@@ -1164,7 +1171,7 @@
         },
         "frontend/vite.config.js": {
             "source": "projects/multi-database-demo/frontend/vite.config.js",
-            "sha256": "343a646743751ff78f744333232e57c9d1a58b0fe839187b022d2381799aa5f5",
+            "sha256": "d6094590ba9172fa9e73e246006cc23281a9c9dd6e3484d427a4bffbbc66a96b",
             "mode": 420
         },
         "frontend/vitest.config.ts": {
@@ -1184,7 +1191,7 @@
         },
         "miniprogram/README.md": {
             "source": "projects/multi-database-demo/miniprogram/README.md",
-            "sha256": "bf21cb55967dd67768ccac3f332ae0a40b47f276595f20c357b6713dfa7b0f13",
+            "sha256": "698548537096f90357b6600bbdf52676cdff303f0a8ddb996baa70a2554ba3c2",
             "mode": 420
         },
         "miniprogram/babel.config.js": {
@@ -1254,7 +1261,7 @@
         },
         "miniprogram/src/auth/session.ts": {
             "source": "projects/multi-database-demo/miniprogram/src/auth/session.ts",
-            "sha256": "d2df196398cbaa396a438db28683d51c7537c385331f569c5b30226f04930f5b",
+            "sha256": "391b626c7ce809491abd867dd04321ab669db2aa86df20722927708291714476",
             "mode": 420
         },
         "miniprogram/src/config/endpoint.ts": {
@@ -1269,12 +1276,12 @@
         },
         "miniprogram/src/graphql/member/generated.ts": {
             "source": "projects/multi-database-demo/miniprogram/src/graphql/member/generated.ts",
-            "sha256": "30200a205cc63a574bac32fb0ddc17e003713937e7d039ad5c4f73acd3e796a6",
+            "sha256": "b24328906a386ce8edf59b5af18409b14c213daebb051ff60855cb930c0021fa",
             "mode": 420
         },
         "miniprogram/src/graphql/member/operations.ts": {
             "source": "projects/multi-database-demo/miniprogram/src/graphql/member/operations.ts",
-            "sha256": "30fa13261d25734711e5baae2c31380456bb58a08c490ca54f0752de5efbc1c2",
+            "sha256": "9bd33d4fa3131f20717946a5533fc2f11e2e0a1121cf66110e7eca68a2d50d08",
             "mode": 420
         },
         "miniprogram/src/graphql/member/shop.ts": {
@@ -1284,7 +1291,7 @@
         },
         "miniprogram/src/graphql/taro-fetch.ts": {
             "source": "projects/multi-database-demo/miniprogram/src/graphql/taro-fetch.ts",
-            "sha256": "bc20b1c312b48a998ccadf52b01e889025b9c3b72a456970b2d542659b6c3149",
+            "sha256": "58737de7da1ac350c742eeb146a283ae9db78f36895883e4ce5a78628d9f2d6d",
             "mode": 420
         },
         "miniprogram/src/pages/dev/batch-test/index.config.ts": {
@@ -1299,7 +1306,7 @@
         },
         "miniprogram/tests/node/auth.test.cjs": {
             "source": "projects/multi-database-demo/miniprogram/tests/node/auth.test.cjs",
-            "sha256": "2831e0f909ce2b53f1343efc34daaeda835ab9630a4c66b8024ea8da8bcb7932",
+            "sha256": "33900a326b84b04a45232c32edceecaf5d8748eb1e309eeba11ffd6cedf99812",
             "mode": 420
         },
         "miniprogram/tests/node/codegen.test.mjs": {
@@ -1314,7 +1321,7 @@
         },
         "miniprogram/tests/node/harness.cjs": {
             "source": "projects/multi-database-demo/miniprogram/tests/node/harness.cjs",
-            "sha256": "29db82fd38d4fe7d855d09a2fac843a108299e2651dafe1a0f61e63cb491fdc0",
+            "sha256": "5ed0534f134542aa0e25f99161573ec2c574ebeece2fea1e94cebe8523bc52d1",
             "mode": 420
         },
         "miniprogram/tests/node/module-scope.test.mjs": {
@@ -1359,41 +1366,95 @@
         },
         "package.json": {
             "source": "projects/multi-database-demo/package.json",
-            "sha256": "b0ec5502b01ec247b82165af73a5bcf6b43a79c2c2d412d4cf84b16f70766586",
-            "mode": 420,
-            "sourceSha256": "b499f848f684c25384e6e46bad7cdf7dd6569dd39a5a62fa92a8084788fc26ba"
+            "sha256": "9fd5936fa5d348b88dbf80f8aef1600c367c960b816648518f173eab72186d12",
+            "mode": 420
         },
         "pnpm-lock.yaml": {
             "source": "projects/multi-database-demo/pnpm-lock.yaml",
-            "sha256": "eb87f2914179864bbb31ac65ae81bc7cb10367269bd8d3cfaa0b1dc542566ee8",
+            "sha256": "dc1315ef91e0b882b11365d5eef37655a3e767dbbcd4a32a2ef5e793e274894c",
             "mode": 420,
-            "sourceSha256": "8f9c565f30e171be6f90eceafb20f24a4539142cf7695fdee42a3a9bc5a39c21"
+            "sourceSha256": "f87ec954cd1e350f60b0ba78c48e1516c6511af51a9f44ed168531717448bd67"
         },
         "pnpm-workspace.yaml": {
             "source": "projects/multi-database-demo/pnpm-workspace.yaml",
-            "sha256": "3ff9d274d75588924e16a41a310906a00b67e72ef2c9f87b1c503ae6a4e94df9",
+            "sha256": "c44acf99741313e04dd73b810d3be67f8d27021b4f6ef9c571cfcd7840430f51",
             "mode": 420,
-            "sourceSha256": "dd91ee21bc06ff40fcc79180801db19e2ca5b59ce40fe8ff537e1dadd0dd79c6"
+            "sourceSha256": "76cb56c5f4e8543beb78a9a5af8b9c0bcbd42462b7cb41f93b86d260dd894485"
         },
         "release-dependencies.json": {
             "source": "projects/multi-database-demo/release-dependencies.json",
-            "sha256": "24b4b827642840a6b7d0351f6bbf14a7ec90185d2e944b10c5029e5c4c73bad4",
+            "sha256": "5531de62f7fef6943a5d3ce0a7499bf631d79dd07c8a0eb4fecd43634825b5b7",
             "mode": 420,
-            "sourceSha256": "8bf8c76b30bf2b6515ecdcd3ad9b6674e7be182091bd537063f7c56316237617"
+            "sourceSha256": "4b7ceaf4e17dd690679e98989d8f0fc10721dfe9fa4eb0fee5abf57f88ec6e2a"
         },
         "ruff.toml": {
             "source": "projects/multi-database-demo/ruff.toml",
             "sha256": "0c2c72a4e162f1e868ce866a4b54d7f504cf4aeb5a001125f22a309f88977618",
             "mode": 420
         },
-        "scripts/go-starter.mjs": {
-            "source": "projects/multi-database-demo/scripts/go-starter.mjs",
-            "sha256": "b7e9c0df24484b74976eeea81e8b6c91bbca80724951c06b897cd6907e0247ad",
+        "scripts/clean-runtime.py": {
+            "source": "scripts/clean-runtime.py",
+            "sha256": "32d90959e3e5c8d8b37df9a32b3876a869490492d15dfcd5602833194430308d",
+            "mode": 420
+        },
+        "scripts/database_url.py": {
+            "source": "scripts/database_url.py",
+            "sha256": "0d5d87829259c7f0178cc68c0ac16cf6f605fa99cd494208c63bac32a1c23f3b",
+            "mode": 420
+        },
+        "scripts/dev.py": {
+            "source": "projects/multi-database-demo/scripts/dev.py",
+            "sha256": "93611bce47014ee4788710af9d430f9729652e825ea9ef3cbbe51cd65427ae3c",
+            "mode": 420
+        },
+        "scripts/dev_processes.py": {
+            "source": "projects/multi-database-demo/scripts/dev_processes.py",
+            "sha256": "65d8de82da675fb9d6f66452fe7b3f0b98bb9f483cf7afbcb1eb9d39705b124d",
+            "mode": 420
+        },
+        "scripts/dev_reload.py": {
+            "source": "projects/multi-database-demo/scripts/dev_reload.py",
+            "sha256": "2949f2636e93a827339f427aaa7affd4f4ac5127142158e2d1661ea2db30cb98",
+            "mode": 420
+        },
+        "scripts/format.py": {
+            "source": "scripts/format.py",
+            "sha256": "5dc27f51a9f3e4ca4a7b8eb230db33a313dcd66b1de7c53fb7bb6bb4b2fdb06e",
+            "mode": 420
+        },
+        "scripts/host_platform.py": {
+            "source": "scripts/host_platform.py",
+            "sha256": "a718ebc321ac3542f9fe4e437d17de0b6d9e9e2994e9223eda315b566f0d55c9",
+            "mode": 420
+        },
+        "scripts/project.py": {
+            "source": "scripts/project.py",
+            "sha256": "7d4b63275bbca5b5c6aec62e7a2ac6db9e18fb43fd4a325d6bebc6199194c9e4",
+            "mode": 420
+        },
+        "scripts/runtime_cleanup.py": {
+            "source": "scripts/runtime_cleanup.py",
+            "sha256": "ddaa03d9a8798f61b467265f7297dbfdf2bb9b5acb88acc76a77e9ab224841f9",
+            "mode": 420
+        },
+        "scripts/setup.py": {
+            "source": "scripts/setup.py",
+            "sha256": "1fef186ae1dbb2d7fa050710eb66d5e8aa3bdbfecb977d1383abf6f610d03312",
+            "mode": 420
+        },
+        "scripts/starter_context.py": {
+            "source": "scripts/starter_context.py",
+            "sha256": "b3b25ec24ba6a463c935dce6b4296052cb4e4df4ee97e0574747299b6b1b2fdf",
+            "mode": 420
+        },
+        "scripts/toolchain.py": {
+            "source": "scripts/toolchain.py",
+            "sha256": "dd15e22820b1c7045d571a33aac5de569d9fb79773ebffba715b98053f7dfbae",
             "mode": 420
         },
         "share/schema/admin.graphqls": {
             "source": "projects/multi-database-demo/share/schema/admin.graphqls",
-            "sha256": "cf8861bba52c35cb008576326999dd09dc4ebc9952c9737cca05fba213d5b32c",
+            "sha256": "a04d9602f3b4dacd97a1a112a326241a70ec0fd2d8f847debf7f2d0fc8b1b434",
             "mode": 420
         },
         "share/schema/common.graphqls": {
@@ -1418,7 +1479,7 @@
         },
         "share/schema/member.graphqls": {
             "source": "projects/multi-database-demo/share/schema/member.graphqls",
-            "sha256": "efbf63ed225a3b59aaff8324dee144a49720ab13c65f6a6f73826ac17acb1aaa",
+            "sha256": "2c9d3a4b4e72ee0a36de31fa007157980f4cae8a17816c1204937d566a11af32",
             "mode": 420
         },
         "share/schema/queue.graphqls": {
@@ -1434,6 +1495,26 @@
         "toolchain.json": {
             "source": "projects/multi-database-demo/toolchain.json",
             "sha256": "0a36b7ba608fb169140b6132d9c199f8101342b2bf965ecadd2129714780d776",
+            "mode": 420
+        },
+        "tools/cmd/format-go/main.go": {
+            "source": "tools/cmd/format-go/main.go",
+            "sha256": "fa78ed89c251d04d089e008b814b09dbbeeb0c44b779a581f45f189e8880313c",
+            "mode": 420
+        },
+        "tools/cmd/format-go/main_test.go": {
+            "source": "tools/cmd/format-go/main_test.go",
+            "sha256": "b2d0a2c23f50e429a18e3b1530b5364722cfae0449cb7c8f763a9d02cf1b8169",
+            "mode": 420
+        },
+        "tools/go.mod": {
+            "source": "tools/go.mod",
+            "sha256": "75d96f29ab12ab1a7174908ca16a1a2deaa9015027278da9fe9d05eb07a1018e",
+            "mode": 420
+        },
+        "tools/go.sum": {
+            "source": "tools/go.sum",
+            "sha256": "06ca7e56bded05929f77abaa6ae53609bac2e8c11c4c9b5b5dc286ffdf1f1601",
             "mode": 420
         }
     }

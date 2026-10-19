@@ -60,6 +60,7 @@ func TestShopReadPermissionCannotCreate(t *testing.T) {
     api.Use(authentication.Guard)
     for _, item := range []struct{ query, code string }{
         {`{listShops{id}}`, ""},
+        {`{getDashboardOverview{shops backend mode}}`, ""},
         {`mutation{createShop(set:{name:"越权创建",slug:"review-read-only"}){id name}}`, "FORBIDDEN"},
     } {
         payload := `{"query":` + strconv.Quote(item.query) + `}`
@@ -80,6 +81,24 @@ func TestShopReadPermissionCannotCreate(t *testing.T) {
         }
     }
 
+    if err = db.Model(&auth.User{}).Where("id = 1").Update("role", "dashboard_only").Error; err != nil {
+        t.Fatal(err)
+    }
+    overviewQuery := `{"query":"{getDashboardOverview{shops}}"}`
+    denied := perform(api, http.MethodPost, subject.AdminPath, overviewQuery, map[string]string{"Authorization": "Bearer review-read-token"})
+    deniedBody := decoded(t, denied.Body.Bytes()).(map[string]any)
+    if denied.Code != 200 || deniedBody["errors"] == nil {
+        t.Fatal(denied.Code, denied.Body.String())
+    }
+    code := deniedBody["errors"].([]any)[0].(map[string]any)["extensions"].(map[string]any)["code"]
+    if code != "FORBIDDEN" {
+        t.Fatal(deniedBody)
+    }
+    anonymous := perform(api, http.MethodPost, subject.AdminPath, overviewQuery, nil)
+    if anonymous.Code != http.StatusUnauthorized {
+        t.Fatal(anonymous.Code, anonymous.Body.String())
+    }
+
     for _, role := range []string{"admin", "owner"} {
         if err = db.Model(&auth.User{}).Where("id = 1").Update("role", role).Error; err != nil {
             t.Fatal(err)
@@ -97,5 +116,6 @@ func TestShopReadPermissionCannotCreate(t *testing.T) {
 func shopReaderPermissions() auth.RolePermissions {
     permissions := auth.DefaultRolePermissions()
     permissions["shop_reader"] = []auth.Permission{{Resource: "dashboard", Action: "access:admin"}, {Resource: "shop", Action: "list"}}
+    permissions["dashboard_only"] = []auth.Permission{{Resource: "dashboard", Action: "access:admin"}}
     return permissions
 }

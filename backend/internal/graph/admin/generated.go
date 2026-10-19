@@ -39,11 +39,25 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+    DashboardOverview struct {
+        Backend func(childComplexity int) int
+        Mode    func(childComplexity int) int
+        Shops   func(childComplexity int) int
+    }
+
+    InstallStatus struct {
+        Enabled   func(childComplexity int) int
+        Installed func(childComplexity int) int
+    }
+
     Mutation struct {
         CreateShop                 func(childComplexity int, set CreateShopSetInput) int
         CreateUser                 func(childComplexity int, set CreateUserSetInput) int
+        InitializeAdmin            func(childComplexity int, input InitializeAdminInput) int
         RevokeUserSession          func(childComplexity int, userID string, sessionID string) int
         RevokeUserSessions         func(childComplexity int, userID string) int
+        SignInWithEmail            func(childComplexity int, input SignInWithEmailInput) int
+        SignOut                    func(childComplexity int) int
         UpdateQueueExecutionRecord func(childComplexity int, set QueueExecutionRecordSetInput) int
         UpdateUser                 func(childComplexity int, set UpdateUserSetInput, where UserFilters) int
     }
@@ -51,6 +65,8 @@ type ComplexityRoot struct {
     Query struct {
         GetCurrentPermissions     func(childComplexity int) int
         GetCurrentUser            func(childComplexity int) int
+        GetDashboardOverview      func(childComplexity int) int
+        GetInstallStatus          func(childComplexity int) int
         GetQueueDashboard         func(childComplexity int) int
         GetQueueExecutionRecord   func(childComplexity int, recordID string, statusHint *string) int
         GetQueueSchedules         func(childComplexity int) int
@@ -252,6 +268,9 @@ type ComplexityRoot struct {
 // region    ************************** generated!.gotpl **************************
 
 type MutationResolver interface {
+    InitializeAdmin(ctx context.Context, input InitializeAdminInput) (*UserItem, error)
+    SignInWithEmail(ctx context.Context, input SignInWithEmailInput) (*UserItem, error)
+    SignOut(ctx context.Context) (bool, error)
     CreateUser(ctx context.Context, set CreateUserSetInput) ([]*UserItem, error)
     UpdateUser(ctx context.Context, set UpdateUserSetInput, where UserFilters) ([]*UserItem, error)
     RevokeUserSessions(ctx context.Context, userID string) (bool, error)
@@ -260,8 +279,10 @@ type MutationResolver interface {
     UpdateQueueExecutionRecord(ctx context.Context, set QueueExecutionRecordSetInput) (*QueueExecutionRecordUpdatePayload, error)
 }
 type QueryResolver interface {
+    GetInstallStatus(ctx context.Context) (*InstallStatus, error)
     GetCurrentUser(ctx context.Context) (*UserItem, error)
     GetCurrentPermissions(ctx context.Context) ([]string, error)
+    GetDashboardOverview(ctx context.Context) (*DashboardOverview, error)
     GetUser(ctx context.Context, where UserFilters) (*UserItem, error)
     ListUsers(ctx context.Context, limit *int, offset *int, orderBy *UserOrderBy, where *UserFilters) ([]*UserItem, error)
     ListUserSessions(ctx context.Context, userID string, limit *int, offset *int) ([]*UserSessionItem, error)
@@ -291,6 +312,38 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
     _ = ec
     switch typeName + "." + field {
 
+    case "DashboardOverview.backend":
+        if e.ComplexityRoot.DashboardOverview.Backend == nil {
+            break
+        }
+
+        return e.ComplexityRoot.DashboardOverview.Backend(childComplexity), true
+    case "DashboardOverview.mode":
+        if e.ComplexityRoot.DashboardOverview.Mode == nil {
+            break
+        }
+
+        return e.ComplexityRoot.DashboardOverview.Mode(childComplexity), true
+    case "DashboardOverview.shops":
+        if e.ComplexityRoot.DashboardOverview.Shops == nil {
+            break
+        }
+
+        return e.ComplexityRoot.DashboardOverview.Shops(childComplexity), true
+
+    case "InstallStatus.enabled":
+        if e.ComplexityRoot.InstallStatus.Enabled == nil {
+            break
+        }
+
+        return e.ComplexityRoot.InstallStatus.Enabled(childComplexity), true
+    case "InstallStatus.installed":
+        if e.ComplexityRoot.InstallStatus.Installed == nil {
+            break
+        }
+
+        return e.ComplexityRoot.InstallStatus.Installed(childComplexity), true
+
     case "Mutation.createShop":
         if e.ComplexityRoot.Mutation.CreateShop == nil {
             break
@@ -313,6 +366,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
         }
 
         return e.ComplexityRoot.Mutation.CreateUser(childComplexity, args["set"].(CreateUserSetInput)), true
+    case "Mutation.initializeAdmin":
+        if e.ComplexityRoot.Mutation.InitializeAdmin == nil {
+            break
+        }
+
+        args, err := ec.field_Mutation_initializeAdmin_args(ctx, rawArgs)
+        if err != nil {
+            return 0, false
+        }
+
+        return e.ComplexityRoot.Mutation.InitializeAdmin(childComplexity, args["input"].(InitializeAdminInput)), true
     case "Mutation.revokeUserSession":
         if e.ComplexityRoot.Mutation.RevokeUserSession == nil {
             break
@@ -335,6 +399,23 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
         }
 
         return e.ComplexityRoot.Mutation.RevokeUserSessions(childComplexity, args["userId"].(string)), true
+    case "Mutation.signInWithEmail":
+        if e.ComplexityRoot.Mutation.SignInWithEmail == nil {
+            break
+        }
+
+        args, err := ec.field_Mutation_signInWithEmail_args(ctx, rawArgs)
+        if err != nil {
+            return 0, false
+        }
+
+        return e.ComplexityRoot.Mutation.SignInWithEmail(childComplexity, args["input"].(SignInWithEmailInput)), true
+    case "Mutation.signOut":
+        if e.ComplexityRoot.Mutation.SignOut == nil {
+            break
+        }
+
+        return e.ComplexityRoot.Mutation.SignOut(childComplexity), true
     case "Mutation.updateQueueExecutionRecord":
         if e.ComplexityRoot.Mutation.UpdateQueueExecutionRecord == nil {
             break
@@ -370,6 +451,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
         }
 
         return e.ComplexityRoot.Query.GetCurrentUser(childComplexity), true
+    case "Query.getDashboardOverview":
+        if e.ComplexityRoot.Query.GetDashboardOverview == nil {
+            break
+        }
+
+        return e.ComplexityRoot.Query.GetDashboardOverview(childComplexity), true
+    case "Query.getInstallStatus":
+        if e.ComplexityRoot.Query.GetInstallStatus == nil {
+            break
+        }
+
+        return e.ComplexityRoot.Query.GetInstallStatus(childComplexity), true
     case "Query.getQueueDashboard":
         if e.ComplexityRoot.Query.GetQueueDashboard == nil {
             break
@@ -1320,11 +1413,13 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
     inputUnmarshalMap := graphql.BuildUnmarshalerMap(
         ec.unmarshalInputCreateShopSetInput,
         ec.unmarshalInputCreateUserSetInput,
+        ec.unmarshalInputInitializeAdminInput,
         ec.unmarshalInputInnerOrder,
         ec.unmarshalInputIntFilters,
         ec.unmarshalInputQueueExecutionRecordSetInput,
         ec.unmarshalInputShopFilters,
         ec.unmarshalInputShopOrderBy,
+        ec.unmarshalInputSignInWithEmailInput,
         ec.unmarshalInputStringFilters,
         ec.unmarshalInputUpdateUserSetInput,
         ec.unmarshalInputUserFilters,
@@ -1453,8 +1548,10 @@ type ShopItem {
 }
 `, BuiltIn: false},
     {Name: "../../../../share/schema/admin.graphqls", Input: `type Query {
+    getInstallStatus: InstallStatus!
     getCurrentUser: UserItem
     getCurrentPermissions: [String!]!
+    getDashboardOverview: DashboardOverview!
     getUser(where: UserFilters!): UserItem
     listUsers(limit: Int, offset: Int, orderBy: UserOrderBy, where: UserFilters): [UserItem!]
     listUserSessions(userId: ID!, limit: Int, offset: Int): [UserSessionItem!]!
@@ -1462,7 +1559,16 @@ type ShopItem {
     listShops(limit: Int, offset: Int, orderBy: ShopOrderBy, where: ShopFilters): [ShopItem!]
 }
 
+type DashboardOverview {
+    shops: Int!
+    backend: String!
+    mode: String!
+}
+
 type Mutation {
+    initializeAdmin(input: InitializeAdminInput!): UserItem!
+    signInWithEmail(input: SignInWithEmailInput!): UserItem!
+    signOut: Boolean!
     createUser(set: CreateUserSetInput!): [UserItem!]!
     updateUser(set: UpdateUserSetInput!, where: UserFilters!): [UserItem!]!
     revokeUserSessions(userId: ID!): Boolean!
@@ -1551,6 +1657,22 @@ type UserSessionItem {
     updatedAt: DateTime!
     expiresAt: DateTime!
     current: Boolean!
+}
+
+# 认证字段允许匿名调用；凭据仅通过 POST variables 传入，Cookie 由 HTTP 层管理。
+type InstallStatus {
+    installed: Boolean!
+    enabled: Boolean!
+}
+input InitializeAdminInput {
+    bootstrapToken: String!
+    name: String!
+    email: String!
+    password: String!
+}
+input SignInWithEmailInput {
+    email: String!
+    password: String!
 }
 `, BuiltIn: false},
     {Name: "../../../../share/schema/queue.graphqls", Input: `# 队列接口沿用 Node.js 查询与操作名称；时间使用 Unix 毫秒。
@@ -1728,6 +1850,28 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // childFields_* functions provide shared child field context lookups.
 // Each function is generated once per unique object type, deduplicating the
 // switch statements that were previously inlined in every fieldContext_* function.
+
+func (ec *executionContext) childFields_DashboardOverview(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+    switch field.Name {
+    case "shops":
+        return ec.fieldContext_DashboardOverview_shops(ctx, field)
+    case "backend":
+        return ec.fieldContext_DashboardOverview_backend(ctx, field)
+    case "mode":
+        return ec.fieldContext_DashboardOverview_mode(ctx, field)
+    }
+    return nil, fmt.Errorf("no field named %q was found under type DashboardOverview", field.Name)
+}
+
+func (ec *executionContext) childFields_InstallStatus(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+    switch field.Name {
+    case "installed":
+        return ec.fieldContext_InstallStatus_installed(ctx, field)
+    case "enabled":
+        return ec.fieldContext_InstallStatus_enabled(ctx, field)
+    }
+    return nil, fmt.Errorf("no field named %q was found under type InstallStatus", field.Name)
+}
 
 func (ec *executionContext) childFields_QueueDashboardCapabilities(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
     switch field.Name {
@@ -2241,6 +2385,20 @@ func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, 
     return args, nil
 }
 
+func (ec *executionContext) field_Mutation_initializeAdmin_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+    var err error
+    args := map[string]any{}
+    arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input",
+        func(ctx context.Context, v any) (InitializeAdminInput, error) {
+            return ec.unmarshalNInitializeAdminInput2codeupᚗaliyunᚗcomᚋshanjingᚋlabsᚋgoᚑfullᚑstackᚑstarterᚗgitᚋprojectsᚋmultiᚑdatabaseᚑdemoᚋinternalᚋgraphᚋadminᚐInitializeAdminInput(ctx, v)
+        })
+    if err != nil {
+        return nil, err
+    }
+    args["input"] = arg0
+    return args, nil
+}
+
 func (ec *executionContext) field_Mutation_revokeUserSession_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
     var err error
     args := map[string]any{}
@@ -2274,6 +2432,20 @@ func (ec *executionContext) field_Mutation_revokeUserSessions_args(ctx context.C
         return nil, err
     }
     args["userId"] = arg0
+    return args, nil
+}
+
+func (ec *executionContext) field_Mutation_signInWithEmail_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+    var err error
+    args := map[string]any{}
+    arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input",
+        func(ctx context.Context, v any) (SignInWithEmailInput, error) {
+            return ec.unmarshalNSignInWithEmailInput2codeupᚗaliyunᚗcomᚋshanjingᚋlabsᚋgoᚑfullᚑstackᚑstarterᚗgitᚋprojectsᚋmultiᚑdatabaseᚑdemoᚋinternalᚋgraphᚋadminᚐSignInWithEmailInput(ctx, v)
+        })
+    if err != nil {
+        return nil, err
+    }
+    args["input"] = arg0
     return args, nil
 }
 
@@ -2621,6 +2793,232 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
+func (ec *executionContext) _DashboardOverview_shops(ctx context.Context, field graphql.CollectedField, obj *DashboardOverview) (ret graphql.Marshaler) {
+    return graphql.ResolveField(
+        ctx,
+        ec.OperationContext,
+        field,
+        func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+            return ec.fieldContext_DashboardOverview_shops(ctx, field)
+        },
+        func(ctx context.Context) (any, error) {
+            return obj.Shops, nil
+        },
+        nil,
+        func(ctx context.Context, selections ast.SelectionSet, v int) graphql.Marshaler {
+            return ec.marshalNInt2int(ctx, selections, v)
+        },
+        true,
+        true,
+    )
+}
+func (ec *executionContext) fieldContext_DashboardOverview_shops(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+    return graphql.NewScalarFieldContext("DashboardOverview", field, false, false, errors.New("field of type Int does not have child fields"))
+}
+
+func (ec *executionContext) _DashboardOverview_backend(ctx context.Context, field graphql.CollectedField, obj *DashboardOverview) (ret graphql.Marshaler) {
+    return graphql.ResolveField(
+        ctx,
+        ec.OperationContext,
+        field,
+        func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+            return ec.fieldContext_DashboardOverview_backend(ctx, field)
+        },
+        func(ctx context.Context) (any, error) {
+            return obj.Backend, nil
+        },
+        nil,
+        func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+            return ec.marshalNString2string(ctx, selections, v)
+        },
+        true,
+        true,
+    )
+}
+func (ec *executionContext) fieldContext_DashboardOverview_backend(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+    return graphql.NewScalarFieldContext("DashboardOverview", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _DashboardOverview_mode(ctx context.Context, field graphql.CollectedField, obj *DashboardOverview) (ret graphql.Marshaler) {
+    return graphql.ResolveField(
+        ctx,
+        ec.OperationContext,
+        field,
+        func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+            return ec.fieldContext_DashboardOverview_mode(ctx, field)
+        },
+        func(ctx context.Context) (any, error) {
+            return obj.Mode, nil
+        },
+        nil,
+        func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+            return ec.marshalNString2string(ctx, selections, v)
+        },
+        true,
+        true,
+    )
+}
+func (ec *executionContext) fieldContext_DashboardOverview_mode(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+    return graphql.NewScalarFieldContext("DashboardOverview", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _InstallStatus_installed(ctx context.Context, field graphql.CollectedField, obj *InstallStatus) (ret graphql.Marshaler) {
+    return graphql.ResolveField(
+        ctx,
+        ec.OperationContext,
+        field,
+        func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+            return ec.fieldContext_InstallStatus_installed(ctx, field)
+        },
+        func(ctx context.Context) (any, error) {
+            return obj.Installed, nil
+        },
+        nil,
+        func(ctx context.Context, selections ast.SelectionSet, v bool) graphql.Marshaler {
+            return ec.marshalNBoolean2bool(ctx, selections, v)
+        },
+        true,
+        true,
+    )
+}
+func (ec *executionContext) fieldContext_InstallStatus_installed(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+    return graphql.NewScalarFieldContext("InstallStatus", field, false, false, errors.New("field of type Boolean does not have child fields"))
+}
+
+func (ec *executionContext) _InstallStatus_enabled(ctx context.Context, field graphql.CollectedField, obj *InstallStatus) (ret graphql.Marshaler) {
+    return graphql.ResolveField(
+        ctx,
+        ec.OperationContext,
+        field,
+        func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+            return ec.fieldContext_InstallStatus_enabled(ctx, field)
+        },
+        func(ctx context.Context) (any, error) {
+            return obj.Enabled, nil
+        },
+        nil,
+        func(ctx context.Context, selections ast.SelectionSet, v bool) graphql.Marshaler {
+            return ec.marshalNBoolean2bool(ctx, selections, v)
+        },
+        true,
+        true,
+    )
+}
+func (ec *executionContext) fieldContext_InstallStatus_enabled(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+    return graphql.NewScalarFieldContext("InstallStatus", field, false, false, errors.New("field of type Boolean does not have child fields"))
+}
+
+func (ec *executionContext) _Mutation_initializeAdmin(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+    return graphql.ResolveField(
+        ctx,
+        ec.OperationContext,
+        field,
+        func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+            return ec.fieldContext_Mutation_initializeAdmin(ctx, field)
+        },
+        func(ctx context.Context) (any, error) {
+            fc := graphql.GetFieldContext(ctx)
+            return ec.Resolvers.Mutation().InitializeAdmin(ctx, fc.Args["input"].(InitializeAdminInput))
+        },
+        nil,
+        func(ctx context.Context, selections ast.SelectionSet, v *UserItem) graphql.Marshaler {
+            return ec.marshalNUserItem2ᚖcodeupᚗaliyunᚗcomᚋshanjingᚋlabsᚋgoᚑfullᚑstackᚑstarterᚗgitᚋprojectsᚋmultiᚑdatabaseᚑdemoᚋinternalᚋgraphᚋadminᚐUserItem(ctx, selections, v)
+        },
+        true,
+        true,
+    )
+}
+func (ec *executionContext) fieldContext_Mutation_initializeAdmin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+    fc = &graphql.FieldContext{
+        Object:     "Mutation",
+        Field:      field,
+        IsMethod:   true,
+        IsResolver: true,
+        Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+            return ec.childFields_UserItem(ctx, field)
+        },
+    }
+    defer func() {
+        if r := recover(); r != nil {
+            err = ec.Recover(ctx, r)
+            ec.Error(ctx, err)
+        }
+    }()
+    ctx = graphql.WithFieldContext(ctx, fc)
+    if fc.Args, err = ec.field_Mutation_initializeAdmin_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+        ec.Error(ctx, err)
+        return fc, err
+    }
+    return fc, nil
+}
+
+func (ec *executionContext) _Mutation_signInWithEmail(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+    return graphql.ResolveField(
+        ctx,
+        ec.OperationContext,
+        field,
+        func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+            return ec.fieldContext_Mutation_signInWithEmail(ctx, field)
+        },
+        func(ctx context.Context) (any, error) {
+            fc := graphql.GetFieldContext(ctx)
+            return ec.Resolvers.Mutation().SignInWithEmail(ctx, fc.Args["input"].(SignInWithEmailInput))
+        },
+        nil,
+        func(ctx context.Context, selections ast.SelectionSet, v *UserItem) graphql.Marshaler {
+            return ec.marshalNUserItem2ᚖcodeupᚗaliyunᚗcomᚋshanjingᚋlabsᚋgoᚑfullᚑstackᚑstarterᚗgitᚋprojectsᚋmultiᚑdatabaseᚑdemoᚋinternalᚋgraphᚋadminᚐUserItem(ctx, selections, v)
+        },
+        true,
+        true,
+    )
+}
+func (ec *executionContext) fieldContext_Mutation_signInWithEmail(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+    fc = &graphql.FieldContext{
+        Object:     "Mutation",
+        Field:      field,
+        IsMethod:   true,
+        IsResolver: true,
+        Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+            return ec.childFields_UserItem(ctx, field)
+        },
+    }
+    defer func() {
+        if r := recover(); r != nil {
+            err = ec.Recover(ctx, r)
+            ec.Error(ctx, err)
+        }
+    }()
+    ctx = graphql.WithFieldContext(ctx, fc)
+    if fc.Args, err = ec.field_Mutation_signInWithEmail_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+        ec.Error(ctx, err)
+        return fc, err
+    }
+    return fc, nil
+}
+
+func (ec *executionContext) _Mutation_signOut(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+    return graphql.ResolveField(
+        ctx,
+        ec.OperationContext,
+        field,
+        func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+            return ec.fieldContext_Mutation_signOut(ctx, field)
+        },
+        func(ctx context.Context) (any, error) {
+            return ec.Resolvers.Mutation().SignOut(ctx)
+        },
+        nil,
+        func(ctx context.Context, selections ast.SelectionSet, v bool) graphql.Marshaler {
+            return ec.marshalNBoolean2bool(ctx, selections, v)
+        },
+        true,
+        true,
+    )
+}
+func (ec *executionContext) fieldContext_Mutation_signOut(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+    return graphql.NewScalarFieldContext("Mutation", field, true, true, errors.New("field of type Boolean does not have child fields"))
+}
+
 func (ec *executionContext) _Mutation_createUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
     return graphql.ResolveField(
         ctx,
@@ -2885,6 +3283,38 @@ func (ec *executionContext) fieldContext_Mutation_updateQueueExecutionRecord(ctx
     return fc, nil
 }
 
+func (ec *executionContext) _Query_getInstallStatus(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+    return graphql.ResolveField(
+        ctx,
+        ec.OperationContext,
+        field,
+        func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+            return ec.fieldContext_Query_getInstallStatus(ctx, field)
+        },
+        func(ctx context.Context) (any, error) {
+            return ec.Resolvers.Query().GetInstallStatus(ctx)
+        },
+        nil,
+        func(ctx context.Context, selections ast.SelectionSet, v *InstallStatus) graphql.Marshaler {
+            return ec.marshalNInstallStatus2ᚖcodeupᚗaliyunᚗcomᚋshanjingᚋlabsᚋgoᚑfullᚑstackᚑstarterᚗgitᚋprojectsᚋmultiᚑdatabaseᚑdemoᚋinternalᚋgraphᚋadminᚐInstallStatus(ctx, selections, v)
+        },
+        true,
+        true,
+    )
+}
+func (ec *executionContext) fieldContext_Query_getInstallStatus(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+    fc = &graphql.FieldContext{
+        Object:     "Query",
+        Field:      field,
+        IsMethod:   true,
+        IsResolver: true,
+        Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+            return ec.childFields_InstallStatus(ctx, field)
+        },
+    }
+    return fc, nil
+}
+
 func (ec *executionContext) _Query_getCurrentUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
     return graphql.ResolveField(
         ctx,
@@ -2938,6 +3368,38 @@ func (ec *executionContext) _Query_getCurrentPermissions(ctx context.Context, fi
 }
 func (ec *executionContext) fieldContext_Query_getCurrentPermissions(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
     return graphql.NewScalarFieldContext("Query", field, true, true, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _Query_getDashboardOverview(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+    return graphql.ResolveField(
+        ctx,
+        ec.OperationContext,
+        field,
+        func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+            return ec.fieldContext_Query_getDashboardOverview(ctx, field)
+        },
+        func(ctx context.Context) (any, error) {
+            return ec.Resolvers.Query().GetDashboardOverview(ctx)
+        },
+        nil,
+        func(ctx context.Context, selections ast.SelectionSet, v *DashboardOverview) graphql.Marshaler {
+            return ec.marshalNDashboardOverview2ᚖcodeupᚗaliyunᚗcomᚋshanjingᚋlabsᚋgoᚑfullᚑstackᚑstarterᚗgitᚋprojectsᚋmultiᚑdatabaseᚑdemoᚋinternalᚋgraphᚋadminᚐDashboardOverview(ctx, selections, v)
+        },
+        true,
+        true,
+    )
+}
+func (ec *executionContext) fieldContext_Query_getDashboardOverview(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+    fc = &graphql.FieldContext{
+        Object:     "Query",
+        Field:      field,
+        IsMethod:   true,
+        IsResolver: true,
+        Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+            return ec.childFields_DashboardOverview(ctx, field)
+        },
+    }
+    return fc, nil
 }
 
 func (ec *executionContext) _Query_getUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -7811,6 +8273,57 @@ func (ec *executionContext) unmarshalInputCreateUserSetInput(ctx context.Context
     return it, nil
 }
 
+func (ec *executionContext) unmarshalInputInitializeAdminInput(ctx context.Context, obj any) (InitializeAdminInput, error) {
+    var it InitializeAdminInput
+    if obj == nil {
+        return it, nil
+    }
+
+    asMap := map[string]any{}
+    for k, v := range obj.(map[string]any) {
+        asMap[k] = v
+    }
+
+    fieldsInOrder := [...]string{"bootstrapToken", "name", "email", "password"}
+    for _, k := range fieldsInOrder {
+        v, ok := asMap[k]
+        if !ok {
+            continue
+        }
+        switch k {
+        case "bootstrapToken":
+            ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("bootstrapToken"))
+            data, err := ec.unmarshalNString2string(ctx, v)
+            if err != nil {
+                return it, err
+            }
+            it.BootstrapToken = data
+        case "name":
+            ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+            data, err := ec.unmarshalNString2string(ctx, v)
+            if err != nil {
+                return it, err
+            }
+            it.Name = data
+        case "email":
+            ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+            data, err := ec.unmarshalNString2string(ctx, v)
+            if err != nil {
+                return it, err
+            }
+            it.Email = data
+        case "password":
+            ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
+            data, err := ec.unmarshalNString2string(ctx, v)
+            if err != nil {
+                return it, err
+            }
+            it.Password = data
+        }
+    }
+    return it, nil
+}
+
 func (ec *executionContext) unmarshalInputInnerOrder(ctx context.Context, obj any) (InnerOrder, error) {
     var it InnerOrder
     if obj == nil {
@@ -8082,6 +8595,43 @@ func (ec *executionContext) unmarshalInputShopOrderBy(ctx context.Context, obj a
                 return it, err
             }
             it.UpdatedAt = data
+        }
+    }
+    return it, nil
+}
+
+func (ec *executionContext) unmarshalInputSignInWithEmailInput(ctx context.Context, obj any) (SignInWithEmailInput, error) {
+    var it SignInWithEmailInput
+    if obj == nil {
+        return it, nil
+    }
+
+    asMap := map[string]any{}
+    for k, v := range obj.(map[string]any) {
+        asMap[k] = v
+    }
+
+    fieldsInOrder := [...]string{"email", "password"}
+    for _, k := range fieldsInOrder {
+        v, ok := asMap[k]
+        if !ok {
+            continue
+        }
+        switch k {
+        case "email":
+            ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+            data, err := ec.unmarshalNString2string(ctx, v)
+            if err != nil {
+                return it, err
+            }
+            it.Email = data
+        case "password":
+            ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
+            data, err := ec.unmarshalNString2string(ctx, v)
+            if err != nil {
+                return it, err
+            }
+            it.Password = data
         }
     }
     return it, nil
@@ -8397,6 +8947,97 @@ func (ec *executionContext) unmarshalInputUserOrderBy(ctx context.Context, obj a
 
 // region    **************************** object.gotpl ****************************
 
+var dashboardOverviewImplementors = []string{"DashboardOverview"}
+
+func (ec *executionContext) _DashboardOverview(ctx context.Context, sel ast.SelectionSet, obj *DashboardOverview) graphql.Marshaler {
+    fields := graphql.CollectFields(ec.OperationContext, sel, dashboardOverviewImplementors)
+
+    out := graphql.NewFieldSet(fields)
+    deferredFieldSet := graphql.NewFieldSet(nil)
+    deferLabelToView := make(map[string]*graphql.FieldSetView)
+    for i, field := range fields {
+        switch field.Name {
+        case "__typename":
+            out.Values[i] = graphql.MarshalString("DashboardOverview")
+        case "shops":
+            out.Values[i] = ec._DashboardOverview_shops(ctx, field, obj)
+            if out.Values[i] == graphql.Null {
+                out.Invalids++
+            }
+        case "backend":
+            out.Values[i] = ec._DashboardOverview_backend(ctx, field, obj)
+            if out.Values[i] == graphql.Null {
+                out.Invalids++
+            }
+        case "mode":
+            out.Values[i] = ec._DashboardOverview_mode(ctx, field, obj)
+            if out.Values[i] == graphql.Null {
+                out.Invalids++
+            }
+        default:
+            panic("unknown field " + strconv.Quote(field.Name))
+        }
+    }
+    out.Dispatch(ctx)
+    if out.Invalids > 0 {
+        return graphql.Null
+    }
+
+    atomic.AddInt32(&ec.Deferred, int32(min(len(deferLabelToView), math.MaxInt32)))
+
+    ec.ProcessDeferredGroup(graphql.DeferredGroup{
+        Defers:   deferLabelToView,
+        Path:     graphql.GetPath(ctx),
+        FieldSet: deferredFieldSet,
+        Context:  ctx,
+    })
+
+    return out
+}
+
+var installStatusImplementors = []string{"InstallStatus"}
+
+func (ec *executionContext) _InstallStatus(ctx context.Context, sel ast.SelectionSet, obj *InstallStatus) graphql.Marshaler {
+    fields := graphql.CollectFields(ec.OperationContext, sel, installStatusImplementors)
+
+    out := graphql.NewFieldSet(fields)
+    deferredFieldSet := graphql.NewFieldSet(nil)
+    deferLabelToView := make(map[string]*graphql.FieldSetView)
+    for i, field := range fields {
+        switch field.Name {
+        case "__typename":
+            out.Values[i] = graphql.MarshalString("InstallStatus")
+        case "installed":
+            out.Values[i] = ec._InstallStatus_installed(ctx, field, obj)
+            if out.Values[i] == graphql.Null {
+                out.Invalids++
+            }
+        case "enabled":
+            out.Values[i] = ec._InstallStatus_enabled(ctx, field, obj)
+            if out.Values[i] == graphql.Null {
+                out.Invalids++
+            }
+        default:
+            panic("unknown field " + strconv.Quote(field.Name))
+        }
+    }
+    out.Dispatch(ctx)
+    if out.Invalids > 0 {
+        return graphql.Null
+    }
+
+    atomic.AddInt32(&ec.Deferred, int32(min(len(deferLabelToView), math.MaxInt32)))
+
+    ec.ProcessDeferredGroup(graphql.DeferredGroup{
+        Defers:   deferLabelToView,
+        Path:     graphql.GetPath(ctx),
+        FieldSet: deferredFieldSet,
+        Context:  ctx,
+    })
+
+    return out
+}
+
 var mutationImplementors = []string{"Mutation"}
 
 func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -8417,6 +9058,27 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
         switch field.Name {
         case "__typename":
             out.Values[i] = graphql.MarshalString("Mutation")
+        case "initializeAdmin":
+            out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+                return ec._Mutation_initializeAdmin(ctx, field)
+            })
+            if out.Values[i] == graphql.Null {
+                out.Invalids++
+            }
+        case "signInWithEmail":
+            out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+                return ec._Mutation_signInWithEmail(ctx, field)
+            })
+            if out.Values[i] == graphql.Null {
+                out.Invalids++
+            }
+        case "signOut":
+            out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+                return ec._Mutation_signOut(ctx, field)
+            })
+            if out.Values[i] == graphql.Null {
+                out.Invalids++
+            }
         case "createUser":
             out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
                 return ec._Mutation_createUser(ctx, field)
@@ -8500,6 +9162,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
         switch field.Name {
         case "__typename":
             out.Values[i] = graphql.MarshalString("Query")
+        case "getInstallStatus":
+            field := field
+
+            innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+                defer func() {
+                    if r := recover(); r != nil {
+                        ec.Error(ctx, ec.Recover(ctx, r))
+                    }
+                }()
+                res = ec._Query_getInstallStatus(ctx, field)
+                if res == graphql.Null {
+                    atomic.AddUint32(&fs.Invalids, 1)
+                }
+                return res
+            }
+
+            rrm := func(ctx context.Context) graphql.Marshaler {
+                return ec.OperationContext.RootResolverMiddleware(ctx,
+                    func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+            }
+
+            out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
         case "getCurrentUser":
             field := field
 
@@ -8532,6 +9216,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
                     }
                 }()
                 res = ec._Query_getCurrentPermissions(ctx, field)
+                if res == graphql.Null {
+                    atomic.AddUint32(&fs.Invalids, 1)
+                }
+                return res
+            }
+
+            rrm := func(ctx context.Context) graphql.Marshaler {
+                return ec.OperationContext.RootResolverMiddleware(ctx,
+                    func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+            }
+
+            out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+        case "getDashboardOverview":
+            field := field
+
+            innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+                defer func() {
+                    if r := recover(); r != nil {
+                        ec.Error(ctx, ec.Recover(ctx, r))
+                    }
+                }()
+                res = ec._Query_getDashboardOverview(ctx, field)
                 if res == graphql.Null {
                     atomic.AddUint32(&fs.Invalids, 1)
                 }
@@ -10385,6 +11091,16 @@ func (ec *executionContext) unmarshalNCreateUserSetInput2codeupᚗaliyunᚗcom�
     return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalNDashboardOverview2ᚖcodeupᚗaliyunᚗcomᚋshanjingᚋlabsᚋgoᚑfullᚑstackᚑstarterᚗgitᚋprojectsᚋmultiᚑdatabaseᚑdemoᚋinternalᚋgraphᚋadminᚐDashboardOverview(ctx context.Context, sel ast.SelectionSet, v *DashboardOverview) graphql.Marshaler {
+    if v == nil {
+        if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+            graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+        }
+        return graphql.Null
+    }
+    return ec._DashboardOverview(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNDateTime2codeupᚗaliyunᚗcomᚋshanjingᚋlabsᚋgoᚑfullᚑstackᚑstarterᚗgitᚋprojectsᚋmultiᚑdatabaseᚑdemoᚋinternalᚋgraphᚋscalarᚐDateTime(ctx context.Context, v any) (scalar.DateTime, error) {
     var res scalar.DateTime
     err := res.UnmarshalGQL(v)
@@ -10425,6 +11141,21 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
         }
     }
     return res
+}
+
+func (ec *executionContext) unmarshalNInitializeAdminInput2codeupᚗaliyunᚗcomᚋshanjingᚋlabsᚋgoᚑfullᚑstackᚑstarterᚗgitᚋprojectsᚋmultiᚑdatabaseᚑdemoᚋinternalᚋgraphᚋadminᚐInitializeAdminInput(ctx context.Context, v any) (InitializeAdminInput, error) {
+    res, err := ec.unmarshalInputInitializeAdminInput(ctx, v)
+    return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNInstallStatus2ᚖcodeupᚗaliyunᚗcomᚋshanjingᚋlabsᚋgoᚑfullᚑstackᚑstarterᚗgitᚋprojectsᚋmultiᚑdatabaseᚑdemoᚋinternalᚋgraphᚋadminᚐInstallStatus(ctx context.Context, sel ast.SelectionSet, v *InstallStatus) graphql.Marshaler {
+    if v == nil {
+        if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+            graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+        }
+        return graphql.Null
+    }
+    return ec._InstallStatus(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v any) (int, error) {
@@ -10671,6 +11402,11 @@ func (ec *executionContext) marshalNShopItem2ᚖcodeupᚗaliyunᚗcomᚋshanjing
         return graphql.Null
     }
     return ec._ShopItem(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNSignInWithEmailInput2codeupᚗaliyunᚗcomᚋshanjingᚋlabsᚋgoᚑfullᚑstackᚑstarterᚗgitᚋprojectsᚋmultiᚑdatabaseᚑdemoᚋinternalᚋgraphᚋadminᚐSignInWithEmailInput(ctx context.Context, v any) (SignInWithEmailInput, error) {
+    res, err := ec.unmarshalInputSignInWithEmailInput(ctx, v)
+    return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v any) (string, error) {

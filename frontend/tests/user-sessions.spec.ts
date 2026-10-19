@@ -41,12 +41,30 @@ async function mockSessions(
     };
     await page.route("**/api/**", async (route) => {
         const path = new URL(route.request().url()).pathname;
-        if (path === "/api/auth/install-status") {
-            await route.fulfill({ json: { installed: true, enabled: false } });
+        if (
+            path === "/api/graphql/admin" &&
+            route.request().postDataJSON().query.includes("getInstallStatus")
+        ) {
+            await route.fulfill({
+                json: { data: { getInstallStatus: { installed: true, enabled: false } } },
+            });
             return;
         }
-        if (path === "/api/rest/demo/overview") {
-            await route.fulfill({ json: { shops: 1, backend: "会话验收" } });
+        if (
+            path === "/api/graphql/admin" &&
+            route.request().postDataJSON().query.includes("getDashboardOverview")
+        ) {
+            await route.fulfill({
+                json: {
+                    data: {
+                        getDashboardOverview: {
+                            shops: 1,
+                            backend: "会话验收",
+                            mode: "development",
+                        },
+                    },
+                },
+            });
             return;
         }
         if (path !== "/api/graphql/admin") throw new Error(`意外请求 ${path}`);

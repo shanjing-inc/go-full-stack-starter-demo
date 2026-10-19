@@ -19,6 +19,39 @@ import (
     "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/projects/multi-database-demo/internal/service"
 )
 
+// InitializeAdmin 初始化后台管理员，保留引导令牌与原子初始化校验。
+func (r *mutationResolver) InitializeAdmin(ctx context.Context, input InitializeAdminInput) (*UserItem, error) {
+    if err := r.usersReady(); err != nil {
+        return nil, err
+    }
+    user, err := r.Users.InitializeRequest(ctx, input.BootstrapToken, input.Name, input.Email, input.Password)
+    if err != nil {
+        return nil, err
+    }
+    return fromUser(user), nil
+}
+
+// SignInWithEmail 验证凭据并写入 HttpOnly 会话 Cookie。
+func (r *mutationResolver) SignInWithEmail(ctx context.Context, input SignInWithEmailInput) (*UserItem, error) {
+    if err := r.usersReady(); err != nil {
+        return nil, err
+    }
+    user, err := r.Users.LoginRequest(ctx, input.Email, input.Password)
+    if err != nil {
+        return nil, err
+    }
+    return fromUser(user), nil
+}
+
+// SignOut 撤销当前会话并清理 Cookie。
+func (r *mutationResolver) SignOut(ctx context.Context) (bool, error) {
+    if err := r.usersReady(); err != nil {
+        return false, err
+    }
+    err := r.Users.LogoutRequest(ctx)
+    return err == nil, err
+}
+
 // CreateUser 映射创建输入并调用认证服务，按 Schema 约定返回单元素用户列表。
 func (r *mutationResolver) CreateUser(ctx context.Context, set CreateUserSetInput) ([]*UserItem, error) {
     if err := r.usersReady(); err != nil {
@@ -115,6 +148,18 @@ func (r *mutationResolver) CreateShop(ctx context.Context, set CreateShopSetInpu
     return model.FromShop(row), err
 }
 
+// GetInstallStatus 返回安装状态和初始化资格。
+func (r *queryResolver) GetInstallStatus(ctx context.Context) (*InstallStatus, error) {
+    if err := r.usersReady(); err != nil {
+        return nil, err
+    }
+    installed, enabled, err := r.Users.InstallStatus(ctx)
+    if err != nil {
+        return nil, err
+    }
+    return &InstallStatus{Installed: installed, Enabled: enabled}, nil
+}
+
 // GetCurrentUser 读取当前已认证用户并映射为后台安全 DTO。
 func (r *queryResolver) GetCurrentUser(ctx context.Context) (*UserItem, error) {
     if err := r.usersReady(); err != nil {
@@ -136,6 +181,20 @@ func (r *queryResolver) GetCurrentPermissions(ctx context.Context) ([]string, er
         return nil, &httperr.Error{Code: "FORBIDDEN", Message: "当前会话缺少身份信息"}
     }
     return r.Users.DashboardPermissions(user), nil
+}
+
+// GetDashboardOverview 校验 shop:list 权限并通过店铺服务统计概览。
+func (r *queryResolver) GetDashboardOverview(ctx context.Context) (*DashboardOverview, error) {
+    if r.Users != nil {
+        if err := r.Users.Require(ctx, "shop", "list"); err != nil {
+            return nil, err
+        }
+    }
+    count, err := r.Shops.Count(ctx)
+    if err != nil {
+        return nil, err
+    }
+    return &DashboardOverview{Shops: int(count), Backend: "Go / Echo", Mode: "development"}, nil
 }
 
 // GetUser 映射筛选并调用带权限和审计的用户查询服务。

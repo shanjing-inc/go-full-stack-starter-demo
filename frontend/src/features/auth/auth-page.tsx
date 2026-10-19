@@ -8,6 +8,20 @@ import {
     Button,
     Input,
 } from "@shanjing/shadcnui-dashboard";
+import { graphql } from "../../lib/request";
+import {
+    GET_INSTALL_STATUS,
+    INITIALIZE_ADMIN,
+    SIGN_IN_WITH_EMAIL,
+} from "../../graphql/admin/operations";
+import type {
+    GetInstallStatusQuery,
+    GetInstallStatusQueryVariables,
+    InitializeAdminMutation,
+    InitializeAdminMutationVariables,
+    SignInWithEmailMutation,
+    SignInWithEmailMutationVariables,
+} from "../../graphql/admin/generated";
 import { safeReturnTo } from "./session-context";
 
 export function AuthPage({ install = false }: { install?: boolean }) {
@@ -25,13 +39,14 @@ export function AuthPage({ install = false }: { install?: boolean }) {
         const controller = new AbortController();
         setStatus(null);
         setError("");
-        fetch("/api/auth/install-status", { signal: controller.signal, credentials: "include" })
-            .then(async (response) => {
-                if (!response.ok) throw new Error("初始化状态读取失败");
-                return response.json();
-            })
-            .then((current) => {
-                if (!controller.signal.aborted) setStatus(current);
+        graphql<GetInstallStatusQuery, GetInstallStatusQueryVariables>(
+            GET_INSTALL_STATUS,
+            {},
+            controller.signal,
+            true,
+        )
+            .then((data) => {
+                if (!controller.signal.aborted) setStatus(data.getInstallStatus);
             })
             .catch((err) => {
                 if (!controller.signal.aborted) setError(err.message);
@@ -48,29 +63,31 @@ export function AuthPage({ install = false }: { install?: boolean }) {
             if (install ? passwordBytes < 8 || passwordBytes > 128 : passwordBytes > 512) {
                 throw new Error(install ? "密码长度需要 8–128 字节" : "密码长度最多 512 字节");
             }
-            const response = await fetch(
-                install ? "/api/auth/initialize" : "/api/auth/sign-in/email",
-                {
-                    method: "POST",
-                    credentials: "include",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(
-                        install
-                            ? { name, email, password, bootstrapToken: token }
-                            : { email, password },
-                    ),
-                },
-            );
-            const result = await response.json();
-            if (!response.ok) throw new Error(result.message || "认证请求失败");
+            const result = install
+                ? (
+                      await graphql<InitializeAdminMutation, InitializeAdminMutationVariables>(
+                          INITIALIZE_ADMIN,
+                          { input: { name, email, password, bootstrapToken: token } },
+                          undefined,
+                          true,
+                      )
+                  ).initializeAdmin
+                : (
+                      await graphql<SignInWithEmailMutation, SignInWithEmailMutationVariables>(
+                          SIGN_IN_WITH_EMAIL,
+                          { input: { email, password } },
+                          undefined,
+                          true,
+                      )
+                  ).signInWithEmail;
             setPassword("");
             setToken("");
             if (install) {
                 setStatus({ installed: true, enabled: false });
-                setEmail(result.user.email);
+                setEmail(result.email ?? email);
                 navigate("/login", {
                     replace: true,
-                    state: { initializedEmail: result.user.email },
+                    state: { initializedEmail: result.email ?? email },
                 });
             } else {
                 const returnTo = new URLSearchParams(location.search).get("returnTo");

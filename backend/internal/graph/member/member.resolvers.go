@@ -8,8 +8,30 @@ package member
 import (
     "context"
 
+    "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit/transport/httperr"
     "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/projects/multi-database-demo/internal/graph/model"
 )
+
+// SignInWithEmail 为小程序创建独立 Bearer 会话。
+func (r *mutationResolver) SignInWithEmail(ctx context.Context, input MemberSignInInput) (*MemberSignInPayload, error) {
+    if r.Users == nil {
+        return nil, &httperr.Error{Code: "SERVICE_UNAVAILABLE", Message: "认证服务暂时不可用"}
+    }
+    token, err := r.Users.LoginBearerRequest(ctx, input.Email, input.Password)
+    if err != nil {
+        return nil, err
+    }
+    return &MemberSignInPayload{Token: token}, nil
+}
+
+// SignOut 撤销小程序当前 Bearer 会话。
+func (r *mutationResolver) SignOut(ctx context.Context) (bool, error) {
+    if r.Users == nil {
+        return false, &httperr.Error{Code: "SERVICE_UNAVAILABLE", Message: "认证服务暂时不可用"}
+    }
+    err := r.Users.LogoutBearerRequest(ctx)
+    return err == nil, err
+}
 
 // GetShop 将成员端 eq 筛选映射到共享业务查询，空记录保留为空结果。
 func (r *queryResolver) GetShop(ctx context.Context, where model.ShopFilters) (*model.ShopItem, error) {
@@ -22,7 +44,13 @@ func (r *queryResolver) GetShop(ctx context.Context, where model.ShopFilters) (*
     return model.FromShop(row), err
 }
 
+// Mutation returns MutationResolver implementation.
+func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
+
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
-type queryResolver struct{ *Resolver }
+type (
+    mutationResolver struct{ *Resolver }
+    queryResolver    struct{ *Resolver }
+)

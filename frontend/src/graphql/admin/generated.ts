@@ -18,6 +18,13 @@ export type CreateUserSetInput = {
     role?: string | null | undefined;
 };
 
+export type InitializeAdminInput = {
+    bootstrapToken: string;
+    email: string;
+    name: string;
+    password: string;
+};
+
 export type IntFilters = {
     eq?: number | null | undefined;
     gt?: number | null | undefined;
@@ -40,6 +47,11 @@ export type ShopFilters = {
     id?: IntFilters | null | undefined;
     slug?: StringFilters | null | undefined;
     status?: StringFilters | null | undefined;
+};
+
+export type SignInWithEmailInput = {
+    email: string;
+    password: string;
 };
 
 export type StringFilters = {
@@ -114,6 +126,12 @@ export type DashboardQueueRecordFieldsFragment = {
     meta: unknown;
     failedReason: string;
     stacktrace: Array<string>;
+};
+
+export type GetDashboardOverviewQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetDashboardOverviewQuery = {
+    getDashboardOverview: { shops: number; backend: string; mode: string };
 };
 
 export type GetDashboardSessionQueryVariables = Exact<{ [key: string]: never }>;
@@ -437,3 +455,27 @@ export type ListAdminShopsQuery = {
         updatedAt: string | null;
     }> | null;
 };
+
+export type GetInstallStatusQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetInstallStatusQuery = { getInstallStatus: { installed: boolean; enabled: boolean } };
+
+export type InitializeAdminMutationVariables = Exact<{
+    input: InitializeAdminInput;
+}>;
+
+export type InitializeAdminMutation = {
+    initializeAdmin: { id: string | null; email: string | null };
+};
+
+export type SignInWithEmailMutationVariables = Exact<{
+    input: SignInWithEmailInput;
+}>;
+
+export type SignInWithEmailMutation = {
+    signInWithEmail: { id: string | null; email: string | null };
+};
+
+export type SignOutMutationVariables = Exact<{ [key: string]: never }>;
+
+export type SignOutMutation = { signOut: boolean };

@@ -7,6 +7,7 @@ async function mockNavigation(page: Page) {
         shops: 0,
         users: 0,
         overview: 0,
+        restOverview: 0,
         created: 0,
         authenticated: true,
         userQueries: [] as { where: { email?: { like: string } }; offset: number; limit: number }[],
@@ -19,7 +20,12 @@ async function mockNavigation(page: Page) {
             request.postDataJSON()?.query.includes("getDashboardSession")
         )
             state.session += 1;
-        if (path === "/api/rest/demo/overview") state.overview += 1;
+        if (path.startsWith("/api/rest/") || path.startsWith("/api/auth/")) state.restOverview += 1;
+        if (
+            path === "/api/graphql/admin" &&
+            request.postDataJSON()?.query.includes("getDashboardOverview")
+        )
+            state.overview += 1;
         if (
             path === "/api/graphql/admin" &&
             request.postDataJSON()?.query.includes("listAdminShops")
@@ -34,14 +40,32 @@ async function mockNavigation(page: Page) {
     });
     await page.route("**/api/**", async (route) => {
         const path = new URL(route.request().url()).pathname;
-        if (path === "/api/rest/demo/overview") {
-            await route.fulfill({ json: { shops: 1, backend: "导航验收后端" } });
-        } else if (path === "/api/graphql/admin") {
+        if (path === "/api/graphql/admin") {
             const { query } = route.request().postDataJSON();
+            if (query.includes("getInstallStatus")) {
+                await route.fulfill({
+                    json: { data: { getInstallStatus: { installed: true, enabled: false } } },
+                });
+                return;
+            }
             if (!state.authenticated) {
                 await route.fulfill({
                     status: 401,
                     json: { code: "UNAUTHORIZED", message: "会话已过期" },
+                });
+                return;
+            }
+            if (query.includes("getDashboardOverview")) {
+                await route.fulfill({
+                    json: {
+                        data: {
+                            getDashboardOverview: {
+                                shops: 1,
+                                backend: "导航验收后端",
+                                mode: "development",
+                            },
+                        },
+                    },
                 });
                 return;
             }
@@ -109,8 +133,6 @@ async function mockNavigation(page: Page) {
                     },
                 },
             });
-        } else if (path === "/api/auth/install-status") {
-            await route.fulfill({ json: { installed: true, enabled: false } });
         } else {
             throw new Error(`意外请求 ${path}`);
         }
@@ -262,4 +284,19 @@ test("用户列表筛选、重置、刷新与分页各查询一次", async ({ pa
     expect(state.users - beforeReload).toBe(1);
     await expect(page.getByText("导航验收管理员", { exact: true })).toBeVisible();
     expect(state.userQueries.at(-1)?.limit).toBe(11);
+});
+
+test("首页概览通过一次 Admin GraphQL 读取并保留展示", async ({ page }) => {
+    const state = await mockNavigation(page);
+    await page.goto("/admin/");
+    await expect(page.getByText("导航验收后端", { exact: true })).toBeVisible();
+    await expect(page.getByTestId("shop-count")).toHaveText("1");
+    expect(state.overview).toBe(1);
+    expect(state.restOverview).toBe(0);
+    await page.getByRole("button", { name: "店铺列表", exact: true }).click();
+    await expectShopResult(page, 1);
+    await page.getByRole("button", { name: "系统概览", exact: true }).click();
+    await expect(page.getByTestId("shop-count")).toHaveText("1");
+    expect(state.overview).toBe(2);
+    expect(state.restOverview).toBe(0);
 });

@@ -6,21 +6,42 @@ async function mockSidebar(page: Page, permissions = ["user:list", "demo:read"])
     const state = { identities: 0, users: 0, shops: 0, overview: 0, logout: 0, logoutStatus: 200 };
     await page.route("**/api/**", async (route) => {
         const path = new URL(route.request().url()).pathname;
-        if (path === "/api/auth/install-status") {
-            await route.fulfill({ json: { installed: true, enabled: false } });
-            return;
-        }
-        if (path === "/api/auth/sign-out") {
-            state.logout++;
+        if (
+            path === "/api/graphql/admin" &&
+            route.request().postDataJSON().query.includes("getInstallStatus")
+        ) {
             await route.fulfill({
-                status: state.logoutStatus,
-                json: { success: state.logoutStatus === 200 },
+                json: { data: { getInstallStatus: { installed: true, enabled: false } } },
             });
             return;
         }
-        if (path === "/api/rest/demo/overview") {
+        if (
+            path === "/api/graphql/admin" &&
+            route.request().postDataJSON().query.includes("signOut")
+        ) {
+            state.logout++;
+            await route.fulfill({
+                status: state.logoutStatus,
+                json: { data: { signOut: state.logoutStatus === 200 } },
+            });
+            return;
+        }
+        if (
+            path === "/api/graphql/admin" &&
+            route.request().postDataJSON().query.includes("getDashboardOverview")
+        ) {
             state.overview++;
-            await route.fulfill({ json: { shops: 0, backend: "侧栏验收后端" } });
+            await route.fulfill({
+                json: {
+                    data: {
+                        getDashboardOverview: {
+                            shops: 0,
+                            backend: "侧栏验收后端",
+                            mode: "development",
+                        },
+                    },
+                },
+            });
             return;
         }
         expect(path).toBe("/api/graphql/admin");
@@ -236,10 +257,11 @@ test("退出等待期间锁定动作并合并重复请求", async ({ page }) => 
     const gate = new Promise<void>((resolve) => {
         release = resolve;
     });
-    await page.route("**/api/auth/sign-out", async (route) => {
+    await page.route("**/api/graphql/admin", async (route) => {
+        if (!route.request().postDataJSON().query.includes("signOut")) return route.fallback();
         requests++;
         await gate;
-        await route.fulfill({ json: { success: true } });
+        await route.fulfill({ json: { data: { signOut: true } } });
     });
     await signOutFromSidebar(page);
     await expect(page.getByRole("menu")).toHaveCount(0);

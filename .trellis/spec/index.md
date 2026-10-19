@@ -10,6 +10,6 @@
 
 源码路径相对本应用根；独立发布直接使用同一目录结构、应用命令与固定扩展依赖。
 
-应用根使用 `pnpm dev` 启动 Vite HMR、Go Web 与 Go Worker，使用 `pnpm dev:weapp` 启动小程序 watch。package.json 使用 `dev` 作为组合开发入口；底层 `go-starter dev` 与 frontend 内部 Vite `dev` 保持原名。
+应用根使用 `pnpm dev` 启动 Vite HMR、Go Web 与 Go Worker，使用 `pnpm dev:weapp` 启动小程序 watch。package.json 的 `dev` 直接运行本地 `scripts/dev.py`，frontend 内部 `dev` 运行 Vite。
 
 开发前读源码/同目录测试；代码/命令/接口变化同步 spec；按 backend/quality-guidelines 运行真实命令，明确环境与未覆盖项。

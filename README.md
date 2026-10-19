@@ -1,17 +1,21 @@
 # Multi Database Demo
 
+主仓 `multi-database-demo:dev` 保留公共 Go kit／Dashboard 的源码联调与主仓工具上下文；应用内 `dev` 使用自己的工具和固定公共依赖。
+
 多数据库全栈应用：Go Web/Worker、React Dashboard、双 GraphQL Schema、SSR 首页、认证/用户/店铺与队列示例。源码在主仓 projects/multi-database-demo，独立发布后本目录就是仓库根。
 
-`backend`、`frontend`、`miniprogram`、`share`、`docker`、AGENTS 和应用 Trellis 随发布交付。公共 Go kit、Dashboard 与 devtools 是固定版本扩展依赖；不携带主仓 packages/tools/poc/docs 或任务历史。来源提交、逐文件映射和依赖完整性见 demo-release.json；依赖升级记录见 release-dependencies.json。
+`backend`、`frontend`、`miniprogram`、`share`、`docker`、`scripts`、AGENTS 和应用 Trellis 随发布交付。公共支持脚本与 formatter 工具白名单由导出器从同一提交交付。公共 Go kit、Dashboard 是固定版本扩展依赖；主仓发版工具和任务历史保持主仓归属。来源提交、逐文件映射和依赖完整性见 demo-release.json；依赖升级记录见 release-dependencies.json。
 
 ## 目录边界
 
 ```text
-backend/          Go 模块、cmd、internal、migrations、Air 和 gqlgen 配置
+backend/          Go 模块、cmd、internal、migrations 和 gqlgen 配置
 frontend/         Web 前端源码、包配置和测试
 miniprogram/      应用提供的小程序源码、包配置和测试
 share/schema/     共用 GraphQL SDL 与生成的目标数据库 Schema
 docker/           Dockerfile 与基础／测试镜像清单
+scripts/          可直接编辑的生成、开发、检查、测试与清理命令
+tools/            独立导出时注入公共工具白名单（工作区复用主仓 tools）
 .trellis/         应用规范与工作流
 ```
 
@@ -21,9 +25,9 @@ Docker 从应用根使用 `rtk proxy docker build -f docker/Dockerfile -t multi-
 
 ## 安装与命令
 
-源码平台矩阵：Linux amd64、macOS Intel（amd64）/Apple Silicon（arm64）；Python 3.12+、Node 24、pnpm 11.15.1。toolchain.json 按平台固定 Go/Atlas/Ruff 的版本、下载地址与 SHA256。当前布局为 `app-layout-v2`，需要包含三端目录适配的新版 devtools。主仓 demo 默认通过轻量入口使用本地工具源码，独立应用使用固定包。`STARTER_TOOL_MODE=auto/source/package` 控制来源，`pnpm tools:info` 查看实际来源与布局兼容信息。现有依赖锁仍固定已发布的 0.1.1；正式升级需先发布新版，再同步 package.json、锁文件和 release-dependencies.json 的真实完整性。本地工具打包验收与正式 registry 验收分别记录；macOS 两架构原生运行保留实机验收。
+源码平台矩阵：Linux amd64、macOS Intel（amd64）/Apple Silicon（arm64）；Python 3.12+、Node 24、pnpm 11.15.1。toolchain.json 按平台固定 Go/Atlas/Ruff 的版本、下载地址与 SHA256。命令直接执行本应用 `scripts/*.py`，独立导出的 `tools` 提供固定 CLI 依赖锁和格式工具，应用开发重载由 `scripts/dev_reload.py` 负责。主仓使用 `pnpm multi-database-demo:dev` 等名称前缀转发，本目录使用 `pnpm dev` 等原生入口。macOS 两架构保留实机验收。
 
-布局规范名为 `app-layout-v2`，旧 `app-only-v2` 保留为兼容别名，两者使用相同目录与环境规则；`app-only-v1` 保持历史根目录布局。devtools 明确声明支持这三个标识，固定依赖升级沿用正式发布流程。
+布局规范名为 `app-layout-v2`，旧 `app-only-v2` 保留为兼容别名，两者使用相同目录与环境规则；`app-only-v1` 保持历史根目录布局。应用脚本通过 starter.config.json 校验布局。
 
 公司 npm registry 由本目录无凭据 .npmrc 指定。若 registry 要求认证，使用运行环境或任务专属 userconfig 注入；不要把 token 写入应用 .npmrc。Codeup Go 模块需要本仓只读权限，通过任务专属 Git credential helper/netrc 或 SSH URL 映射提供，不依赖另一份 checkout。GOPRIVATE 默认为 codeup.aliyun.com/shanjing。SSH 用户可在当前 shell 设置 GIT_CONFIG_COUNT=1、GIT_CONFIG_KEY_0=url.git@codeup.aliyun.com:.insteadOf、GIT_CONFIG_VALUE_0=https://codeup.aliyun.com/ 并使用自己的 SSH agent。
 
@@ -53,7 +57,7 @@ Vite 原生加载 `frontend/.env`、`.env.local`、`.env.[mode]`、`.env.[mode].
 
 日常开发从应用根执行 `rtk pnpm dev`。前端目录单独启动时，在前端环境文件或进程环境提供 `WEB_ORIGIN`；缺省代理到 `http://127.0.0.1:8080`。`SPA_PORT` 的解析结果须为有效数字端口；`VITE_*` 为浏览器公开配置，变化后重新构建。
 
-源码模式和新构建的 devtools 包使用以上契约。正式 registry 安装的 devtools 需跟随新版本发布及精确依赖升级完成交付；候选包验证与正式发布分别记录。
+应用命令随源码发布；派生项目在自己的 package.json 与 scripts 中维护编排，后续工具改进通过定向源码补丁升级。主仓开发期间，通用脚本通过 shared_scripts.py 复用根公共实现，公共 formatter 源码维护于根 tools/cmd/format-go；独立导出从同一提交展开脚本并交付白名单 tools 源码及单测。
 
 检查和发布构建：
 
@@ -66,7 +70,7 @@ pnpm build
 
 `pnpm test` 在前端构建后执行 Vite 配置回归和应用 Go 测试，配置测试失败立即终止后续测试。
 
-覆盖率只统计本应用 backend/cmd 与 backend/internal，公共包测试由主仓和包发布验收负责。生成与构建采用 GOWORK=off；主仓共享开发仍可用根 go.work。pnpm schema/schema:diff、format/format:check、clean:runtime/clean:cache/clean:all 保留。应用轻量入口选择本地源码或正式 devtools 包，共用同一生成、格式、进程监管和清理实现；正式验收强制 package 模式。Python 3.11 系统可通过 STARTER_SETUP_PYTHON 指定任务内 Python 3.12 供 setup 使用；所有开发命令的 python3 统一使用 3.12+；Linux 接管依赖 pidfd。
+覆盖率只统计本应用 backend/cmd 与 backend/internal，公共包验收由主仓负责。生成与构建采用 GOWORK=off；主仓公共验收使用根 go.work。schema/schema:diff、format/format:check、clean:runtime/clean:cache/clean:all 直接执行本地脚本，工具安装和运行产物位于本应用 `.tools`、`.runtime`；Python 命令统一使用 3.12+，Linux 接管依赖 pidfd。
 
 pnpm dev 先构建私有资源，再串行重载 Web/Worker，业务就绪后启动 Vite。Linux 保留同项目进程接管、其他进程保护、pidfd 身份核验、启动锁、运行租约、退出端口复查和缓存清理。新版工具的 macOS 适配通过 ps/lsof/sysctl 管理当前受管进程，冲突端口提示占用详情，用户手动退出旧服务后重试；检查失败保留运行产物与缓存。公开页在 http://127.0.0.1:5173/ 、/test/queue 与 /test/bus，后台 /admin/；直接 Go 服务默认 8080。
 
@@ -94,7 +98,7 @@ AGENTS.md 和 .trellis/spec 是应用规范。从本目录运行 `python3 .trell
 
 静态资源缓存随后端 `APP_MODE` 生效：`development` 对 `/admin`、`/admin/*` 与 `/public/*` 响应统一返回 `Cache-Control: no-store`；`production` 保留 `assets/*` 的一年 `immutable` 缓存及入口 HTML／固定文件名资源的 `no-cache`。API、WebSocket、SSE 保持原响应策略。浏览器已有强缓存需要一次清理或强制重新加载后取得新策略；开发监管的内嵌资源仍来自启动构建快照，前端资源更新沿用重新构建／完整重启流程。
 
-devtools 0.1.1 已正式发布，涵盖 `internal/web/dist` 资源快照、macOS 工具适配与 Vite 配置测试入口。应用精确依赖、锁文件、minimumReleaseAgeExclude 与 release-dependencies.json 同步记录真实 registry 版本及完整性；独立应用通过常规安装取得同一正式包。
+开发监管、资源快照、macOS 平台适配与 Vite 配置测试入口由本应用脚本维护。
 
 Go kit 固定为 `v0.0.0-20261011051254-4d1c52cf70e4`，来源为已合并的 main，包含密码校验/繁忙错误、队列 Logger 和标准 GraphQL 装配接口。Dashboard 固定正式 0.1.1，支持 Sheet 遮罩定制。版本与真实校验值见 backend/go.mod、backend/go.sum 和 release-dependencies.json；主仓工作区联调与独立 `GOWORK=off` 验收分别记录。
 
@@ -107,7 +111,7 @@ rtk pnpm codegen
 rtk pnpm codegen:check
 ```
 
-修改 SDL 或操作后执行 `codegen`，将生成文件与源码一起提交。`codegen:check` 全程只读，支持未提交产物和无 Git 的独立应用；前端构建和类型检查会执行它。主仓 `generate` 同时更新 Go、SQL 和前端操作类型。独立应用的 `codegen` 命令覆盖 Admin 前端与 Member 小程序；其 devtools 全生成入口的正式分发跟随工具新版本发布。
+修改 SDL 或操作后执行 `codegen`，将生成文件与源码一起提交。`codegen:check` 全程只读，支持未提交产物和无 Git 的独立应用；前端构建和类型检查会执行它。主仓 `multi-database-demo:generate` 同时更新 Go、SQL 和前端操作类型。独立应用的 `codegen` 命令覆盖 Admin 前端与 Member 小程序；生成命令实现随应用源码交付。
 
 生成结果保留字段空值和可选输入，DateTime 映射为字符串，JSON 映射为 unknown。Admin 与 Member 按各自 SDL、操作和产物隔离。前端测试覆盖同步检查、非法操作/变量、scalar 和现有请求边界；编译期断言覆盖分页变量、必填输入和可空结果。
 

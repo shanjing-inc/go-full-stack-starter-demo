@@ -4,6 +4,27 @@ import { CombinedGraphQLErrors, ServerError, ServerParseError } from "@apollo/cl
 import { getOperationAST, print } from "graphql";
 import { Observable, catchError, map, throwError } from "rxjs";
 
+const errorListeners = new Set<(error: unknown) => void>();
+
+export function subscribeRequestErrors(listener: (error: unknown) => void) {
+    errorListeners.add(listener);
+    return () => {
+        errorListeners.delete(listener);
+    };
+}
+
+export function notifyRequestError(error: unknown) {
+    for (const listener of errorListeners) {
+        try {
+            listener(error);
+        } catch {
+            /* 监控故障保持请求错误语义。 */
+        }
+    }
+}
+
+const notifyError = notifyRequestError;
+
 export class ApiError extends Error {
     constructor(
         message: string,
@@ -12,23 +33,6 @@ export class ApiError extends Error {
     ) {
         super(message);
         this.name = "ApiError";
-    }
-}
-
-const errorListeners = new Set<(error: unknown) => void>();
-export function subscribeRequestErrors(listener: (error: unknown) => void) {
-    errorListeners.add(listener);
-    return () => {
-        errorListeners.delete(listener);
-    };
-}
-function notifyError(error: unknown) {
-    for (const listener of errorListeners) {
-        try {
-            listener(error);
-        } catch {
-            /* 监控故障保持请求错误语义。 */
-        }
     }
 }
 

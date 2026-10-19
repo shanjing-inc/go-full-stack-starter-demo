@@ -33,6 +33,30 @@ function aborted(): Error {
     return error;
 }
 
+// 混合认证端点通过 GraphQL 错误表达失效会话，单条和批量响应共用同一边界。
+function unauthorized(data: unknown): boolean {
+    if (typeof data === "string") {
+        try {
+            return unauthorized(JSON.parse(data));
+        } catch {
+            return false;
+        }
+    }
+    if (Array.isArray(data)) return data.some(unauthorized);
+    if (!data || typeof data !== "object" || !("errors" in data) || !Array.isArray(data.errors))
+        return false;
+    return data.errors.some(
+        (error: unknown) =>
+            error &&
+            typeof error === "object" &&
+            "extensions" in error &&
+            error.extensions &&
+            typeof error.extensions === "object" &&
+            "code" in error.extensions &&
+            error.extensions.code === "UNAUTHORIZED",
+    );
+}
+
 // 显式提供 fetch 兼容层，网络请求统一交给微信平台。
 export const taroFetch: typeof fetch = (input, init) =>
     new Promise<Response>((resolve, reject) => {
@@ -71,7 +95,10 @@ export const taroFetch: typeof fetch = (input, init) =>
                 (response) => {
                     if (settled) return;
                     try {
-                        if (url === GRAPHQL_ENDPOINT && response.statusCode === 401) {
+                        if (
+                            url === GRAPHQL_ENDPOINT &&
+                            (response.statusCode === 401 || unauthorized(response.data))
+                        ) {
                             if (token) clearAuthToken(token);
                             finish(() =>
                                 reject(

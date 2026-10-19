@@ -36,6 +36,7 @@ type Shops interface {
     Get(context.Context, Lookup) (*Shop, error)
     Create(context.Context, Create) (*Shop, error)
     List(context.Context, ListQuery) ([]*Shop, error)
+    Count(context.Context) (int64, error)
 }
 
 // Memory 通过读写锁保护内存样例，查询返回实体副本以隔离后续修改。
@@ -135,4 +136,14 @@ func (m *Memory) Create(ctx context.Context, set Create) (*Shop, error) {
     m.nextID++
     m.rows[row.ID] = row
     return &row, nil
+}
+
+// Count 返回全部店铺数量，沿用请求取消与读锁边界。
+func (m *Memory) Count(ctx context.Context) (int64, error) {
+    if err := ctx.Err(); err != nil {
+        return 0, err
+    }
+    m.mu.RLock()
+    defer m.mu.RUnlock()
+    return int64(len(m.rows)), nil
 }
