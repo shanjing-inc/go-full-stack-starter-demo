@@ -157,7 +157,7 @@ def run_dev(go, env, module, release_startup, keep_runtime=False, *, worker=True
     prepare_dev_ports(env, module)
     frontend = frontend_directory(module)
     safe_maintain(ROOT, automatic=True, cache=True)
-    env["DASHBOARD_SOURCE"] = "1" if env.get("GOWORK", "off") != "off" else "0"
+    env.setdefault("DASHBOARD_SOURCE", "0")
     env["WEB_ORIGIN"] = "http://" + env.get("WEB_ADDR", "127.0.0.1:8080")
     stopping = False
 

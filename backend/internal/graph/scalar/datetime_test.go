@@ -15,6 +15,9 @@ func TestDateTime(t *testing.T) {
         if err := value.UnmarshalGQL(input); err != nil {
             t.Fatal(err)
         }
+        if parsed := time.Time(value); parsed.Location() != time.UTC || parsed.Nanosecond() != 0 {
+            t.Fatal("输入应在进入持久化前归一为秒级 UTC")
+        }
 
         var output bytes.Buffer
         value.MarshalGQL(&output)

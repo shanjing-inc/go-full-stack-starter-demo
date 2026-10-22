@@ -11,17 +11,14 @@ type Shop = {
 // 浏览器回归全部拦截 API，人工开发库保持原状。SQL 与协议由隔离 Go 测试覆盖。
 async function mockShops(page: Page, permissions = ["demo:read", "demo:write", "shop:create"]) {
     const state = {
-        rows: Array.from(
-            { length: 25 },
-            (_, index): Shop => ({
-                id: String(index + 1),
-                name: `已有店铺${index + 1}`,
-                slug: `shop-${String(index + 1).padStart(2, "0")}`,
-                status: index % 2 === 0 ? "active" : "inactive",
-                createdAt: "2026-10-04T00:00:00Z",
-                updatedAt: "2026-10-04T00:00:00Z",
-            }),
-        ),
+        rows: Array.from({ length: 25 }, (_, index): Shop => ({
+            id: String(index + 1),
+            name: `已有店铺${index + 1}`,
+            slug: `shop-${String(index + 1).padStart(2, "0")}`,
+            status: index % 2 === 0 ? "active" : "inactive",
+            createdAt: "2026-10-04T00:00:00Z",
+            updatedAt: "2026-10-04T00:00:00Z",
+        })),
         fail: false,
         beforeCreate: async () => {},
         createError: false,

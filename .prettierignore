@@ -9,3 +9,5 @@ test-results/
 # 数据库 migration／checksum 与生成 SQL 由数据库工具维护。
 **/migrations/
 **/schema/generated/
+# 固定依赖准备的第三方小程序资源，不格式化上游源码。
+**/miniprogram/src/native/tdesign/

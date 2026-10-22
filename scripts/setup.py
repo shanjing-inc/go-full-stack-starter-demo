@@ -14,7 +14,7 @@ import urllib.request
 import zipfile
 from runtime_cleanup import exclusive_lock
 from toolchain import artifact, host_target, load_lock, probe_go, validate_go, cli
-from starter_context import ROOT, TOOL_ROOT, MODULES
+from starter_context import ROOT, TOOL_ROOT, MODULES, APPLICATION_ONLY, kit_environment
 
 
 def sha256(path):
@@ -143,13 +143,16 @@ def main():
         env.update(GOPROXY="off", GOSUMDB="off")
     else:
         env["GOPROXY"] = env.get("GOPROXY", "https://goproxy.cn")
+    env = kit_environment(env, workspace=not APPLICATION_ONLY, announce=True)
     for module in [*MODULES, TOOL_ROOT / "tools"]:
-        subprocess.run(
-            [str(go), "mod", "download"], cwd=module, env=dict(env, GOWORK="off"), check=True
-        )
-        subprocess.run(
-            [str(go), "mod", "verify"], cwd=module, env=dict(env, GOWORK="off"), check=True
-        )
+        module_env = dict(env, GOWORK="off") if module == TOOL_ROOT / "tools" else env
+        if module_env["GOWORK"] != "off":
+            # mod download/verify 按单模块 require 读取，会下载被 workspace 遮蔽的旧 kit。
+            # 源码模式先准备实际选中的依赖图，构建时由 Go 校验并下载所需包。
+            subprocess.run([str(go), "list", "-m", "all"], cwd=module, env=module_env, check=True)
+            continue
+        subprocess.run([str(go), "mod", "download"], cwd=module, env=module_env, check=True)
+        subprocess.run([str(go), "mod", "verify"], cwd=module, env=module_env, check=True)
     subprocess.run(
         [
             str(go),

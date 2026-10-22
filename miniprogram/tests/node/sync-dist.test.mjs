@@ -7,10 +7,13 @@ import {
     existsSync,
     rmSync,
     symlinkSync,
+    statSync,
+    utimesSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
+import { build } from "vite";
 import {
     createWindowsDistSync,
     validateDestination,
@@ -64,6 +67,77 @@ test("镜像同步保留私有配置，完整及增量同步删除旧文件，�
         "私有配置",
     );
     assert.equal(existsSync(join(destination, "old.js")), false);
+});
+
+test("增量同步不触碰内容未变的配置，仍发布页面内容与路由变更", (t) => {
+    const { source, destination } = fixture(t);
+    const config = JSON.stringify({ pages: ["pages/dev/components/index"] });
+    writeFileSync(join(source, "app.json"), config);
+    writeFileSync(join(source, "app.js"), "第一版");
+    syncDist(source, destination);
+    const before = statSync(join(destination, "app.json")).mtimeMs;
+    // Taro 每轮重新输出配置；字节不变，源文件时间仍会变化。
+    const rebuiltAt = new Date("2030-01-01T00:00:00Z");
+    utimesSync(join(source, "app.json"), rebuiltAt, rebuiltAt);
+    writeFileSync(join(source, "app.js"), "第二版");
+    syncDist(source, destination);
+    assert.equal(statSync(join(destination, "app.json")).mtimeMs, before);
+    assert.equal(readFileSync(join(destination, "app.js"), "utf8"), "第二版");
+    const nextConfig = JSON.stringify({ pages: ["pages/dev/components/index", "pages/new/index"] });
+    writeFileSync(join(source, "app.json"), nextConfig);
+    syncDist(source, destination);
+    assert.equal(readFileSync(join(destination, "app.json"), "utf8"), nextConfig);
+});
+
+test("同步钩子等待其他异步产物处理完成后再发布", async (t) => {
+    const { root, source, destination } = fixture(t);
+    const plugin = createWindowsDistSync({
+        root,
+        env: { TARO_APP_WINDOWS_DIST: "/mnt/c/weapp-sync-hook-test/dist" },
+    });
+    await build({
+        configFile: false,
+        root,
+        logLevel: "silent",
+        plugins: [
+            {
+                name: "async-output-producer",
+                generateBundle() {
+                    this.emitFile({ type: "asset", fileName: "app.json", source: "初始产物" });
+                },
+                async writeBundle() {
+                    await new Promise((resolve) => setTimeout(resolve, 20));
+                    writeFileSync(join(source, "app.json"), "最终产物");
+                },
+            },
+            {
+                ...plugin,
+                // 保留实际钩子的调度属性，只将同步目的地换成临时目录。
+                writeBundle: {
+                    ...plugin.writeBundle,
+                    handler() {
+                        syncDist(source, destination);
+                    },
+                },
+            },
+        ],
+        build: {
+            outDir: source,
+            emptyOutDir: true,
+            rollupOptions: {
+                input: "virtual:entry",
+                plugins: [
+                    {
+                        name: "test-entry",
+                        resolveId: (id) => (id === "virtual:entry" ? id : undefined),
+                        load: (id) =>
+                            id === "virtual:entry" ? "export const revision = 1;" : undefined,
+                    },
+                ],
+            },
+        },
+    });
+    assert.equal(readFileSync(join(destination, "app.json"), "utf8"), "最终产物");
 });
 
 test("已有外来产物、源目录重叠和符号链接目标受到保护", (t) => {

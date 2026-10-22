@@ -20,7 +20,7 @@ Vite、Codegen 和请求回归由 `frontend/package.json` 的 `test` 执行；�
 - 登录、初始化与完整后台同步加载。`app.tsx` 静态导入 `dashboard-layout.tsx` 的默认导出，组合会话 Provider、布局和全部后台业务；用户页直接复用公共 `UserList`，队列路由静态组合。
 - 登录、后台路由与后台内部切页复用同一静态依赖闭包，导航新增 JS 请求为零；登录回跳、权限与旧队列深链沿用现有行为。运行时渲染异常由 `main.tsx` 的 Sentry ErrorBoundary 提供兜底。
 - `lib/request.ts` 维护请求错误订阅，`observability.ts` 直接订阅。认证及业务统一通过 Apollo 请求后台 GraphQL。
-- `vite.config.js` 使用 Vite 8 默认自动分包，保留 admin 与 public 两个独立入口；后台模块静态导入。`build.chunkSizeWarningLimit: 1000` 为 minify 后、gzip 前的单文件告警阈值。
+- `vite.config.js` 使用 Vite 8.3.4 默认自动分包，保留 admin 与 public 两个独立入口；后台模块静态导入。`build.chunkSizeWarningLimit: 1000` 为 minify 后、gzip 前的单文件告警阈值。
 - JS 请求按入口静态依赖闭包去重计数，CSS/字体另计。登录和后台各最多 2 个 JS、闭包总量 1,000,000 字节；全部构建 JS 最多 3 个，每个 minify JS 最多 1,000,000 字节。
 - Zod 等跨入口共享依赖由自动分包处理；公开页闭包保持后台框架、GraphQL、监控与应用模块隔离，最多 2 个 JS、总量 120,000 字节。静态 chunk 图保持无环，manifest 资源引用全部可解析。
 - `tests/node/vite.config.test.mjs` 使用 `write: false` 真实构建，覆盖源码与安装包导出模式、静态后台闭包、零异步入口、体积及资源完整性。`tests/chunk-loading.spec.ts` 通过 `TEST_PRODUCTION_CHUNKS=1` 验证生产产物登录跳转、匿名回跳、后台切页零新增 JS；预览服务器设置 `preview.proxy: {}`。
@@ -45,7 +45,7 @@ Vite、Codegen 和请求回归由 `frontend/package.json` 的 `test` 执行；�
 - `rtk pnpm codegen` 更新产物；`rtk pnpm codegen:check` 在内存重新生成并逐字比较，检查过程只读，支持未提交变更和无 Git 的独立应用。
 - 前端 `build`、`typecheck` 先执行同步检查；主仓 `rtk pnpm multi-database-demo:generate` 在 Go 与 SQL 生成后更新前端类型。独立应用可直接使用自己的 `rtk pnpm codegen`；全生成链路随应用 scripts 源码交付。
 - 前端 `test` 同时验证 Vite、生成/只读检查、运行时操作完整性及请求行为；类型契约用 `tests/types/graphql/admin/type-contract.test.ts` 的编译错误断言校验；用户对象与 ID 字段的空值契约分别断言，ID 通过 `NonNullable` 用户直接访问，避免可选链引入的 `undefined` 掩盖字段类型漂移。
-- Docker 前端构建阶段复制应用 SDL；生成与检查只依赖源码和 npm 工具链。
+- Docker 前端构建阶段复制根依赖元数据、应用根 `patches/`、`frontend/` 和含 SDL 的 `share/`；pnpm 安装会读取全局补丁，仅执行 Web 构建，小程序源码和构建不参与该阶段。生成与检查只依赖源码和 npm 工具链。
 
 ## GraphQL 查询请求合并
 
@@ -58,7 +58,9 @@ Vite、Codegen 和请求回归由 `frontend/package.json` 的 `test` 执行；�
 
 ## 前端工具与监控契约
 
-- ESLint 使用 flat config、typescript-eslint recommended、Hooks 的 rules-of-hooks/exhaustive-deps 和 jsx-a11y recommended，零 warning 门禁。Input/Button/SelectTrigger 等组件映射到原生元素；角色选择使用自身 aria-label 与普通容器。no-explicit-any 保留现有显式泛型/动态边界，类型正确性由严格 TypeScript 与 Codegen 负责。
+- Web 的 Tailwind 与 @tailwindcss/vite 固定 4.3.3，小程序 Tailwind 使用同一版本；Prettier 全工作区统一 3.9.10。
+- ESLint 10.13.0 配合 typescript-eslint 8.72.0，使用 flat config、typescript-eslint recommended、Hooks 的 rules-of-hooks/exhaustive-deps 和 jsx-a11y recommended，零 warning 门禁。Input/Button/SelectTrigger 等组件映射到原生元素；角色选择使用自身 aria-label 与普通容器。no-explicit-any 保留现有显式泛型/动态边界，类型正确性由严格 TypeScript 与 Codegen 负责。
+- 两级 workspace 的 peerDependencyRules.allowedVersions 仅为固定 eslint-plugin-jsx-a11y 6.10.2 允许 ESLint 10；升级插件时重新核对。`tests/node/eslint.test.mjs` 在独立进程中加载应用与公共 Dashboard 的真实配置，验证合法 JSX 通过、图片说明／标签关联及条件 Hook 违规仍被拦截；独立应用缺少公共源码时只验应用配置。
 - `typecheck` 先执行 lint；测试统一位于 frontend/tests。Vitest 仅收集 tests/unit 下的 `*.test.ts/tsx`，tests/types 中的编译契约由 tsc 校验；TypeScript 与 ESLint 同时覆盖 src、unit、types 和 tests/setup.ts。DOM 测试按文件启用 jsdom，setup 加载 jest-dom 并在每例结束 cleanup；Node 回归由 `node --test tests/node/*.test.mjs` 单独执行，Playwright 仅匹配 `tests/**/*.spec.ts`；独立 HMR 验收脚本位于 tests/verify-hmr.mjs，由共享验收工具调用。
 - 店铺创建输入在提交请求前通过 Zod 校验，归整空白并按 Unicode 字符验证 1–255 长度；沿用服务器权威校验及操作生成类型。
 - SPA 监控默认关闭，`VITE_SENTRY_*` 为构建时公开配置；事件使用白名单脱敏，关闭 PII/面包屑/Replay/追踪/会话。请求错误订阅者的异常保持隔离，取消与可预期 ApiError 静默，内部错误与非法响应可采集。React ErrorBoundary 提供中文降级页面，未捕获/可恢复错误由根入口接入。
@@ -99,3 +101,5 @@ Web 使用 React 19，小程序使用 React 18。两级 pnpm workspace 为固定
 - 安装状态、初始化、登录与退出分别使用 `getInstallStatus`、`initializeAdmin`、`signInWithEmail`、`signOut`；操作集中在 `graphql/admin/operations.ts`，结果和变量使用生成类型。初始化成功后显式登录，服务端通过签名 HttpOnly Cookie 建立会话。
 - 认证操作使用 `identity=true` 的独立 HTTP 请求；业务请求继续沿用批量查询、错误事件、取消与权限语义。后台源码中的认证和业务调用统一经过 `/api/graphql/admin`；公开 Bus/Queue 演示页的 REST/SSE/WebSocket 保持各自传输边界。
 - 数量与体积预算集中在 Node 构建测试；浏览器根据 manifest 静态依赖闭包核对实际请求、增量与复用。匿名直接访问后台深链会先加载完整后台闭包进行会话检查，再跳转登录；直接访问登录页加载相同的后台静态闭包。
+
+依赖安全维护：Codegen CLI 与小程序统一为 7.4.6，Vitest 使用 4.1.12；传递依赖补丁由两级 workspace 配置统一维护，原始审计结果与补丁缓解状态分别报告。

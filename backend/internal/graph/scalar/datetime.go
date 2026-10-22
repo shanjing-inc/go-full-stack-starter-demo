@@ -16,7 +16,7 @@ func (d DateTime) MarshalGQL(w io.Writer) {
     fmt.Fprint(w, strconv.Quote(time.Time(d).UTC().Truncate(time.Second).Format(time.RFC3339)))
 }
 
-// UnmarshalGQL 接受携带明确时区的 RFC3339 时间字符串，保留输入的小数秒精度。
+// UnmarshalGQL 接受携带明确时区的 RFC3339 时间字符串，归一为秒级 UTC。
 func (d *DateTime) UnmarshalGQL(v any) error {
     text, ok := v.(string)
     if !ok {
@@ -28,6 +28,6 @@ func (d *DateTime) UnmarshalGQL(v any) error {
         return fmt.Errorf("DateTime 输入需要明确时区")
     }
 
-    *d = DateTime(parsed)
+    *d = DateTime(parsed.UTC().Truncate(time.Second))
     return nil
 }

@@ -5,5 +5,8 @@ module.exports = function registerWeappComponents(ctx) {
     ctx.modifyComponentConfig(({ componentConfig }) => {
         componentConfig.includes.add("button");
         componentConfig.includes.add("input");
+        componentConfig.includes.add("label");
+        componentConfig.includes.add("navigator");
+        componentConfig.includes.add("slot");
     });
 };

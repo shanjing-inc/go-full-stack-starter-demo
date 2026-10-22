@@ -31,6 +31,6 @@
         "test:weapp": "pnpm --filter multi-database-demo-miniprogram test"
     },
     "devDependencies": {
-        "prettier": "3.6.2"
+        "prettier": "3.9.10"
     }
 }

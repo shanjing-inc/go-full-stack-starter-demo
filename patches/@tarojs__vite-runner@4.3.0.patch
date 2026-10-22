@@ -1,0 +1,73 @@
+--- a/dist/mini/emit.js
++++ b/dist/mini/emit.js
+@@ -75,7 +75,7 @@
+                         // 先生成 base 模板：buildPageTemplate 的平台覆写（如微信小程序的 page-meta）
+                         // 依赖 buildTemplate 填充的组件信息，而页面模板先于 base 模板生成
+                         const baseTemplate = template.buildTemplate(component_1.componentConfig);
+-                        viteCompilerContext.pages.forEach(page => {
++                        for (const page of viteCompilerContext.pages) {
+                             const pageConfig = page.config;
+                             if (!page.isNative) {
+                                 const usingComponents = pageConfig.usingComponents = Object.assign({}, pageConfig.usingComponents);
+@@ -88,7 +88,7 @@
+                                     usingComponents[constants_1.baseCompName] = importBaseCompPath;
+                                 }
+                                 const importBaseTemplatePath = (0, helper_1.promoteRelativePath)(node_path_1.default.relative(page.scriptPath, node_path_1.default.join(sourceDir, viteCompilerContext.getTemplatePath(constants_1.baseTemplateName))));
+-                                generateTemplateFile(this, viteCompilerContext, {
++                                yield generateTemplateFile(this, viteCompilerContext, {
+                                     filePath: page.scriptPath,
+                                     content: template.buildPageTemplate(importBaseTemplatePath, { content: pageConfig, path: page.name })
+                                 });
+@@ -97,7 +97,7 @@
+                                 filePath: page.name,
+                                 config: pageConfig
+                             });
+-                        });
++                        }
+                         // emit native components' json
+                         for (const comp of viteCompilerContext.nativeComponents.values()) {
+                             if (comp.isPackage)
+@@ -108,7 +108,7 @@
+                             });
+                         }
+                         // emit: base.xml（内容已在生成页面模板前计算，供 buildPageTemplate 覆写读取组件信息）
+-                        generateTemplateFile(this, viteCompilerContext, {
++                        yield generateTemplateFile(this, viteCompilerContext, {
+                             filePath: constants_1.baseTemplateName,
+                             content: baseTemplate
+                         });
+@@ -136,7 +136,7 @@
+                                 filePath: constants_1.baseCompName,
+                                 config: baseCompConfig
+                             });
+-                            generateTemplateFile(this, viteCompilerContext, {
++                            yield generateTemplateFile(this, viteCompilerContext, {
+                                 filePath: constants_1.baseCompName,
+                                 content: template.buildBaseComponentTemplate(viteCompilerContext.fileType.templ)
+                             });
+@@ -166,7 +166,7 @@
+                                     }
+                                 }
+                             });
+-                            generateTemplateFile(this, viteCompilerContext, {
++                            yield generateTemplateFile(this, viteCompilerContext, {
+                                 filePath: constants_1.customWrapperName,
+                                 content: template.buildCustomComponentTemplate(viteCompilerContext.fileType.templ)
+                             });
+@@ -236,13 +236,13 @@
+         source
+     });
+ }
+-function generateTemplateFile(ctx, viteCompilerContext, options) {
++async function generateTemplateFile(ctx, viteCompilerContext, options) {
+     var _a;
+     let source = options.content;
+     const fileName = viteCompilerContext.getTemplatePath((0, utils_1.getComponentName)(viteCompilerContext, options.filePath));
+     if ((_a = viteCompilerContext.taroConfig.minifyXML) === null || _a === void 0 ? void 0 : _a.collapseWhitespace) {
+-        const minify = require('html-minifier').minify;
+-        source = minify(source, {
++        const minify = require('html-minifier-terser').minify;
++        source = await minify(source, {
+             collapseWhitespace: true,
+             keepClosingSlash: true
+         });

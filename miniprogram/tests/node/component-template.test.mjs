@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -10,7 +10,7 @@ import ts from "typescript";
 const root = fileURLToPath(new URL("../../", import.meta.url));
 const require = createRequire(path.join(root, "config/index.ts"));
 
-test("Taro 模板配置覆盖 batch-test 实际使用的微信原生组件", async () => {
+test("Taro 模板配置覆盖页面与组合组件实际使用的微信原生组件", async () => {
     const source = await readFile(path.join(root, "config/index.ts"), "utf8");
     const code = ts.transpileModule(source, {
         compilerOptions: {
@@ -37,7 +37,7 @@ test("Taro 模板配置覆盖 batch-test 实际使用的微信原生组件", asy
         { env: {} },
     );
     const config = module.exports.default;
-    const components = { includes: new Set(["view", "text"]) };
+    const components = { includes: new Set(["view", "text"]), thirdPartyComponents: new Map() };
     // Taro CLI 会覆盖根配置的同名回调，组件 hook 必须通过 plugins 注册。
     assert.ok(config.plugins?.length, "需要注册 Taro 组件模板插件");
     const callbacks = [];
@@ -46,27 +46,46 @@ test("Taro 模板配置覆盖 batch-test 实际使用的微信原生组件", asy
         const plugin = require(entry);
         (plugin.default ?? plugin)({
             modifyComponentConfig: (callback) => callbacks.push(callback),
+            modifyViteConfig: () => {},
         });
     }
     for (const callback of callbacks) callback({ componentConfig: components });
-    const page = ts.createSourceFile(
-        "index.tsx",
-        await readFile(path.join(root, "src/pages/dev/batch-test/index.tsx"), "utf8"),
-        ts.ScriptTarget.Latest,
-        true,
-        ts.ScriptKind.TSX,
-    );
-    const imports = page.statements.find(
-        (node) =>
-            ts.isImportDeclaration(node) && node.moduleSpecifier.text === "@tarojs/components",
-    ).importClause.namedBindings.elements;
-    for (const node of imports) {
-        const name = (node.propertyName ?? node.name).text.toLowerCase();
-        assert.ok(components.includes.has(name), `原生组件 ${name} 需要对应 WXML 模板`);
+    async function inspect(directory) {
+        for (const entry of await readdir(directory, { withFileTypes: true })) {
+            const file = path.join(directory, entry.name);
+            if (entry.isDirectory()) {
+                await inspect(file);
+                continue;
+            }
+            if (!file.endsWith(".tsx")) continue;
+            const source = ts.createSourceFile(
+                file,
+                await readFile(file, "utf8"),
+                ts.ScriptTarget.Latest,
+                true,
+                ts.ScriptKind.TSX,
+            );
+            for (const statement of source.statements) {
+                if (
+                    !ts.isImportDeclaration(statement) ||
+                    statement.moduleSpecifier.text !== "@tarojs/components"
+                )
+                    continue;
+                for (const node of statement.importClause.namedBindings.elements) {
+                    if (node.isTypeOnly || statement.importClause.isTypeOnly) continue;
+                    const name = (node.propertyName ?? node.name).text.toLowerCase();
+                    assert.ok(
+                        components.includes.has(name),
+                        `原生组件 ${name} 需要对应 WXML 模板：${file}`,
+                    );
+                }
+            }
+        }
     }
+    await inspect(path.join(root, "src"));
 });
 
-test("完整与增量模板生成均保留按钮和输入框", () => {
+test("完整与增量模板生成均保留按钮、输入框、标签和导航", () => {
     const register = require(path.join(root, "config/plugins/weapp-components.cjs"));
     const callbacks = [];
     register({ modifyComponentConfig: (callback) => callbacks.push(callback) });
@@ -84,5 +103,7 @@ test("完整与增量模板生成均保留按钮和输入框", () => {
         const wxml = template.buildTemplate(components);
         assert.match(wxml, /<button\s/u);
         assert.match(wxml, /<input\s/u);
+        assert.match(wxml, /<label\s/u);
+        assert.match(wxml, /<navigator\s/u);
     }
 });

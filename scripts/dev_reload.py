@@ -9,7 +9,7 @@ import shutil
 import subprocess
 import time
 import host_platform as host
-from starter_context import workspace_modules
+from starter_context import workspace_modules, write_workspace
 
 
 def runtime_base(root):
@@ -79,15 +79,30 @@ def stop_process(process, timeout=10):
     return forced
 
 
-def source_modules(root, module):
+def source_modules(root, module, env=None):
     """源码快照与内容指纹共享 go.work 的正式模块清单。"""
+    if env and env.get("STARTER_KIT_SOURCE"):
+        return [module, Path(env["STARTER_KIT_SOURCE"]).resolve()]
+    if env and env.get("STARTER_KIT_MODE") == "installed":
+        return [module]
     return list(dict.fromkeys([*workspace_modules(root), module]))
 
 
-def source_fingerprint(root, module, embedded=None):
+def snapshot_path(root, path, modules):
+    if path.is_relative_to(root):
+        return path.relative_to(root)
+    for index, directory in enumerate(modules):
+        if path.is_relative_to(directory):
+            return Path("_external") / str(index) / path.relative_to(directory)
+    raise RuntimeError("快照路径不属于已选模块")
+
+
+def source_fingerprint(root, module, embedded=None, env=None):
     """内容摘要覆盖 module/workspace、Go 源码、SSR 模板与内嵌资源，保存时间保持独立。"""
-    files = {root / "go.work", root / "go.work.sum"}
-    for directory in source_modules(root, module):
+    explicit = env and (env.get("STARTER_KIT_SOURCE") or env.get("STARTER_KIT_MODE") == "installed")
+    files = set() if explicit else {root / "go.work", root / "go.work.sum"}
+    modules = source_modules(root, module, env)
+    for directory in modules:
         files.update(directory.glob("go.*"))
         for current, directories, names in os.walk(directory):
             directories[:] = [
@@ -120,7 +135,7 @@ def source_fingerprint(root, module, embedded=None):
                     or path.is_relative_to(module / "internal/web/dist")
                 ):
                     files.add(path)
-    entries = {str(path.relative_to(root)): path for path in files}
+    entries = {str(snapshot_path(root, path, modules)): path for path in files}
     if embedded is not None:
         entries.update(
             {
@@ -230,11 +245,17 @@ class ReloadSupervisor:
         source = self.folder / "source"
         source.mkdir()
         try:
-            for name in ("go.work", "go.work.sum"):
-                if (self.root / name).exists():
-                    shutil.copy2(self.root / name, source / name)
-            for original in source_modules(self.root, self.module):
-                destination = source / original.relative_to(self.root)
+            modules = source_modules(self.root, self.module, self.env)
+            explicit = (
+                self.env.get("STARTER_KIT_SOURCE")
+                or self.env.get("STARTER_KIT_MODE") == "installed"
+            )
+            if not explicit:
+                for name in ("go.work", "go.work.sum"):
+                    if (self.root / name).exists():
+                        shutil.copy2(self.root / name, source / name)
+            for original in modules:
+                destination = source / snapshot_path(self.root, original, modules)
                 shutil.copytree(
                     original,
                     destination,
@@ -252,6 +273,13 @@ class ReloadSupervisor:
                     ),
                 )
             self.build_module = source / self.module.relative_to(self.root)
+            self.snapshot_env = dict(self.env)
+            if self.env.get("STARTER_KIT_SOURCE"):
+                snapshot_modules = [
+                    source / snapshot_path(self.root, path, modules) for path in modules
+                ]
+                write_workspace(source / "go.work", snapshot_modules)
+                self.snapshot_env["STARTER_KIT_SOURCE"] = str(snapshot_modules[1])
             embedded = self.build_module / "internal/web/dist"
             if (self.runtime / "frontend-dist").exists():
                 shutil.rmtree(embedded, ignore_errors=True)
@@ -262,13 +290,16 @@ class ReloadSupervisor:
                 detail.startswith("[Errno 2]") for _, _, detail in error.args[0]
             ):
                 raise
-            if any(not directory.is_dir() for directory in source_modules(self.root, self.module)):
+            if any(
+                not directory.is_dir()
+                for directory in source_modules(self.root, self.module, self.env)
+            ):
                 raise
             self.attempted = None
             self.publish("superseded", error="复制期间源码变化，重新准备输入快照")
             return
         # 源码复制期间继续发生编辑时，验证快照内容后再开始编译。
-        if source_fingerprint(source, self.build_module) != fingerprint:
+        if source_fingerprint(source, self.build_module, env=self.snapshot_env) != fingerprint:
             self.attempted = None
             self.publish("superseded")
             return
@@ -330,7 +361,7 @@ class ReloadSupervisor:
 
     def tick(self):
         now = time.monotonic()
-        fingerprint = source_fingerprint(self.root, self.module, self.embedded)
+        fingerprint = source_fingerprint(self.root, self.module, self.embedded, self.env)
         if fingerprint != self.observed:
             self.observed, self.changed_at = fingerprint, now
         for role, process in self.roles.items():

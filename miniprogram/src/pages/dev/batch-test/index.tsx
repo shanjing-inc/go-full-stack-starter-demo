@@ -1,6 +1,13 @@
+import { Title, Text } from "../../../components/ui/typography";
 import { useRef, useState } from "react";
-import { Button, Input, Text, View } from "@tarojs/components";
+import { View } from "@tarojs/components";
 import { useUnload } from "@tarojs/taro";
+import { Button } from "../../../components/ui/button";
+import { Input } from "../../../components/ui/input";
+import { Card } from "../../../components/ui/card";
+import { Tag } from "../../../components/ui/tag";
+import { EmptyState } from "../../../components/ui/empty-state";
+import { ThemePage } from "../../../components/theme/theme-page";
 import { GRAPHQL_ENDPOINT } from "../../../config/endpoint";
 import { getAuthToken, signIn, signOut } from "../../../auth/session";
 import {
@@ -22,6 +29,7 @@ export default function BatchTestPage() {
     const [signedIn, setSignedIn] = useState(getAuthToken() !== "");
     const [authenticating, setAuthenticating] = useState(false);
     const [authMessage, setAuthMessage] = useState("");
+    const [authFailed, setAuthFailed] = useState(false);
     const active = useRef(true);
     const busy = useRef(false);
     useUnload(() => {
@@ -32,6 +40,7 @@ export default function BatchTestPage() {
         busy.current = true;
         setAuthenticating(true);
         setAuthMessage("");
+        setAuthFailed(false);
         try {
             if (signingOut) await signOut();
             else await signIn(email, password);
@@ -47,6 +56,7 @@ export default function BatchTestPage() {
             if (active.current) {
                 setSignedIn(getAuthToken() !== "");
                 setAuthMessage(errorMessage(cause));
+                setAuthFailed(true);
             }
         } finally {
             busy.current = false;
@@ -69,7 +79,10 @@ export default function BatchTestPage() {
                 setRows(result);
                 const hasSession = getAuthToken() !== "";
                 setSignedIn(hasSession);
-                if (GRAPHQL_ENDPOINT && !hasSession) setAuthMessage("登录已失效，请重新登录后重试");
+                if (GRAPHQL_ENDPOINT && !hasSession) {
+                    setAuthMessage("登录已失效，请重新登录后重试");
+                    setAuthFailed(true);
+                }
                 const failed = result.filter((row) => row.error).length;
                 setSummary(
                     `${batch ? `${BATCH_SIZE} 个并发操作` : "单个操作"} 总耗时 ${Date.now() - startedAt}ms` +
@@ -87,30 +100,32 @@ export default function BatchTestPage() {
         }
     }
     return (
-        <View className="min-h-screen px-6 py-8">
-            <Text className="block text-3xl font-semibold">批量请求测试</Text>
-            <Text className="mt-2 block text-sm text-gray-600">
+        <ThemePage>
+            <Title>批量请求测试</Title>
+            <Text className="mt-2 block" size="caption" theme="secondary">
                 验证 BatchHttpLink 与 Member 端点批量协议（10ms 窗口合并）
             </Text>
-            <Text className="mt-4 block break-all text-sm text-gray-600">
+            <Text className="mt-4 block break-all" size="caption" theme="secondary">
                 端点：{GRAPHQL_ENDPOINT || "待配置"}
             </Text>
-            <View className="mt-6 rounded-xl bg-white p-5 shadow-sm">
-                <Text className="block text-base font-medium">登录（Member 端点需登录态）</Text>
-                <Text className="mt-2 block text-sm text-gray-600">
+            <Card className="mt-6" title="账号登录" description="Member 端点需登录态，* 表示必填。">
+                <Tag variant={signedIn ? "success" : "neutral"}>
                     {signedIn ? "已登录" : "未登录"}
-                </Text>
+                </Tag>
                 {!signedIn && (
-                    <View>
+                    <View className="mt-4">
                         <Input
-                            className="mt-3 h-12 rounded-lg bg-gray-50 px-4 text-base"
+                            id="login-email"
+                            label="邮箱 *"
                             placeholder="邮箱"
                             value={email}
                             disabled={loading || authenticating}
                             onInput={(event) => setEmail(event.detail.value)}
                         />
                         <Input
-                            className="mt-3 h-12 rounded-lg bg-gray-50 px-4 text-base"
+                            id="login-password"
+                            label="密码 *"
+                            borderless
                             placeholder="密码"
                             password
                             value={password}
@@ -119,64 +134,94 @@ export default function BatchTestPage() {
                         />
                     </View>
                 )}
-                <Button
-                    className="weapp-action-button mt-4 rounded-xl bg-action text-base text-white"
-                    disabled={loading || authenticating}
-                    onClick={() => void authenticate(signedIn)}
-                >
-                    {authenticating
-                        ? signedIn
-                            ? "退出中…"
-                            : "登录中…"
-                        : signedIn
-                          ? "退出登录"
-                          : "登录"}
-                </Button>
+                <View className="mt-4">
+                    <Button
+                        fullWidth
+                        variant={signedIn ? "ghost" : "default"}
+                        disabled={loading || authenticating}
+                        loading={authenticating}
+                        onClick={() => void authenticate(signedIn)}
+                    >
+                        {authenticating
+                            ? signedIn
+                                ? "退出中…"
+                                : "登录中…"
+                            : signedIn
+                              ? "退出登录"
+                              : "登录"}
+                    </Button>
+                </View>
                 {authMessage && (
-                    <Text className="mt-3 block text-sm text-gray-600">{authMessage}</Text>
+                    <View className="mt-3">
+                        {authFailed ? (
+                            <Text className="block" size="caption" theme="error">
+                                {authMessage}
+                            </Text>
+                        ) : (
+                            <Tag variant="success">{authMessage}</Tag>
+                        )}
+                    </View>
                 )}
-            </View>
-            <View className="mt-6 rounded-xl bg-white p-5 shadow-sm">
-                <Text className="block text-base font-medium">店铺查询</Text>
+            </Card>
+            <Card className="mt-6" title="店铺查询">
                 <Input
-                    className="mt-3 h-12 rounded-lg bg-gray-50 px-4 text-base"
-                    placeholder="店铺 ID 或 slug"
+                    id="shop-query"
+                    label="店铺 ID 或 slug *"
+                    borderless
+                    layout="vertical"
+                    customStyle="--td-input-label-max-width: 100%;"
+                    tips={error}
+                    invalid={!!error}
+                    placeholder="可输入数字 ID 或店铺标识"
                     value={value}
                     disabled={loading || authenticating}
                     onInput={(event) => setValue(event.detail.value)}
                 />
-                <Button
-                    className="weapp-action-button mt-4 rounded-xl bg-action text-base text-white"
-                    disabled={loading || authenticating}
-                    onClick={() => void run(false)}
-                >
-                    发送单次请求
-                </Button>
-                <Button
-                    className="weapp-action-button mt-3 rounded-xl bg-action text-base text-white"
-                    disabled={loading || authenticating}
-                    onClick={() => void run(true)}
-                >
-                    发送 {BATCH_SIZE} 条并发请求
-                </Button>
-                <Text className="mt-4 block text-sm text-gray-600">{summary}</Text>
-                {error && <Text className="mt-3 block text-sm text-red-700">{error}</Text>}
-            </View>
-            {rows.map((row) => (
-                <View key={row.index} className="mt-4 rounded-xl bg-white p-5 shadow-sm">
-                    <Text className="block text-base font-semibold">
-                        请求 {row.index} · {row.durationMs} ms
-                    </Text>
-                    <Text
-                        className={`mt-2 block text-base ${row.error ? "text-red-700" : "text-primary"}`}
+                <View className="mt-4 flex flex-col gap-3">
+                    <Button
+                        fullWidth
+                        disabled={loading || authenticating}
+                        onClick={() => void run(false)}
                     >
-                        {row.error ??
-                            (row.shop
-                                ? `成功：${row.shop.name ?? row.shop.id}`
-                                : "成功：暂无匹配店铺")}
-                    </Text>
+                        发送单次请求
+                    </Button>
+                    <Button
+                        fullWidth
+                        variant="outline"
+                        disabled={loading || authenticating}
+                        onClick={() => void run(true)}
+                    >
+                        发送 {BATCH_SIZE} 条并发请求
+                    </Button>
                 </View>
+                <Text className="mt-4 block" size="caption" theme="secondary">
+                    {summary}
+                </Text>
+                {loading && (
+                    <Tag className="mt-3" variant="brand">
+                        请求中…
+                    </Tag>
+                )}
+                {!rows.length && !error && !loading && (
+                    <EmptyState title="等待查询" description="输入店铺信息，结果将在下方展示" />
+                )}
+            </Card>
+            {rows.map((row) => (
+                <Card key={row.index} className="mt-4">
+                    <Title level="h5">
+                        请求 {row.index} · {row.durationMs} ms
+                    </Title>
+                    <View className="mt-2">
+                        {!row.error && row.shop ? (
+                            <Tag variant="success">成功：{row.shop.name ?? row.shop.id}</Tag>
+                        ) : (
+                            <Text className="block" theme={row.error ? "error" : "secondary"}>
+                                {row.error ?? "暂无匹配店铺"}
+                            </Text>
+                        )}
+                    </View>
+                </Card>
             ))}
-        </View>
+        </ThemePage>
     );
 }

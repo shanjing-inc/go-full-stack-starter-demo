@@ -1,39 +1,39 @@
 {
     "go": {
-        "version": "go1.26.8",
-        "url": "https://go.dev/dl/go1.26.8.linux-amd64.tar.gz",
-        "sha256": "d0f743b33e8d8945e6b1f432edd15785c70507121d6e2a723b21285eddf8b57b",
+        "version": "go1.26.10",
+        "url": "https://go.dev/dl/go1.26.10.linux-amd64.tar.gz",
+        "sha256": "ccfe7ae822d2c2f41f4fe7c956199967a4dac22d0ee0d2b2bfdb440aab3b20c5",
         "platforms": {
             "linux-amd64": {
-                "url": "https://go.dev/dl/go1.26.8.linux-amd64.tar.gz",
-                "sha256": "d0f743b33e8d8945e6b1f432edd15785c70507121d6e2a723b21285eddf8b57b"
+                "url": "https://go.dev/dl/go1.26.10.linux-amd64.tar.gz",
+                "sha256": "ccfe7ae822d2c2f41f4fe7c956199967a4dac22d0ee0d2b2bfdb440aab3b20c5"
             },
             "darwin-amd64": {
-                "url": "https://go.dev/dl/go1.26.8.darwin-amd64.tar.gz",
-                "sha256": "186be014105aa6542b767d2c6ed5cca10a0214bdff809ef1724022a8c7894150"
+                "url": "https://go.dev/dl/go1.26.10.darwin-amd64.tar.gz",
+                "sha256": "e820ab780c273ae4a340b79d0f3c4313b74ee029aa3874792145d44b9f4f91da"
             },
             "darwin-arm64": {
-                "url": "https://go.dev/dl/go1.26.8.darwin-arm64.tar.gz",
-                "sha256": "a012b25b571bd0138a03dcd25375ceba866fe5ca822f426d2c66a4de56fd3f4b"
+                "url": "https://go.dev/dl/go1.26.10.darwin-arm64.tar.gz",
+                "sha256": "0b5183492292ada170f9b561a834863808dd02edba599e4ad0e89899330020b3"
             }
         }
     },
     "atlas": {
-        "version": "v1.3.0",
-        "url": "https://atlasbinaries.com/atlas/atlas-community-linux-amd64-v1.3.0",
-        "sha256": "10d7913e3dce43ab99b8d71534a4cbadaf11a16dc293adf3b91d10e83a0ac70b",
+        "version": "v1.3.1-ed994a7-canary",
+        "url": "https://release.ariga.io/atlas/atlas-community-linux-amd64-v1.3.1-ed994a7-canary",
+        "sha256": "8e493bce9b47ab251145ed8d69d6c34c95a4f1a6339cc22dfa867c9af6593aa2",
         "platforms": {
             "linux-amd64": {
-                "url": "https://atlasbinaries.com/atlas/atlas-community-linux-amd64-v1.3.0",
-                "sha256": "10d7913e3dce43ab99b8d71534a4cbadaf11a16dc293adf3b91d10e83a0ac70b"
+                "url": "https://release.ariga.io/atlas/atlas-community-linux-amd64-v1.3.1-ed994a7-canary",
+                "sha256": "8e493bce9b47ab251145ed8d69d6c34c95a4f1a6339cc22dfa867c9af6593aa2"
             },
             "darwin-amd64": {
-                "url": "https://atlasbinaries.com/atlas/atlas-community-darwin-amd64-v1.3.0",
-                "sha256": "650981a024301775ec964e5134e2d5712b7ef1b25fec4b2ec54bad762b4bdf6f"
+                "url": "https://release.ariga.io/atlas/atlas-community-darwin-amd64-v1.3.1-ed994a7-canary",
+                "sha256": "64894b6d0cb8c44fa33d2a0409132c0551e69b201cf3ae1ee8773bf79d8f43f5"
             },
             "darwin-arm64": {
-                "url": "https://atlasbinaries.com/atlas/atlas-community-darwin-arm64-v1.3.0",
-                "sha256": "4e5ffdc10b2b4fd3a06074aba72848150907d5316cacad7b19bae6c6ae3db991"
+                "url": "https://release.ariga.io/atlas/atlas-community-darwin-arm64-v1.3.1-ed994a7-canary",
+                "sha256": "79708a6e7e4730997c86c246a916cb81aa804aab018517080b48e3d942512199"
             }
         }
     },

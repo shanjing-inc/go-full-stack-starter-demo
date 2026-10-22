@@ -78,7 +78,12 @@ func Export(dialect string) (string, error) {
 
     sql = strings.Join(lines, "\n") + "\n"
     if dialect == "postgres" {
+        sql = strings.ReplaceAll(sql, "timestamptz", "timestamptz(0)")
+        sql = strings.ReplaceAll(sql, "DEFAULT CURRENT_TIMESTAMP", "DEFAULT date_trunc('second', CURRENT_TIMESTAMP)")
         sql = UnicodeCollation + "\n" + sql
+    }
+    if dialect == "sqlite" {
+        sql = strings.ReplaceAll(sql, "DEFAULT CURRENT_TIMESTAMP", "DEFAULT (unixepoch())")
     }
     if dialect == "mysql" {
         return mysqlAttributes(sql)

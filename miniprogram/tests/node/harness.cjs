@@ -19,16 +19,51 @@ function createHarness({ endpoint = "https://test.invalid/api/graphql/member", t
         },
         signOut: { statusCode: 200, data: { data: { signOut: true } } },
     };
-    const slots = [];
+    const componentSlots = new Map();
+    const effectCleanups = new Set();
+    const shown = new Map();
+    const themeListeners = new Set();
+    const contextValues = new Map();
+    state.systemTheme = "light";
+    let componentPath = "root";
+    let slots = [];
     let cursor = 0;
+    let effects = [];
     const hooks = {
-        useState(initial) {
+        createContext: require("react").createContext,
+        useContext(context) {
+            return contextValues.has(context) ? contextValues.get(context) : context._currentValue;
+        },
+        useMemo(factory, dependencies) {
             const index = cursor++;
-            if (!(index in slots)) slots[index] = initial;
+            const previous = slots[index];
+            if (
+                !previous ||
+                !dependencies.every((value, i) => Object.is(value, previous.dependencies[i]))
+            ) {
+                slots[index] = { value: factory(), dependencies };
+            }
+            return slots[index].value;
+        },
+        useCallback(callback, dependencies) {
+            const index = cursor++;
+            const previous = slots[index];
+            if (
+                !previous ||
+                !dependencies.every((value, i) => Object.is(value, previous.dependencies[i]))
+            )
+                slots[index] = { callback, dependencies };
+            return slots[index].callback;
+        },
+        useState(initial) {
+            const localSlots = slots;
+            const index = cursor++;
+            if (!(index in localSlots))
+                localSlots[index] = typeof initial === "function" ? initial() : initial;
             return [
-                slots[index],
+                localSlots[index],
                 (next) => {
-                    slots[index] = next;
+                    localSlots[index] = typeof next === "function" ? next(localSlots[index]) : next;
                 },
             ];
         },
@@ -37,10 +72,48 @@ function createHarness({ endpoint = "https://test.invalid/api/graphql/member", t
             if (!(index in slots)) slots[index] = { current: initial };
             return slots[index];
         },
+        useEffect(callback, dependencies) {
+            const localSlots = slots;
+            const index = cursor++;
+            const previous = localSlots[index];
+            if (
+                previous &&
+                dependencies?.every((value, i) => Object.is(value, previous.dependencies?.[i]))
+            )
+                return;
+            effects.push(() => {
+                previous?.cleanup?.();
+                if (previous?.cleanup) effectCleanups.delete(previous.cleanup);
+                const cleanup = callback();
+                if (cleanup) effectCleanups.add(cleanup);
+                localSlots[index] = { dependencies, cleanup };
+            });
+        },
+        useSyncExternalStore(subscribe, getSnapshot) {
+            const index = cursor++;
+            if (!(index in slots)) {
+                const cleanup = subscribe(() => {});
+                slots[index] = { cleanup };
+                effectCleanups.add(cleanup);
+            }
+            return getSnapshot();
+        },
     };
     const taro = {
+        getAppBaseInfo: () => ({ theme: state.systemTheme }),
+        onThemeChange: (callback) => themeListeners.add(callback),
+        offThemeChange: (callback) => themeListeners.delete(callback),
         useUnload(callback) {
             state.unloaded.push(callback);
+        },
+        useDidShow(callback) {
+            shown.set(componentPath, callback);
+        },
+        async setNavigationBarColor(options) {
+            (state.navigation ??= []).push(options);
+        },
+        async setBackgroundColor(options) {
+            (state.backgrounds ??= []).push(options);
         },
         getStorageSync(key) {
             if (state.storageReadError) throw new Error("storage read failed");
@@ -144,6 +217,7 @@ function createHarness({ endpoint = "https://test.invalid/api/graphql/member", t
     const context = vm.createContext({
         APP_GRAPHQL_ENDPOINT_BUILD: endpoint,
         defineAppConfig: (config) => config,
+        definePageConfig: (config) => config,
         console,
         Error,
         Promise,
@@ -168,13 +242,22 @@ function createHarness({ endpoint = "https://test.invalid/api/graphql/member", t
             if (id === "@tarojs/taro") return taro;
             if (id === "@tarojs/components")
                 return Object.fromEntries(
-                    ["View", "Text", "Input", "Button", "Navigator"].map((name) => [name, name]),
+                    ["View", "Text", "Input", "Button", "Navigator", "Label", "Slot"].map(
+                        (name) => [name, name],
+                    ),
                 );
             if (id === "react") return hooks;
-            if (id.startsWith("."))
-                return load(
-                    path.resolve(path.dirname(file), id) + (/\.tsx?$/u.test(id) ? "" : ".ts"),
-                );
+            if (id.startsWith(".")) {
+                const target = path.resolve(path.dirname(file), id);
+                const resolved = [
+                    target,
+                    `${target}.ts`,
+                    `${target}.tsx`,
+                    path.join(target, "index.ts"),
+                ].find((candidate) => fs.existsSync(candidate) && fs.statSync(candidate).isFile());
+                if (!resolved) throw new Error(`无法解析 ${id}，来源 ${file}`);
+                return load(resolved);
+            }
             return require(id);
         };
         vm.runInContext(`(function(require,module,exports){${outputText}\n})`, context, {
@@ -183,17 +266,67 @@ function createHarness({ endpoint = "https://test.invalid/api/graphql/member", t
         return module.exports;
     }
     const source = (name) => load(path.resolve(__dirname, "../../src", name));
+    function renderTree(tree, location) {
+        if (Array.isArray(tree))
+            return tree.map((child, index) =>
+                renderTree(child, `${location}/${child?.key ?? index}`),
+            );
+        if (!tree || typeof tree !== "object" || !tree.props) return tree;
+        if (tree.type?.$$typeof === Symbol.for("react.provider")) {
+            const context = tree.type._context;
+            const hadValue = contextValues.has(context);
+            const previous = contextValues.get(context);
+            contextValues.set(context, tree.props.value);
+            try {
+                return renderTree(tree.props.children, `${location}/provider`);
+            } finally {
+                if (hadValue) contextValues.set(context, previous);
+                else contextValues.delete(context);
+            }
+        }
+        if (typeof tree.type === "function") {
+            componentPath = `${location}/${tree.type.name}`;
+            if (!componentSlots.has(componentPath)) componentSlots.set(componentPath, []);
+            slots = componentSlots.get(componentPath);
+            cursor = 0;
+            return renderTree(tree.type(tree.props), componentPath);
+        }
+        return {
+            ...tree,
+            props: {
+                ...tree.props,
+                children: renderTree(tree.props.children, `${location}/children`),
+            },
+        };
+    }
+    function renderComponent(Component, props = {}, location = "component") {
+        effects = [];
+        const tree = renderTree({ type: Component, props }, location);
+        const pending = effects;
+        effects = [];
+        pending.forEach((effect) => effect());
+        return tree;
+    }
     return {
         state,
         source,
         render(name = "pages/dev/batch-test/index.tsx") {
-            cursor = 0;
-            return source(name).default();
+            return renderComponent(source(name).default, {}, name);
+        },
+        renderComponent,
+        changeTheme(theme) {
+            state.systemTheme = theme;
+            themeListeners.forEach((callback) => callback({ theme }));
+        },
+        themeListenerCount: () => themeListeners.size,
+        show() {
+            shown.forEach((callback) => callback());
         },
         unload() {
             state.unloaded.forEach((callback) => callback());
         },
         stop() {
+            effectCleanups.forEach((cleanup) => cleanup());
             modules
                 .get(path.resolve(__dirname, "../../src/graphql/client.ts"))
                 ?.exports.client.stop();
@@ -209,11 +342,13 @@ function elements(tree) {
     ];
 }
 function texts(tree) {
-    return elements(tree)
-        .filter((item) => item.type === "Text")
-        .map((item) =>
-            Array.isArray(item.props.children) ? item.props.children.join("") : item.props.children,
-        )
-        .join("\n");
+    if (tree === null || tree === undefined || typeof tree === "boolean") return "";
+    if (typeof tree === "string" || typeof tree === "number") return String(tree);
+    if (Array.isArray(tree)) return tree.map(texts).join("");
+    // 原生 Typography 的 content 优先于默认插槽。
+    if (["t-title", "t-text", "t-paragraph"].includes(tree.type) && tree.props.content) {
+        return tree.props.content;
+    }
+    return texts(tree.props?.children);
 }
 module.exports = { createHarness, elements, texts };

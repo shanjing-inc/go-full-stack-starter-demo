@@ -14,3 +14,5 @@
 !**/.env.*.example
 bin
 coverage
+# 放在环境示例的保留规则之后，小程序整体不进入构建上下文。
+miniprogram

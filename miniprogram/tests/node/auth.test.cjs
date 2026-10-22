@@ -8,12 +8,12 @@ function fixture(t, options) {
 }
 const input = (h, placeholder, value) =>
     elements(h.render())
-        .find((item) => item.type === "Input" && item.props.placeholder === placeholder)
-        .props.onInput({ detail: { value } });
+        .find((item) => item.type === "t-input" && item.props.placeholder === placeholder)
+        .props.onChange({ detail: { value } });
 const button = (h, label) =>
     elements(h.render()).find(
         (item) =>
-            item.type === "Button" &&
+            item.type === "t-button" &&
             (Array.isArray(item.props.children)
                 ? item.props.children.join("")
                 : item.props.children) === label,
@@ -172,39 +172,43 @@ test("token 按服务端点隔离，异源请求保持无会话，旧 401 保留
 
 test("页面登录与查询互斥、防重复、清空密码，退出后恢复登录表单", async (t) => {
     const h = fixture(t);
-    input(h, "店铺 ID 或 slug", "1");
-    button(h, "发送单次请求").props.onClick();
+    input(h, "可输入数字 ID 或店铺标识", "1");
+    button(h, "发送单次请求").props.onTap();
     await settle();
-    assert.match(texts(h.render()), /请先登录/);
+    const query = elements(h.render()).find(
+        (item) => item.type === "t-input" && item.props.id === "shop-query",
+    );
+    assert.match(query.props.tips, /请先登录/);
+    assert.equal(query.props.status, "error");
     assert.equal(h.state.requests.length, 0);
     input(h, "邮箱", "a@b.test");
     input(h, "密码", "password");
-    const click = button(h, "登录").props.onClick;
+    const click = button(h, "登录").props.onTap;
     click();
     click();
-    button(h, "发送单次请求").props.onClick();
+    button(h, "发送单次请求").props.onTap();
     assert.ok(
         elements(h.render())
-            .filter((item) => item.type === "Button")
+            .filter((item) => item.type === "t-button")
             .every((item) => item.props.disabled),
     );
     await settle();
     assert.equal(h.state.requests.length, 1);
     assert.match(texts(h.render()), /已登录/);
     assert.ok(button(h, "退出登录"));
-    button(h, "发送 5 条并发请求").props.onClick();
-    button(h, "退出登录").props.onClick();
+    button(h, "发送 5 条并发请求").props.onTap();
+    button(h, "退出登录").props.onTap();
     await settle();
     assert.equal(h.state.requests.length, 2);
     assert.equal(h.state.requests[1].header.authorization, "Bearer test-session");
     assert.match(texts(h.render()), /全部成功/);
-    button(h, "退出登录").props.onClick();
+    button(h, "退出登录").props.onTap();
     await settle();
     assert.match(texts(h.render()), /已退出登录/);
     assert.equal(button(h, "登录").props.disabled, false);
     assert.equal(
         elements(h.render()).find(
-            (item) => item.type === "Input" && item.props.placeholder === "密码",
+            (item) => item.type === "t-input" && item.props.placeholder === "密码",
         ).props.value,
         "",
     );
@@ -221,7 +225,7 @@ test("页面失败可重试、过期恢复登录表单、卸载后保持原 UI",
             errors: [{ message: "邮箱或密码错误", extensions: { code: "INVALID_CREDENTIALS" } }],
         },
     };
-    button(h, "登录").props.onClick();
+    button(h, "登录").props.onTap();
     await settle();
     assert.match(texts(h.render()), /邮箱或密码错误/);
     assert.equal(button(h, "登录").props.disabled, false);
@@ -229,18 +233,18 @@ test("页面失败可重试、过期恢复登录表单、卸载后保持原 UI",
         statusCode: 200,
         data: { data: { signInWithEmail: { token: "test-session" } } },
     };
-    button(h, "登录").props.onClick();
+    button(h, "登录").props.onTap();
     await settle();
-    input(h, "店铺 ID 或 slug", "1");
+    input(h, "可输入数字 ID 或店铺标识", "1");
     h.state.status = 401;
-    button(h, "发送 5 条并发请求").props.onClick();
+    button(h, "发送 5 条并发请求").props.onTap();
     await settle();
     assert.ok(button(h, "登录"));
     assert.match(texts(h.render()), /重新登录/);
     const unloaded = fixture(t);
     input(unloaded, "邮箱", "a@b.test");
     input(unloaded, "密码", "password");
-    button(unloaded, "登录").props.onClick();
+    button(unloaded, "登录").props.onTap();
     unloaded.unload();
     await settle();
     assert.doesNotMatch(texts(unloaded.render()), /登录成功/);

@@ -1,25 +1,88 @@
 @import "tailwindcss" source(none);
 @source "./";
+@source not "./native/tdesign";
 
-@theme {
-    --color-primary: #087f5b;
-    --color-action: #2563eb;
+@layer components {
+    .ui-typography-text {
+        display: inline;
+    }
+}
+
+@theme inline {
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-heading: var(--heading);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    --color-success: var(--success);
+    --color-success-foreground: var(--success-foreground);
+    --color-warning: var(--warning);
+    --color-warning-foreground: var(--warning-foreground);
+    --color-destructive: var(--destructive);
+    --color-destructive-foreground: var(--destructive-foreground);
 }
 
 page {
-    background: #f8faf9;
-    color: #162a22;
-    font-size: 32px;
+    font-size: 32rpx;
 }
-.weapp-action-button {
-    display: flex;
-    width: 100%;
-    height: 96rpx;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
+.ui-page {
+    min-height: 100vh;
     box-sizing: border-box;
+    padding: 32rpx var(--page-padding);
+    padding-bottom: calc(32rpx + env(safe-area-inset-bottom));
+    background: var(--background);
+    color: var(--foreground);
+    font-size: var(--font-body);
+    font-weight: 400;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
 }
-.weapp-action-button::after {
-    border: none;
+.ui-card {
+    box-sizing: border-box;
+    padding: var(--card-padding);
+    border: 1rpx solid var(--border);
+    border-radius: var(--radius);
+    background: var(--card);
+    color: var(--card-foreground);
+}
+.ui-card-heading {
+    margin-bottom: 24rpx;
+}
+.ui-button {
+    display: inline-block;
+    max-width: 100%;
+}
+.ui-button--full {
+    display: block;
+    width: 100%;
+}
+.ui-input-shell {
+    width: 100%;
+}
+.ui-input {
+    display: block;
+}
+.ui-tag {
+    display: inline-block;
+    max-width: 100%;
+}
+.ui-swatch {
+    height: 96rpx;
+    border: 1rpx solid var(--border);
+    border-radius: var(--radius);
+}
+
+.ui-popup-content {
+    padding: 64rpx 32rpx calc(32rpx + env(safe-area-inset-bottom));
 }

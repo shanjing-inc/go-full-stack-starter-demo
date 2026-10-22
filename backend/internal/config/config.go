@@ -33,7 +33,7 @@ var value = configbase.Value
 
 // Load 按进程角色读取并校验环境变量；Web 额外要求认证密钥、监听地址与来源规则，开发模式支持本地任意端口。
 func Load(role string) (Config, error) {
-    c := Config{Address: value("WEB_ADDR", "127.0.0.1:8080"), Version: value("DB_VERSION", "202610040001")}
+    c := Config{Address: value("WEB_ADDR", "127.0.0.1:8080"), Version: value("DB_VERSION", "202610210001")}
     c.Monitoring = observability.Config{
         DSN: os.Getenv("SENTRY_DSN"), Environment: value("SENTRY_ENVIRONMENT", os.Getenv("APP_MODE")), Release: os.Getenv("SENTRY_RELEASE"),
     }
@@ -80,8 +80,8 @@ func Load(role string) (Config, error) {
     if err := c.Worker.Validate(); err != nil {
         return c, errors.New("Redis 或 Worker 配置无效")
     }
-    if c.Version < "202610040001" {
-        return c, errors.New("当前应用至少需要数据库版本 202610040001")
+    if c.Version < "202610210001" {
+        return c, errors.New("当前应用至少需要数据库版本 202610210001")
     }
     if !regexp.MustCompile(`^[0-9]{6,14}$`).MatchString(c.Version) {
         return c, errors.New("数据库配置无效")

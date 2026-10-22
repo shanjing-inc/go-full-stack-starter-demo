@@ -1,8 +1,10 @@
 """应用与主仓公共验收的显式路径契约。"""
 
 import json
+import hashlib
 import os
 from pathlib import Path
+import re
 import shlex
 
 
@@ -93,3 +95,129 @@ def frontend_directory(module):
     if module == BACKEND:
         return APP / "frontend"
     return (module.parent if module.name == "backend" else module) / "frontend"
+
+
+KIT_MODULE = "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit"
+
+
+def kit_source(values):
+    """显式路径只在本地生效；安装模式拒绝继承的源码覆盖。"""
+    mode = values.get("STARTER_KIT_MODE", "auto")
+    if mode not in {"auto", "installed"}:
+        raise RuntimeError("STARTER_KIT_MODE 需要 auto 或 installed")
+    selected = values.get("STARTER_KIT_SOURCE")
+    if mode == "installed":
+        if selected:
+            raise RuntimeError("installed 模式不能配置本地 kit 路径")
+        return None
+    config = APP / ".starter.local.json"
+    if selected is None and config.is_file():
+        try:
+            data = json.loads(config.read_text())
+            selected = data.get("kitSource")
+        except (ValueError, AttributeError):
+            raise RuntimeError(f"kit 本地配置无效：{config}") from None
+    if selected is None:
+        return None
+    if not isinstance(selected, str) or not selected.strip():
+        raise RuntimeError("kitSource 需要非空模块路径")
+    path = (APP / Path(selected).expanduser()).resolve()
+    mod = path / "go.mod"
+    if not mod.is_file() or not re.search(
+        r"(?m)^\s*module\s+" + re.escape(KIT_MODULE) + r"\s*$", mod.read_text()
+    ):
+        raise RuntimeError(f"kit 路径缺少正确的 Go module：{path}")
+    return path
+
+
+def write_workspace(path, modules):
+    """按模块声明生成 workspace，不修改正式模块的依赖文件。"""
+    versions = []
+    for module in modules:
+        match = re.search(r"(?m)^go\s+(\d+\.\d+(?:\.\d+)?)", (module / "go.mod").read_text())
+        if match:
+            versions.append(match[1])
+    version = max(versions, key=lambda value: tuple(map(int, value.split("."))))
+    content = (
+        "go "
+        + version
+        + "\n\nuse (\n"
+        + "".join("\t" + json.dumps(str(module), ensure_ascii=False) + "\n" for module in modules)
+        + ")\n"
+    )
+    # 完整依赖图仍读取 require 中被遮蔽版本的 go.mod；仅在本地 workspace 中
+    # 将这些精确版本映射到选定 kit，避免准备依赖时要求其已发布。
+    kit = next(
+        (
+            module
+            for module in modules
+            if re.search(
+                r"(?m)^module\s+" + re.escape(KIT_MODULE) + r"\s*$", (module / "go.mod").read_text()
+            )
+        ),
+        None,
+    )
+    if kit:
+        required = set()
+        for module in modules:
+            required.update(
+                re.findall(
+                    r"(?m)^\s*(?:require\s+)?" + re.escape(KIT_MODULE) + r"\s+(v[^\s]+)",
+                    (module / "go.mod").read_text(),
+                )
+            )
+        for required_version in sorted(required):
+            content += (
+                f"\nreplace {KIT_MODULE} {required_version} => "
+                + json.dumps(str(kit), ensure_ascii=False)
+                + "\n"
+            )
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if not path.is_file() or path.read_text() != content:
+        # 不同进程可以同时准备同一 workspace；原子替换避免读到半个文件。
+        import tempfile
+
+        with tempfile.NamedTemporaryFile(mode="w", dir=path.parent, delete=False) as file:
+            file.write(content)
+        Path(file.name).replace(path)
+
+
+def kit_environment(values, *, workspace=False, announce=False):
+    values = dict(values)
+    workspace = workspace or (
+        not APPLICATION_ONLY and values.get("STARTER_KIT_WORKSPACE") == str(ROOT)
+    )
+    if workspace and values.get("STARTER_KIT_MODE", "auto") == "auto":
+        # 主仓公共验收覆盖 go.work 全部模块；应用联调配置不能缩小此范围。
+        values.pop("STARTER_KIT_SOURCE", None)
+        # 生成、构建及开发子进程会重新加载配置，继承同一根目录的验收范围。
+        values["STARTER_KIT_WORKSPACE"] = str(ROOT)
+        selected = None
+    else:
+        selected = kit_source(values)
+    installed = values.get("STARTER_KIT_MODE") == "installed"
+    work = "off"
+    if selected:
+        modules = [BACKEND, selected]
+        key = hashlib.sha256("\n".join(map(str, modules)).encode()).hexdigest()[:20]
+        path = APP / ".runtime/kit-workspaces" / key / "go.work"
+        write_workspace(path, modules)
+        work = str(path)
+        values["STARTER_KIT_SOURCE"] = str(selected)
+    elif not installed:
+        path = (SOURCE_WORKSPACE or ROOT) / "go.work"
+        if SOURCE_WORKSPACE or (not APPLICATION_ONLY and path.is_file()):
+            work = str(path)
+    values.update(GOWORK=work, DASHBOARD_SOURCE="1" if SOURCE_WORKSPACE and not installed else "0")
+    if selected:
+        flags = [
+            flag for flag in shlex.split(values.get("GOFLAGS", "")) if not flag.startswith("-mod=")
+        ]
+        values["GOFLAGS"] = shlex.join([*flags, "-mod=readonly"])
+    if announce:
+        print(
+            "Go kit 来源："
+            + (str(selected) if selected else work if work != "off" else "锁定安装版本"),
+            flush=True,
+        )
+    return values

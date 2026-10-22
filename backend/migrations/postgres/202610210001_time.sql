@@ -1,0 +1,24 @@
+-- 业务绝对时间统一到秒；不改变原有 timestamptz 的时区语义。
+ALTER TABLE "user" ALTER COLUMN "ban_expires" TYPE timestamptz(0) USING date_trunc('second', "ban_expires");
+ALTER TABLE "user" ALTER COLUMN "created_at" TYPE timestamptz(0) USING date_trunc('second', "created_at");
+ALTER TABLE "user" ALTER COLUMN "updated_at" TYPE timestamptz(0) USING date_trunc('second', "updated_at");
+ALTER TABLE "user" ALTER COLUMN "created_at" SET DEFAULT date_trunc('second', CURRENT_TIMESTAMP);
+ALTER TABLE "user" ALTER COLUMN "updated_at" SET DEFAULT date_trunc('second', CURRENT_TIMESTAMP);
+ALTER TABLE "session" ALTER COLUMN "expires_at" TYPE timestamptz(0) USING date_trunc('second', "expires_at");
+ALTER TABLE "session" ALTER COLUMN "created_at" TYPE timestamptz(0) USING date_trunc('second', "created_at");
+ALTER TABLE "session" ALTER COLUMN "updated_at" TYPE timestamptz(0) USING date_trunc('second', "updated_at");
+ALTER TABLE "session" ALTER COLUMN "created_at" SET DEFAULT date_trunc('second', CURRENT_TIMESTAMP);
+ALTER TABLE "session" ALTER COLUMN "updated_at" SET DEFAULT date_trunc('second', CURRENT_TIMESTAMP);
+ALTER TABLE "account" ALTER COLUMN "access_token_expires_at" TYPE timestamptz(0) USING date_trunc('second', "access_token_expires_at");
+ALTER TABLE "account" ALTER COLUMN "refresh_token_expires_at" TYPE timestamptz(0) USING date_trunc('second', "refresh_token_expires_at");
+ALTER TABLE "account" ALTER COLUMN "created_at" TYPE timestamptz(0) USING date_trunc('second', "created_at");
+ALTER TABLE "account" ALTER COLUMN "updated_at" TYPE timestamptz(0) USING date_trunc('second', "updated_at");
+ALTER TABLE "account" ALTER COLUMN "created_at" SET DEFAULT date_trunc('second', CURRENT_TIMESTAMP);
+ALTER TABLE "account" ALTER COLUMN "updated_at" SET DEFAULT date_trunc('second', CURRENT_TIMESTAMP);
+ALTER TABLE "verification" ALTER COLUMN "expires_at" TYPE timestamptz(0) USING date_trunc('second', "expires_at");
+ALTER TABLE "verification" ALTER COLUMN "created_at" TYPE timestamptz(0) USING date_trunc('second', "created_at");
+ALTER TABLE "verification" ALTER COLUMN "updated_at" TYPE timestamptz(0) USING date_trunc('second', "updated_at");
+ALTER TABLE "verification" ALTER COLUMN "created_at" SET DEFAULT date_trunc('second', CURRENT_TIMESTAMP);
+ALTER TABLE "verification" ALTER COLUMN "updated_at" SET DEFAULT date_trunc('second', CURRENT_TIMESTAMP);
+ALTER TABLE "shop" ALTER COLUMN "created_at" TYPE timestamptz(0) USING date_trunc('second', "created_at");
+ALTER TABLE "shop" ALTER COLUMN "updated_at" TYPE timestamptz(0) USING date_trunc('second', "updated_at");

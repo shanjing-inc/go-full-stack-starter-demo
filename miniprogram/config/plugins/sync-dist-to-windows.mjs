@@ -76,6 +76,8 @@ export function syncDist(source, destination, run = execFileSync) {
             "rsync",
             [
                 "-a",
+                // 重建会触碰未变的 app.json；不向开发者工具传播纯时间变化。
+                "--no-times",
                 "--checksum",
                 "--delete",
                 "--exclude=" + PRIVATE_FILE,
@@ -104,8 +106,12 @@ export function createWindowsDistSync({ root = process.cwd(), env = process.env 
         name: "sync-dist-to-windows",
         apply: "build",
         enforce: "post",
-        writeBundle() {
-            syncDist(path.join(root, "dist"), target);
+        writeBundle: {
+            order: "post",
+            sequential: true,
+            handler() {
+                syncDist(path.join(root, "dist"), target);
+            },
         },
     };
 }

@@ -1,5 +1,6 @@
 .tools/
 .runtime/
+.starter.local.json
 .cache/
 .env
 .env.*

@@ -12,7 +12,7 @@
 
 ## 开发工具来源
 
-应用 package.json 直接调用 scripts/\*.py，生成、开发监管、格式与清理实现随源码交付。应用使用自己的 .tools/.runtime 与 GOWORK=off；固定 Go kit 和 Dashboard 依赖保持 release-dependencies.json 校验。发布验收凭证绑定同一 sourceCommit/sourceTree，独立 demo 同步消费该凭证。
+应用 package.json 直接调用 scripts/\*.py，生成、开发监管、格式与清理实现随源码交付。应用使用自己的 .tools/.runtime 与默认 GOWORK=off；固定 Go kit 和 Dashboard 依赖保持 release-dependencies.json 校验。发布凭证绑定应用提交、kit 原来源和完整交付摘要，独立 demo 同步消费该凭证。
 
 ## 前后端环境配置
 
@@ -40,8 +40,14 @@ app-layout-v2 的后端默认配置为 `backend/.env`，模板为 `backend/.env.
 
 ## 应用命令归属
 
-开发监管源码由本应用 scripts 维护，公共支持脚本与 formatter 在根 scripts、tools/cmd/format-go 单点维护；工作区通过 shared_scripts.py 复用，独立导出展开完整本地源码。package.json 直接组合应用命令，Go kit、Dashboard 继续固定依赖，应用 .tools/.runtime 与 GOWORK=off 保持独立。派生项目直接修改自己的命令与脚本，升级采用定向补丁和代码审查。
+开发监管源码由本应用 scripts 维护，公共支持脚本与 formatter 在根 scripts、tools/cmd/format-go 单点维护；工作区通过 shared_scripts.py 复用，独立导出展开完整本地源码。package.json 直接组合应用命令，Go kit、Dashboard 继续固定依赖，应用 .tools/.runtime 与默认 GOWORK=off 保持独立。派生项目直接修改自己的命令与脚本，升级采用定向补丁和代码审查。
 
-公共支持脚本与 formatter 在主仓单点维护，工作区通过 scripts/shared_scripts.py 复用根实现；独立导出展开完整本地脚本并交付白名单 tools 源码和同目录单测。派生项目直接修改本地实现，命令保持应用自己的 GOWORK=off 与 .tools/.runtime；应用开发监管源码在应用 scripts 自持。
+公共支持脚本与 formatter 在主仓单点维护，工作区通过 scripts/shared_scripts.py 复用根实现；独立导出展开完整本地脚本并交付白名单 tools 源码和同目录单测。派生项目直接修改本地实现，命令保持应用自己的默认 GOWORK=off 与 .tools/.runtime；应用开发监管源码在应用 scripts 自持。
 
 开发重载由 scripts/dev_reload.py 执行，backend 保留 gqlgen 配置；历史 Air 配置已清理。公共工具优先选择应用自带的 tools/go.mod，工作区薄入口显式传递共享来源；完整独立脚本保持本地来源，STARTER_TOOL_ROOT 支持显式覆盖。
+
+## 显式本地 kit 联调与发布验收
+
+本地 STARTER_KIT_SOURCE 优先于应用根 .starter.local.json 的 kitSource；相对路径以应用根解析，必须是正确的 kit Go 模块，无效路径立即失败。setup、dev、generate、schema、check、test、coverage 和 build 共用选择，受控 workspace 与代际外部 kit 快照仅位于 .runtime，不改正式 go.mod/go.sum，也不改变 Dashboard 来源。取消本地配置恢复默认。
+
+正式 CI 设置 STARTER_KIT_MODE=installed、GOWORK=off，忽略本地配置并拒绝显式源码覆盖；必须从候选模块 zip 安装并核对版本、sum/goModSum、缓存目录及无 Replace。一次冻结最终应用后执行 setup/generate/check/test/test:go:coverage/build，生成后交付内容变化即失败。成功凭证与正式 kit 核对均匹配才可发布同一快照；失败续跑复用有效凭证，不再导出或验收。.starter.local.json、外部源码和候选状态不随应用交付。

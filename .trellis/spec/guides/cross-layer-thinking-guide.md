@@ -34,8 +34,8 @@ For each arrow, ask:
 
 ### Step 2: Identify Boundaries
 
-| Boundary               | Common Issues                     |
-| ---------------------- | --------------------------------- |
+| Boundary              | Common Issues                     |
+| --------------------- | --------------------------------- |
 | API ↔ Service         | Type mismatches, missing fields   |
 | Service ↔ Database    | Format conversions, null handling |
 | Backend ↔ Frontend    | Serialization, date formats       |

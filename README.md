@@ -92,7 +92,7 @@ Dockerfile 的上下文是本应用目录，主仓执行 `docker build -f projec
 
 AGENTS.md 和 .trellis/spec 是应用规范。从本目录运行 `python3 .trellis/scripts/get_context.py --mode packages` 和 `python3 .trellis/scripts/task.py current --source`。本 Trellis 管应用；主仓共享包/工具/发布任务用根 Trellis。同一任务不重复建档，不继承上游身份或日志。
 
-应用升级公共扩展时，先验收并发布新包，更新精确版本、独立 pnpm-lock.yaml 和 release-dependencies.json；Go kit 更新为经验证的 commit/pseudo-version 及 go.sum，不添加相邻目录 replace。惠购等派生项目保留自己的业务和迁移提交，只采用依赖与命令配置的增量升级。
+应用升级公共扩展时，先验收并发布新包，更新精确版本、独立 pnpm-lock.yaml 和 release-dependencies.json；Go kit 更新为经验证的正式版本及 go.sum；显式本地联调只写受控 workspace，不在正式 go.mod 添加相邻目录 replace。惠购等派生项目保留自己的业务和迁移提交，只采用依赖与命令配置的增量升级。
 
 应用 HTTP 路由与前端资源接入统一在 `backend/internal/web`（`package web`）；`frontend` 构建到 `backend/internal/web/dist`，公开 SSR 模板与渲染在 `backend/internal/pages`。
 
@@ -152,3 +152,26 @@ rtk proxy env TEST_ORIGIN=http://127.0.0.1:8080 \
 ```
 
 额外提供 `BUS_PEER_ORIGIN` 可验证第二个 Web 实例的查询回传；`BUS_SCREENSHOT` 指定广播页移动端截图路径。生产 TLS、Secure Cookie、真实数据库部署与容量仍按专项验收流程执行。
+
+## 本地 kit 联调
+
+独立应用默认安装锁定的正式依赖。本地可在应用根执行：
+
+```sh
+STARTER_KIT_SOURCE=/path/to/go-server-kit rtk pnpm run setup
+STARTER_KIT_SOURCE=/path/to/go-server-kit rtk pnpm dev
+```
+
+也可在应用根的 .starter.local.json 保存 `{"kitSource":"../go-server-kit"}`。环境变量优先，相对路径以应用根解析，模块不匹配立即失败；移除配置即恢复默认。生成的 workspace 及热重载的 kit 快照只放 .runtime，正式 go.mod/go.sum 保持原值；Go kit 联调不改变 Dashboard 来源。配置被 Git 与发布导出排除。
+
+CI 强制 STARTER_KIT_MODE=installed，忽略本地配置并拒绝显式 STARTER_KIT_SOURCE。安装最终版本号的候选 kit，验收冻结独立应用；通过后正式核对 kit，再发布同一 demo，不重复构建或验收。
+
+## 数据库时间
+
+业务时间统一表示绝对时间，API 输入必须带时区，输入输出均归一为秒级 UTC，页面按用户时区展示。队列耗时与 heartbeat 继续保留毫秒。
+
+MySQL 以连接 URL 的 `loc` 作为唯一时区配置，缺省 UTC；连接工厂自动设置每条连接的 session `time_zone`。历史 DATETIME 若按北京时间写入，继续使用 `loc=Asia%2FShanghai`，不要直接切换 UTC 或统一减八小时；命名时区需要 MySQL 时区表。PostgreSQL 使用 `timestamptz(0)`，连接时区默认 UTC。
+
+SQLite 时间实际保存为整数 epoch seconds，保留 `datetime` 类型声明供驱动解码到 `time.Time`。写入和查询传 `time.Time`，数据库默认值使用 `unixepoch()`，筛选、排序和分页均在 SQL 内完成。升级前备份旧库；`202610210001` 迁移转换旧时间文本，保留 NULL、外键、索引和自增序列，不能解析的历史值会中止迁移，需处理后重试。旧无时区文本按 UTC 解释，其他历史约定须先核对。
+
+本次迁移要求配套包含新连接契约的 Go kit。主仓开发命令直接使用工作区源码；独立应用开发可通过 `STARTER_KIT_SOURCE` 或 `.starter.local.json` 选择同一份源码，检查、测试、生成和构建均使用该来源，无需先发布公共包。正式发布仍需按候选包流程验收并升级固定依赖，与新迁移一同交付。

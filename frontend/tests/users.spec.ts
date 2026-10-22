@@ -4,22 +4,19 @@ import type { DashboardUserItem, DashboardUserListQuery } from "@shanjing/shadcn
 // Mock 回归保留开发账号与数据库；真实链路另由隔离全流程脚本执行。
 async function mockUsers(page: Page, permissions = ["user:list"]) {
     const state = {
-        rows: Array.from(
-            { length: 25 },
-            (_, i): DashboardUserItem => ({
-                id: String(i + 1),
-                name: `用户${i + 1}`,
-                email: `user${String(i + 1).padStart(2, "0")}@example.test`,
-                role: i === 24 ? "member,admin" : i % 2 ? "admin" : "user",
-                image: null,
-                emailVerified: i % 2 === 0,
-                banned: i % 3 === 0,
-                banReason: i % 3 === 0 ? "测试封禁" : null,
-                banExpires: null,
-                createdAt: "2026-10-04T00:00:00Z",
-                updatedAt: "2026-10-04T00:00:00Z",
-            }),
-        ),
+        rows: Array.from({ length: 25 }, (_, i): DashboardUserItem => ({
+            id: String(i + 1),
+            name: `用户${i + 1}`,
+            email: `user${String(i + 1).padStart(2, "0")}@example.test`,
+            role: i === 24 ? "member,admin" : i % 2 ? "admin" : "user",
+            image: null,
+            emailVerified: i % 2 === 0,
+            banned: i % 3 === 0,
+            banReason: i % 3 === 0 ? "测试封禁" : null,
+            banExpires: null,
+            createdAt: "2026-10-04T00:00:00Z",
+            updatedAt: "2026-10-04T00:00:00Z",
+        })),
         fail: false,
         requests: [] as DashboardUserListQuery[],
     };

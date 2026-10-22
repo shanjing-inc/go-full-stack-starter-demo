@@ -1,10 +1,14 @@
 import path from "node:path";
 import { defineConfig, type UserConfigExport } from "@tarojs/cli";
+import { prepareTDesign, createTDesignCompatibility } from "./plugins/tdesign.mjs";
 import { WeappTailwindcss } from "weapp-tailwindcss/vite";
 import { createWeappModuleScope } from "./plugins/weapp-module-scope.mjs";
 import { createWindowsDistSync } from "./plugins/sync-dist-to-windows.mjs";
+import { createWeappTailwindWatch } from "./plugins/weapp-tailwind-watch.mjs";
+import { createWeappTerserOptions } from "./plugins/weapp-terser-options.mjs";
 
 export default defineConfig<"vite">(() => {
+    prepareTDesign(path.resolve(__dirname, ".."));
     const sync = createWindowsDistSync();
     return {
         projectName: "multi-database-demo-miniprogram",
@@ -20,7 +24,10 @@ export default defineConfig<"vite">(() => {
         compiler: {
             type: "vite",
             vitePlugins: [
+                createWeappTerserOptions(),
                 createWeappModuleScope(),
+                createTDesignCompatibility(),
+                createWeappTailwindWatch(path.resolve(__dirname, "..")),
                 ...(WeappTailwindcss({
                     tailwindcssBasedir: path.resolve(__dirname, ".."),
                     cssEntries: [path.resolve(__dirname, "../src/app.css")],
@@ -31,7 +38,10 @@ export default defineConfig<"vite">(() => {
                 ...(sync ? [sync] : []),
             ],
         },
-        plugins: [path.resolve(__dirname, "plugins/weapp-components.cjs")],
+        plugins: [
+            path.resolve(__dirname, "plugins/weapp-components.cjs"),
+            path.resolve(__dirname, "plugins/tdesign.mjs"),
+        ],
         cache: { enable: false },
         mini: { postcss: { pxtransform: { enable: true }, cssModules: { enable: false } } },
     } satisfies UserConfigExport<"vite">;

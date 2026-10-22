@@ -6,3 +6,5 @@ dist/
 project.private.config.json
 .swc/
 .cache/
+# 固定版本 TDesign 原生资源，由构建配置准备
+src/native/tdesign/

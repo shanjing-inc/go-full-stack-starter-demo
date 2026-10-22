@@ -1,0 +1,38 @@
+--- a/index.js
++++ b/index.js
+@@ -1,6 +1,33 @@
+-var downloadUrl = require('download')
+-var gitclone = require('git-clone')
++var execFile = require('node:child_process').execFile
+ var rm = require('rimraf').sync
++
++// Keep the callback API, but use the maintained downloader and safe extraction.
++function downloadUrl (url, dest, opts) {
++  var got = Object.assign({}, opts)
++  delete got.extract
++  delete got.strip
++  delete got.mode
++  return import('@xhmikosr/downloader').then(function (mod) {
++    return mod.default(url, dest, { extract: opts.extract, decompress: { strip: opts.strip }, got: got })
++  })
++}
++
++// Repository URLs and revisions are arguments, never shell commands.
++function gitclone (url, dest, opts, fn) {
++  if (typeof url !== 'string' || url.startsWith('-') ||
++      typeof opts.checkout !== 'string' || opts.checkout.startsWith('-')) {
++    return fn(new Error('Invalid repository URL or revision'))
++  }
++  var args = ['clone']
++  if (opts.shallow) args.push('--depth', '1')
++  args.push('--', url, dest)
++  execFile('git', args, function (error) {
++    if (error) return fn(error)
++    execFile('git', ['checkout', '--detach', opts.checkout, '--'], { cwd: dest }, function (error) {
++      fn(error || undefined)
++    })
++  })
++}
+ 
+ /**
+  * Expose `download`.

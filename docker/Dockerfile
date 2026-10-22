@@ -1,10 +1,11 @@
 # syntax=docker/dockerfile:1
 ARG NODE_IMAGE=node:24.15.0-bookworm-slim
-ARG GO_IMAGE=golang:1.26.8-bookworm
+ARG GO_IMAGE=golang:1.26.10-bookworm
 FROM ${NODE_IMAGE} AS frontend
 WORKDIR /src
 RUN npm install --global pnpm@11.15.1
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml .npmrc ./
+COPY patches/ patches/
 COPY frontend/ frontend/
 COPY share/ share/
 ARG VITE_SENTRY_DSN=

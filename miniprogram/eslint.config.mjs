@@ -1,7 +1,7 @@
 import tseslint from "typescript-eslint";
 import hooks from "eslint-plugin-react-hooks";
 export default tseslint.config(
-    { ignores: ["src/graphql/member/generated.ts"] },
+    { ignores: ["src/graphql/member/generated.ts", "src/native/tdesign/**"] },
     ...tseslint.configs.recommended,
     {
         files: ["**/*.{ts,tsx}"],

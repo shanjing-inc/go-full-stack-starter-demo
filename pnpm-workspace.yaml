@@ -5,22 +5,61 @@ linkWorkspacePackages: false
 # 脚本执行只提示依赖状态；安装统一在选定工作区根显式执行。
 verifyDepsBeforeRun: warn
 minimumReleaseAgeExclude:
-    - "@shanjing/shadcnui-dashboard@0.1.9"
+    - "@shanjing/shadcnui-dashboard@1.2.0"
+    - "@apollo/client@4.3.5"
+    - "@typescript-eslint/eslint-plugin@8.72.0"
+    - "@typescript-eslint/parser@8.72.0"
+    - "@typescript-eslint/project-service@8.72.0"
+    - "@typescript-eslint/scope-manager@8.72.0"
+    - "@typescript-eslint/tsconfig-utils@8.72.0"
+    - "@typescript-eslint/type-utils@8.72.0"
+    - "@typescript-eslint/types@8.72.0"
+    - "@typescript-eslint/typescript-estree@8.72.0"
+    - "@typescript-eslint/utils@8.72.0"
+    - "@typescript-eslint/visitor-keys@8.72.0"
+    - typescript-eslint@8.72.0
 # 原生 esbuild 安装脚本按固定版本放行；其他已审阅的生命周期脚本保持关闭。
 # Taro CLI 的 postinstall 会修改用户级插件配置，项目明确关闭。
 allowBuilds:
-    "esbuild@0.21.5 || 0.25.12": true
+    "esbuild@0.25.12 || 0.28.2": true
     "@parcel/watcher@2.6.0": false
     "@swc/core@1.3.96": false
-    "@tarojs/binding@4.2.1": false
-    "@tarojs/cli@4.2.1": false
+    "@tarojs/binding@4.3.0": false
+    "@tarojs/cli@4.3.0": false
     "core-js@3.50.0": false
     "core-js-pure@3.50.0": false
 # Web 与小程序使用不同 React 代际，Sentry 类型跟随消费端的 React 类型。
 packageExtensions:
+    "@tarojs/vite-runner@4.3.0":
+        dependencies:
+            "html-minifier-terser": "7.2.0"
+    "download-git-repo@3.0.2":
+        dependencies:
+            "@xhmikosr/downloader": "16.3.1"
     "@sentry/react@11.6.0":
         peerDependencies:
             "@types/react": "*"
         peerDependenciesMeta:
             "@types/react":
                 optional: true
+# 上游尚未声明 ESLint 10；仅允许已通过真实规则回归的固定插件版本。
+peerDependencyRules:
+    allowedVersions:
+        "eslint-plugin-jsx-a11y@6.10.2>eslint": "^10"
+overrides:
+    # Taro 4.3 的旧传递依赖；升级 Taro 后重新核对并移除已不需要的约束。
+    "@tarojs/helper@4.3.0>esbuild": "0.28.2"
+    "@tarojs/cli@4.3.0>adm-zip": "0.6.1"
+    "@tarojs/plugin-doctor@0.0.13>glob": "10.5.0"
+    "@tarojs/components@4.3.0>swiper": "12.1.2"
+    "@tarojs/vite-runner@4.3.0>@rollup/plugin-terser": "1.0.0"
+    "@tarojs/vite-runner@4.3.0>vite-plugin-static-copy": "3.4.0"
+    "@tarojs/vite-runner@4.3.0>html-minifier": "-"
+    "download-git-repo@3.0.2>download": "-"
+    "download-git-repo@3.0.2>git-clone": "-"
+    "latest-version@5.1.0>package-json": "7.0.0"
+# 补丁修复同步/异步 API 差异及模板下载，必须随独立应用交付。
+patchedDependencies:
+    "download-git-repo@3.0.2": "patches/download-git-repo@3.0.2.patch"
+    "@tarojs/vite-runner@4.3.0": "patches/@tarojs__vite-runner@4.3.0.patch"
+    "braces@3.0.3": "patches/braces@3.0.3.patch"

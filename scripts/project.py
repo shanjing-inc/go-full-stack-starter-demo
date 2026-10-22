@@ -10,7 +10,7 @@ import shutil
 from pathlib import Path
 import subprocess
 import sys
-from toolchain import validate_go, cli
+from toolchain import validate_go, cli, load_lock
 from urllib.parse import parse_qsl, unquote, urlencode, urlsplit, urlunsplit
 from database_url import DATABASES, database_type
 
@@ -26,6 +26,7 @@ from starter_context import (
     LAYOUT,
     SOURCE_WORKSPACE,
     frontend_directory,
+    kit_environment,
 )
 
 GO_TEST_PACKAGES = [
@@ -208,7 +209,7 @@ process.stdout.write(JSON.stringify(values));
     return values
 
 
-def environment(env_file=None):
+def environment(env_file=None, *, workspace=False):
     inherited = os.environ.get("STARTER_ENV_FILE")
     file = config_file(env_file or inherited)
     if (env_file or inherited) and not file.is_file() and not os.environ.get("DB_DSN"):
@@ -247,7 +248,7 @@ def environment(env_file=None):
         flags = values.get("GOFLAGS", "")
         if not any(flag.startswith("-trimpath") for flag in shlex.split(flags)):
             values["GOFLAGS"] = (flags + " -trimpath").strip()
-    return str(go), values
+    return str(go), kit_environment(values, workspace=workspace, announce=True)
 
 
 def atlas_dev_url(url):
@@ -378,8 +379,11 @@ def run_project():
         return
     if args.frontend_action is not None:
         parser.error("前端动作需要配合 frontend 使用")
-    go, env = environment(env_file=args.env_file)
     action = args.action
+    go, env = environment(
+        env_file=args.env_file,
+        workspace=not APPLICATION_ONLY and action in {"check", "test", "test-go"},
+    )
     if action == "generate":
         toolenv = dict(env, GOWORK="off")
         run(
@@ -417,7 +421,7 @@ def run_project():
     elif action in ("migrate", "diff"):
         dialect = database_type(env.get("DB_DSN"))
         directory = "file://" + str(BACKEND / "migrations" / dialect)
-        atlas = ROOT / ".tools/bin/atlas-v1.3.0"
+        atlas = ROOT / f".tools/bin/atlas-{load_lock(ROOT)['atlas']['version']}"
         if action == "migrate":
             url = env.get("MIGRATION_URL")
             use_db_dsn = not url or not url.strip()
@@ -513,6 +517,7 @@ def run_project():
             run(["python3", ROOT / "scripts/test-host-platform.py"], env=env)
             run(["python3", ROOT / "scripts/test-sync-go-demo.py"], env=env)
             run(["python3", ROOT / "scripts/test-release-go-demo.py"], env=env)
+            run(["python3", ROOT / "scripts/test-demo-candidate.py"], env=env)
             run(["python3", ROOT / "scripts/test-release-common.py"], env=env)
             run(["python3", ROOT / "scripts/test-demo-dependencies.py"], env=env)
             run(["python3", ROOT / "scripts/test-release-packages.py"], env=env)

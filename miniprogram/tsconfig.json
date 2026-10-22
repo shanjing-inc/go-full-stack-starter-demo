@@ -14,5 +14,6 @@
         "types": ["node", "@tarojs/taro"],
         "resolveJsonModule": true
     },
-    "include": ["src", "config", "types", "tests/types"]
+    "include": ["src", "config", "types", "tests/types"],
+    "exclude": ["src/native/tdesign"]
 }
