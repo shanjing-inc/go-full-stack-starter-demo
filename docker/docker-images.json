@@ -1,7 +1,7 @@
 {
     "buildImages": {
-        "node": "node:24.15.0-bookworm-slim",
-        "go": "golang:1.26.10-bookworm"
+        "node": "node:26.12.0-bookworm-slim",
+        "go": "golang:1.26.9-bookworm"
     },
     "testImages": {
         "mysql": "mysql:8.0.46",

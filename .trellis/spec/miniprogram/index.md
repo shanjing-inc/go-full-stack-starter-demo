@@ -7,7 +7,7 @@
 - SDL 仅 `share/schema/common.graphqls` + `share/schema/member.graphqls`；操作集中于 `miniprogram/src/graphql/member/operations.ts`，生成相邻 `generated.ts`。
 - 类型生成使用固定 `@graphql-codegen/cli 7.4.6` 与 `@graphql-codegen/typescript-operations 6.1.10`。使用严格 scalar 映射：DateTime 为 string，nullable 字段及可选输入保持 SDL。Codegen 校验／格式化完成后写产物，check 全程只读且 Git-independent；升级后检查实际生成内容与类型契约。
 - 端点构建注入，完整 HTTP(S) 地址且限定 `/api/graphql/member`，空配置允许页面启动并在查询时提示。私密凭据保存在服务端。
-- Apollo Client 固定 `4.3.5`，使用 BatchHttpLink + Taro.request；每批十项，十五秒超时，no-cache 独立查询，单次操作或五条并发操作展示总耗时和逐项耗时／结果／错误，null 店铺为合法结果。消费 Taro.request 返回的 Promise，避免平台失败和取消产生额外未处理拒绝；取消应清理监听并 abort 平台请求。
+- Apollo Client 固定 `4.3.4`，使用 BatchHttpLink + Taro.request；每批十项，十五秒超时，no-cache 独立查询，单次操作或五条并发操作展示总耗时和逐项耗时／结果／错误，null 店铺为合法结果。消费 Taro.request 返回的 Promise，避免平台失败和取消产生额外未处理拒绝；取消应清理监听并 abort 平台请求。
 - 页面提供加载、空态、错误、重试、重复点击及卸载保护。`pages/index/index` 为启动页，首页依次提供“设计规范、组件示例、批量请求测试”三个入口。`pages/dev/design-system/index` 仅展示规范；`pages/dev/components/index` 按 basic/navigation/form/content/overlay 分类进入基础、导航、表单、内容、弹层示例；`pages/dev/batch-test/index` 保留请求诊断。九个页面都在 app.config 注册并使用 ThemePage 跟随系统主题。入口使用原生 Navigator navigate 保留返回栈，子页使用微信原生导航栏返回上一页，不重复提供返回链接。首页、规范和全部组件示例无需登录或后端。
 
 ## 登录与会话
@@ -31,7 +31,8 @@ Web 与小程序的 React 类型依赖隔离见 [Web 前端规范](../frontend/i
 ## 样式
 
 - `createWeappTerserOptions` 在 Vite config 阶段将 Taro 4.3 默认 Terser `output` 合并到 `format` 后删除旧键，显式 format 优先，保留 ES5／ASCII／注释选项；避免 Vite 7.3 压缩插件同时传入两个别名而失败。真实 Vite/Terser 回归验证 CommonJS 执行、ASCII 与显式覆盖及 sourcemap。
-- 小程序 Vite 固定 7.3.7；ESLint 10.13.0 配合 typescript-eslint 8.72.0，Prettier 与全工作区统一为 3.9.10。
+- 小程序 Vite 固定 7.3.7；ESLint 10.13.0 配合 typescript-eslint 8.71.2，Prettier 与全工作区统一为 3.9.10。
+- Taro 4.3.0 暂不直接升级 Vite 8：实测 8.3.4 的 Rolldown 不支持原生组件插件读取 `ModuleInfo.ast`，完整生产构建同时出现入口 `loaderMeta` 未初始化错误。独立 Vite 插件回归通过不足以证明整条 Taro 链路兼容，升级须先适配 runner 并通过完整生产／watch 构建。
 - Tailwind CSS 固定 4.3.3，与 Web frontend 对齐；主题工具类映射集中在 `src/app.css` 的 `@theme inline`，通过 `source(none)` + `@source "./"` 将扫描限定到源码。
 - Taro Vite 仅使用固定 `weapp-tailwindcss 5.6.3` 的 `WeappTailwindcss` 生成链路；显式配置 `tailwindcssBasedir`、绝对 `cssEntries` 和 `cssOptions.rem2rpx`。Node 须满足 `^22.18.0 || >=24.11.0`；升级时同步主仓／应用锁文件并重启 watch，验证真实 Taro 连续增量产物中的工具类、间距变量及根样式引用。基础 reset 沿用小程序插件默认输出，保持现有页面行为。
 - 设计规范、组件、亮暗主题和项目覆盖契约统一见 [小程序设计规范](design-system.md)。主题配置集中在 `src/components/theme/project.ts`，通过同一解析结果驱动页面变量及原生导航栏；启用微信 darkmode 与原生主题配置，读取并监听系统主题，页面显示时重新同步。`ThemePage` 为页面根，基础组件以 TDesign 原生控件和项目组合实现，控件默认视觉采用固定版本 TDesign，小程序原生资源与模板兼容集中在构建适配器。
@@ -60,3 +61,7 @@ Web 与小程序的 React 类型依赖隔离见 [Web 前端规范](../frontend/i
 测试使用 `miniprogram/tests/node`（真实 Apollo、模拟 Taro 网络／React hooks、真实 rsync）及 `tests/types`。运行 `pnpm check:weapp`、`pnpm test:weapp`、`pnpm build:weapp`、`pnpm codegen:check`；变更根测试入口执行根 `pnpm test`、`pnpm check`、`pnpm test:go:coverage`。分别报告构建、WSL 挂载盘同步、微信开发者工具、真实后端和真机验收范围。
 
 开发说明与配置示例见 `miniprogram/README.md`。新增命令、接口或同步规则同步此规范及回归。
+
+## TypeScript 分工
+
+`typecheck` 使用独立别名依赖 `typescript7: npm:typescript@7.0.2`，显式执行 `node node_modules/typescript7/bin/tsc --noEmit`，避免两个 TypeScript 版本的 tsc bin 冲突。原 `typescript` 保持 5.9.3，供 typescript-eslint、Taro／TDesign 插件和 Node 测试的旧编译器 API 使用。build:weapp 沿用 typecheck 前置门禁，生产构建仍使用既有 Taro 编译链；升级必须同时验证类型检查、旧 API 回归及真实生产构建，并同步两级锁文件。

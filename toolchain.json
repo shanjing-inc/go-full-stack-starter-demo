@@ -1,63 +1,63 @@
 {
     "go": {
-        "version": "go1.26.10",
-        "url": "https://go.dev/dl/go1.26.10.linux-amd64.tar.gz",
-        "sha256": "ccfe7ae822d2c2f41f4fe7c956199967a4dac22d0ee0d2b2bfdb440aab3b20c5",
+        "version": "go1.26.9",
         "platforms": {
             "linux-amd64": {
-                "url": "https://go.dev/dl/go1.26.10.linux-amd64.tar.gz",
-                "sha256": "ccfe7ae822d2c2f41f4fe7c956199967a4dac22d0ee0d2b2bfdb440aab3b20c5"
+                "url": "https://go.dev/dl/go1.26.9.linux-amd64.tar.gz",
+                "sha256": "42d158b4d8f7b61ac0a830567c940a86098fb7aac52e467a5ebec03ef5cc2f8d"
             },
             "darwin-amd64": {
-                "url": "https://go.dev/dl/go1.26.10.darwin-amd64.tar.gz",
-                "sha256": "e820ab780c273ae4a340b79d0f3c4313b74ee029aa3874792145d44b9f4f91da"
+                "url": "https://go.dev/dl/go1.26.9.darwin-amd64.tar.gz",
+                "sha256": "00c29e3d4c8562f547410daa18d2959b641bd691ab00c4a525ea817a0253d4bd"
             },
             "darwin-arm64": {
-                "url": "https://go.dev/dl/go1.26.10.darwin-arm64.tar.gz",
-                "sha256": "0b5183492292ada170f9b561a834863808dd02edba599e4ad0e89899330020b3"
+                "url": "https://go.dev/dl/go1.26.9.darwin-arm64.tar.gz",
+                "sha256": "f9bb7c0a02506c5d9bf0d1eb1f7ee6c7684f844ae49558308a0427b830e022cc"
             }
-        }
+        },
+        "url": "https://go.dev/dl/go1.26.9.linux-amd64.tar.gz",
+        "sha256": "42d158b4d8f7b61ac0a830567c940a86098fb7aac52e467a5ebec03ef5cc2f8d"
     },
     "atlas": {
-        "version": "v1.3.1-ed994a7-canary",
-        "url": "https://release.ariga.io/atlas/atlas-community-linux-amd64-v1.3.1-ed994a7-canary",
-        "sha256": "8e493bce9b47ab251145ed8d69d6c34c95a4f1a6339cc22dfa867c9af6593aa2",
+        "version": "v1.3.0",
+        "url": "https://atlasbinaries.com/atlas/atlas-community-linux-amd64-v1.3.0",
+        "sha256": "10d7913e3dce43ab99b8d71534a4cbadaf11a16dc293adf3b91d10e83a0ac70b",
         "platforms": {
             "linux-amd64": {
-                "url": "https://release.ariga.io/atlas/atlas-community-linux-amd64-v1.3.1-ed994a7-canary",
-                "sha256": "8e493bce9b47ab251145ed8d69d6c34c95a4f1a6339cc22dfa867c9af6593aa2"
+                "url": "https://atlasbinaries.com/atlas/atlas-community-linux-amd64-v1.3.0",
+                "sha256": "10d7913e3dce43ab99b8d71534a4cbadaf11a16dc293adf3b91d10e83a0ac70b"
             },
             "darwin-amd64": {
-                "url": "https://release.ariga.io/atlas/atlas-community-darwin-amd64-v1.3.1-ed994a7-canary",
-                "sha256": "64894b6d0cb8c44fa33d2a0409132c0551e69b201cf3ae1ee8773bf79d8f43f5"
+                "url": "https://atlasbinaries.com/atlas/atlas-community-darwin-amd64-v1.3.0",
+                "sha256": "650981a024301775ec964e5134e2d5712b7ef1b25fec4b2ec54bad762b4bdf6f"
             },
             "darwin-arm64": {
-                "url": "https://release.ariga.io/atlas/atlas-community-darwin-arm64-v1.3.1-ed994a7-canary",
-                "sha256": "79708a6e7e4730997c86c246a916cb81aa804aab018517080b48e3d942512199"
+                "url": "https://atlasbinaries.com/atlas/atlas-community-darwin-arm64-v1.3.0",
+                "sha256": "4e5ffdc10b2b4fd3a06074aba72848150907d5316cacad7b19bae6c6ae3db991"
             }
         }
     },
     "mysql": "8.0.46",
-    "air": "v1.64.5",
-    "node": "v24.15.0",
-    "pnpm": "11.15.1",
+    "air": "v1.67.4",
+    "node": "v26.12.0",
+    "pnpm": "12.14.0",
     "ruff": {
-        "version": "0.13.3",
-        "url": "https://files.pythonhosted.org/packages/ab/b5/c0feca27d45ae74185a6bacc399f5d8920ab82df2d732a17213fb86a2c4c/ruff-0.13.3-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
-        "sha256": "dc742c50f4ba72ce2a3be362bd359aef7d0d302bf7637a6f942eaa763bd292af",
+        "version": "0.17.1",
         "platforms": {
             "linux-amd64": {
-                "url": "https://files.pythonhosted.org/packages/ab/b5/c0feca27d45ae74185a6bacc399f5d8920ab82df2d732a17213fb86a2c4c/ruff-0.13.3-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
-                "sha256": "dc742c50f4ba72ce2a3be362bd359aef7d0d302bf7637a6f942eaa763bd292af"
+                "url": "https://files.pythonhosted.org/packages/62/86/5566290219708ce2928f3a29c4f843a1185b341ec6111c4631a33c5ceced/ruff-0.17.1-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+                "sha256": "a6ef98e51de8ef38082f90653ceeb84944bd7673783eea13e1647c5b9b064189"
             },
             "darwin-amd64": {
-                "url": "https://files.pythonhosted.org/packages/b0/b5/4a21a4922e5dd6845e91896b0d9ef493574cbe061ef7d00a73c61db531af/ruff-0.13.3-py3-none-macosx_10_12_x86_64.whl",
-                "sha256": "2bdad6512fb666b40fcadb65e33add2b040fc18a24997d2e47fee7d66f7fcae2"
+                "url": "https://files.pythonhosted.org/packages/aa/d2/a2e28bc35b083ae51fa07dfba5280a667c8b01ecaee7802fc8849dcd5c46/ruff-0.17.1-py3-none-macosx_10_12_x86_64.whl",
+                "sha256": "8eadb09a788010be29c895418bdfa513e4e1c65e64b94e5b19e4cd381f6cc7fb"
             },
             "darwin-arm64": {
-                "url": "https://files.pythonhosted.org/packages/40/90/15649af836d88c9f154e5be87e64ae7d2b1baa5a3ef317cb0c8fafcd882d/ruff-0.13.3-py3-none-macosx_11_0_arm64.whl",
-                "sha256": "fc6fa4637284708d6ed4e5e970d52fc3b76a557d7b4e85a53013d9d201d93286"
+                "url": "https://files.pythonhosted.org/packages/8e/71/7a9029a81c8206ee01a98f6cfeeb56e6c095af86857581a37045c46d7e94/ruff-0.17.1-py3-none-macosx_11_0_arm64.whl",
+                "sha256": "29b454f18ca3eeaf37fbf140841dcf27d36109e29dee9aae8acecb68c26c6f74"
             }
-        }
+        },
+        "url": "https://files.pythonhosted.org/packages/62/86/5566290219708ce2928f3a29c4f843a1185b341ec6111c4631a33c5ceced/ruff-0.17.1-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+        "sha256": "a6ef98e51de8ef38082f90653ceeb84944bd7673783eea13e1647c5b9b064189"
     }
 }

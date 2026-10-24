@@ -1,20 +1,20 @@
 {
     "go": {
         "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit": {
-            "version": "v1.2.0",
-            "sourceCommit": "96f6a98b8f474038bf2d1cbb152849cce35c7ff7",
-            "sum": "h1:kIjxD6u1vRI73Rgefe3ypADQljzt/b0wsGflVGAvsOg=",
-            "goModSum": "h1:qgllkepivRlnMQfzDmReboelCXmTIoLCwKzymC6JCr8="
+            "version": "v1.2.1",
+            "sourceCommit": "716bc5fab913ea9b76213a00871fcfcbfe23331d",
+            "sum": "h1:dObdCELdLfYmrGsTTtUQOA//nj4wRozYNTNmS9TYpWs=",
+            "goModSum": "h1:LHdn+ji8Hhr/YocJWLQCtbgsgEe6HcFwW6BtWmR4K0Y="
         }
     },
     "npm": {
         "@shanjing/shadcnui-dashboard": {
-            "version": "1.2.0",
+            "version": "1.2.2",
             "registry": "https://packages.aliyun.com/5eb77c7538076f00011bd238/npm/npm-registry/",
-            "sourceCommit": "96f6a98b8f474038bf2d1cbb152849cce35c7ff7",
-            "integrity": "sha512-NwcUrsVQxD4Gf/n52G/j3P4Ywb6+BDUPhgDiIF1aA//uMBtodj6AbnNryMQ8TqdxUabwH53ZCpYSXXIezji4hg==",
-            "shasum": "68c8abdedbfdb8a11423b9493a7757b078b54ba6",
-            "tarball": "https://packages.aliyun.com/5eb77c7538076f00011bd238/npm/npm-registry/@shanjing/shadcnui-dashboard/-/@shanjing/shadcnui-dashboard-1.2.0.tgz"
+            "sourceCommit": "716bc5fab913ea9b76213a00871fcfcbfe23331d",
+            "integrity": "sha512-SQekuBIrpC4wU6RBGmhVo+X842Grw/kqiX11J2cdHl8G+N4zYVyZmWs6rfGNK2qhheAv1YEVCGXOEUH3SkWPVw==",
+            "shasum": "04bdbfb954d12b623922081cccfe5a912bd32458",
+            "tarball": "https://packages.aliyun.com/5eb77c7538076f00011bd238/npm/npm-registry/@shanjing/shadcnui-dashboard/-/@shanjing/shadcnui-dashboard-1.2.2.tgz"
         }
     }
 }

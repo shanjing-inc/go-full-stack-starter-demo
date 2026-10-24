@@ -31,6 +31,7 @@ export function mountBusPage(root: HTMLElement): () => void {
     const deviceStatus = element("[data-device-status]");
     const broadcastConnect = element<HTMLButtonElement>("[data-broadcast-connect]");
     const deviceConnect = element<HTMLButtonElement>("[data-device-connect]");
+    const loginDialog = element<HTMLDialogElement>("[data-bus-login-dialog]");
     const broadcastLog = element<HTMLOListElement>("[data-broadcast-log]");
     const deviceLog = element<HTMLOListElement>("[data-device-log]");
     const queryLog = element<HTMLOListElement>("[data-query-log]");
@@ -49,6 +50,7 @@ export function mountBusPage(root: HTMLElement): () => void {
     function on(target: EventTarget, name: string, handler: EventListener) {
         target.addEventListener(name, handler, { signal: listeners.signal });
     }
+    on(element("[data-bus-login-cancel]"), "click", () => loginDialog.close());
     function historyState(list: HTMLOListElement, populated: boolean, message?: string) {
         const placeholder = list.parentElement?.querySelector<HTMLElement>("[data-log-empty]");
         const clearButton =
@@ -170,7 +172,12 @@ export function mountBusPage(root: HTMLElement): () => void {
     }
 
     function connect(device: boolean) {
-        if (root.dataset.enabled !== "true") return;
+        const status = device ? deviceStatus : broadcastStatus;
+        if (root.dataset.enabled !== "true") {
+            status.textContent = "请先登录后再连接";
+            if (!loginDialog.open) loginDialog.showModal();
+            return;
+        }
         const previous = device ? deviceSocket : broadcastSocket;
         if (previous) {
             previous.close(1000, "用户断开");
@@ -178,7 +185,6 @@ export function mountBusPage(root: HTMLElement): () => void {
             return;
         }
         const button = device ? deviceConnect : broadcastConnect;
-        const status = device ? deviceStatus : broadcastStatus;
         const records = device ? deviceLog : broadcastLog;
         const label = device ? "设备" : " Bus WebSocket";
         const url = new URL(
@@ -393,6 +399,7 @@ export function mountBusPage(root: HTMLElement): () => void {
         quota();
     });
     function stop() {
+        if (loginDialog.open) loginDialog.close();
         broadcastSocket?.close(1000, "页面离开");
         deviceSocket?.close(1000, "页面离开");
         broadcastSocket = deviceSocket = undefined;

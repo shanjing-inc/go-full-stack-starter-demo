@@ -1,6 +1,6 @@
 # 微信小程序开发模块
 
-Taro 4.3.0 + React 18 + Vite 7.3.7 + Tailwind CSS 4.3.3 + weapp-tailwindcss 5.6.3，独立于 Web SPA 构建。以索引首页 `pages/index/index` 为启动页，依次提供设计规范 `design-system`、组件示例 `components`、批量请求测试 `batch-test` 三个入口。批量请求测试通过 Member GraphQL 查询店铺，支持单次请求与五条并发请求，显示总耗时和每项耗时、结果、错误。同页提供邮箱密码登录与退出，微信 `wx.login` 接入延期；认证、用户模型与数据库沿用现有应用。
+Taro 4.3.0 + React 18 + Vite 7.3.7 + Tailwind CSS 4.3.3 + weapp-tailwindcss 5.6.2，独立于 Web SPA 构建。以索引首页 `pages/index/index` 为启动页，依次提供设计规范 `design-system`、组件示例 `components`、批量请求测试 `batch-test` 三个入口。批量请求测试通过 Member GraphQL 查询店铺，支持单次请求与五条并发请求，显示总耗时和每项耗时、结果、错误。同页提供邮箱密码登录与退出，微信 `wx.login` 接入延期；认证、用户模型与数据库沿用现有应用。
 
 ## 配置与启动
 

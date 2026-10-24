@@ -36,6 +36,33 @@
         >
     </div>
     {{end}}
+    <dialog
+        data-bus-login-dialog
+        aria-labelledby="bus-login-title"
+        aria-describedby="bus-login-description"
+        class="fixed inset-0 m-auto max-h-[calc(100%_-_3rem)] w-[calc(100%_-_3rem)] max-w-md overflow-y-auto rounded-xl border bg-card p-6 text-card-foreground shadow-xl backdrop:bg-black/50"
+    >
+        <h2 id="bus-login-title" class="text-lg font-semibold">请先登录</h2>
+        <p id="bus-login-description" class="mt-3 text-sm/7 text-muted-foreground">
+            登录后即可连接 WebSocket。登录成功后将返回 Bus 演示页，继续体验消息收发。
+        </p>
+        <div class="mt-6 flex flex-wrap justify-end gap-3">
+            <button
+                data-bus-login-cancel
+                type="button"
+                class="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-lg border border-input bg-background px-5 py-2 text-sm font-medium transition hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            >
+                取消
+            </button>
+            <a
+                href="/admin/login?returnTo=%2Ftest%2Fbus"
+                autofocus
+                class="inline-flex min-h-11 items-center justify-center rounded-lg bg-primary px-5 py-2 text-sm font-medium text-primary-foreground transition hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            >
+                去登录
+            </a>
+        </div>
+    </dialog>
     <noscript
         ><p class="rounded-xl border bg-muted/40 p-4 text-sm">
             开启 JavaScript 可操作广播、设备模拟器与 SSE 查询。下方链路说明由 Go 服务端直接渲染。
@@ -92,7 +119,7 @@
             </div>
             <div class="grid items-start gap-5 lg:grid-cols-2">
                 <div class="rounded-xl border bg-card p-5 shadow-sm sm:p-6">
-                    <fieldset {{if not .CanUseBus}}disabled{{end}} class="contents space-y-5 disabled:opacity-60">
+                    <div class="contents space-y-5">
                         <div class="space-y-3">
                             <h3 class="text-base font-semibold">订阅连接</h3>
                             <p
@@ -124,6 +151,7 @@
                             <input
                                 class="min-h-11 w-full rounded-lg border border-input bg-background px-3 text-base text-foreground outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                                 id="bus-message"
+                                {{if not .CanUseBus}}disabled{{end}}
                                 maxlength="2000"
                                 required
                                 value="本地 Bus 测试"
@@ -131,6 +159,7 @@
                             <button
                                 class="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-lg bg-primary px-5 py-2 text-sm font-medium text-primary-foreground transition hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-50"
                                 id="broadcast-publish"
+                                {{if not .CanUseBus}}disabled{{end}}
                                 type="submit"
                             >
                                 发布到 Bus
@@ -145,7 +174,7 @@
                                 发布操作沿用登录会话；发布确认表示 Redis Bus 已接收消息。
                             </p>
                         </form>
-                    </fieldset>
+                    </div>
                 </div>
                 <div class="min-w-0 rounded-xl border bg-card p-5 shadow-sm sm:p-6">
                     <div class="flex flex-wrap items-center justify-between gap-3">
@@ -257,7 +286,7 @@
                         当前演示使用一个浏览器设备模拟器；连接就绪后将自动接收并执行查询。
                     </p>
 
-                    <fieldset {{if not .CanUseBus}}disabled{{end}} class="contents disabled:opacity-60">
+                    <div class="contents">
                         <div class="mt-6 space-y-4">
                             <p class="text-sm text-muted-foreground">
                                 连接状态：
@@ -284,6 +313,7 @@
                                     >回执模式<select
                                         id="device-mode"
                                         data-device-mode
+                                        {{if not .CanUseBus}}disabled{{end}}
                                         class="min-h-11 rounded-lg border border-input bg-background px-3 text-sm text-foreground focus-visible:outline-2 focus-visible:outline-ring"
                                     >
                                         <option value="success">成功</option>
@@ -293,7 +323,7 @@
                                 >
                             </div>
                         </div>
-                    </fieldset>
+                    </div>
 
                     <div class="mt-8 border-t pt-6">
                         <div class="flex items-center justify-between gap-4">

@@ -4,6 +4,7 @@ package config_test
 
 import (
     subject "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/projects/multi-database-demo/internal/config"
+    "strings"
     "testing"
     "time"
 )
@@ -24,6 +25,27 @@ func TestConfig(t *testing.T) {
     if c.QueueRecordRetention != 7*24*time.Hour {
         t.Fatal(c.QueueRecordRetention)
     }
+    t.Run("旧数据库版本提示迁移和配置更新顺序", func(t *testing.T) {
+        t.Setenv("DB_VERSION", "202610040001")
+        for _, role := range []string{"web", "worker"} {
+            _, err := subject.Load(role)
+            if err == nil {
+                t.Fatalf("%s 应拒绝旧版本配置", role)
+            }
+            for _, want := range []string{"DB_VERSION=202610040001", "最低要求 202610210001", "pnpm migrate", "相同的后端配置", "--env-file", "迁移成功后", "DB_VERSION=202610210001"} {
+                if !strings.Contains(err.Error(), want) {
+                    t.Errorf("%s 错误缺少 %q：%v", role, want, err)
+                }
+            }
+        }
+    })
+    t.Run("非法版本配置不回显原值", func(t *testing.T) {
+        t.Setenv("DB_VERSION", "123-private-value")
+        _, err := subject.Load("web")
+        if err == nil || !strings.Contains(err.Error(), "DB_VERSION") || strings.Contains(err.Error(), "private-value") {
+            t.Fatalf("非法版本应提示配置键且隐藏原值：%v", err)
+        }
+    })
     t.Run("监控默认关闭并支持公开部署配置", func(t *testing.T) {
         t.Setenv("SENTRY_DSN", "")
         t.Setenv("SENTRY_ENVIRONMENT", "")

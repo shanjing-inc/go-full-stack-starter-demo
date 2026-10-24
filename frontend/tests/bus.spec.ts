@@ -28,7 +28,7 @@ test("Bus 公开正文支持无 JavaScript、匿名操作门禁与 HEAD", async 
         await expect(page.getByRole("heading", { name: "设备查询，逐条返回结果" })).toBeVisible();
         await expect(
             page.getByRole("button", { name: "连接 Bus WebSocket", exact: true }),
-        ).toBeDisabled();
+        ).toBeEnabled();
         await expect(page.getByRole("button", { name: "发送查询", exact: true })).toBeDisabled();
         await expect(page.getByRole("link", { name: "前往登录" })).toHaveAttribute(
             "href",
@@ -40,6 +40,49 @@ test("Bus 公开正文支持无 JavaScript、匿名操作门禁与 HEAD", async 
     } finally {
         await context.close();
     }
+});
+
+test("Bus 匿名连接弹窗引导登录，支持取消、Esc 和焦点恢复且不发起 WebSocket", async ({ page }) => {
+    const sockets: string[] = [];
+    const messages: string[] = [];
+    page.on("dialog", async (dialog) => {
+        messages.push(dialog.message());
+        await dialog.dismiss();
+    });
+    page.on("websocket", (socket) => sockets.push(socket.url()));
+    await page.goto("/test/bus");
+    const broadcast = page.getByRole("button", { name: "连接 Bus WebSocket", exact: true });
+    const dialog = page.getByRole("dialog", { name: "请先登录" });
+    await broadcast.click();
+    await expect(dialog).toBeVisible();
+    const box = (await dialog.boundingBox())!;
+    expect(box.x + box.width / 2).toBeCloseTo(page.viewportSize()!.width / 2, 0);
+    expect(box.y + box.height / 2).toBeCloseTo(page.viewportSize()!.height / 2, 0);
+    await expect(dialog.getByRole("link", { name: "去登录", exact: true })).toBeFocused();
+    await expect(page.locator("[data-broadcast-status]")).toHaveText("请先登录后再连接");
+    await dialog.getByRole("button", { name: "取消", exact: true }).click();
+    await expect(dialog).not.toBeVisible();
+    await expect(broadcast).toBeFocused();
+    await queryTab(page);
+    const deviceConnect = page.getByRole("button", { name: "连接设备", exact: true });
+    await deviceConnect.click();
+    await expect(dialog).toBeVisible();
+    await expect(page.locator("[data-device-status]")).toHaveText("请先登录后再连接");
+    await page.keyboard.press("Escape");
+    await expect(dialog).not.toBeVisible();
+    await expect(deviceConnect).toBeFocused();
+    await expect(page.getByRole("button", { name: "发送查询", exact: true })).toBeDisabled();
+    await page.setViewportSize({ width: 390, height: 844 });
+    await deviceConnect.click();
+    const mobile = (await dialog.boundingBox())!;
+    expect(mobile.x).toBeGreaterThanOrEqual(24);
+    expect(mobile.x + mobile.width).toBeLessThanOrEqual(366);
+    const login = dialog.getByRole("link", { name: "去登录", exact: true });
+    await expect(login).toHaveAttribute("href", "/admin/login?returnTo=%2Ftest%2Fbus");
+    await login.click();
+    await expect(page).toHaveURL(/\/admin\/login\?returnTo=%2Ftest%2Fbus$/);
+    expect(messages).toEqual([]);
+    expect(sockets).toEqual([]);
 });
 
 test.describe("Bus 登录后的真实 Redis 与浏览器链路", () => {

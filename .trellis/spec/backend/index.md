@@ -51,3 +51,7 @@ app-layout-v2 的后端默认配置为 `backend/.env`，模板为 `backend/.env.
 本地 STARTER_KIT_SOURCE 优先于应用根 .starter.local.json 的 kitSource；相对路径以应用根解析，必须是正确的 kit Go 模块，无效路径立即失败。setup、dev、generate、schema、check、test、coverage 和 build 共用选择，受控 workspace 与代际外部 kit 快照仅位于 .runtime，不改正式 go.mod/go.sum，也不改变 Dashboard 来源。取消本地配置恢复默认。
 
 正式 CI 设置 STARTER_KIT_MODE=installed、GOWORK=off，忽略本地配置并拒绝显式源码覆盖；必须从候选模块 zip 安装并核对版本、sum/goModSum、缓存目录及无 Replace。一次冻结最终应用后执行 setup/generate/check/test/test:go:coverage/build，生成后交付内容变化即失败。成功凭证与正式 kit 核对均匹配才可发布同一快照；失败续跑复用有效凭证，不再导出或验收。.starter.local.json、外部源码和候选状态不随应用交付。
+
+## Go 依赖等待期
+
+第三方 Go 包、工具与新增／升级的传递依赖均发布满 7 天后采用，以官方模块代理的精确版本 `.info` 时间核对；`go mod tidy` 后复核最终选择，不使用分支名或跳过间接依赖。Go 工具链与固定下载工具遵循同一等待期，平台 URL 与 SHA256 同步维护；自维护公共包沿用候选与正式发布验收契约。

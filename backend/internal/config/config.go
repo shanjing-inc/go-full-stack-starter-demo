@@ -7,6 +7,7 @@ import (
     "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit/transport/origin"
     "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/projects/multi-database-demo/internal/observability"
     "errors"
+    "fmt"
     "net"
     "os"
     "regexp"
@@ -31,9 +32,11 @@ type Config struct {
 
 var value = configbase.Value
 
+const minimumDatabaseVersion = "202610210001"
+
 // Load 按进程角色读取并校验环境变量；Web 额外要求认证密钥、监听地址与来源规则，开发模式支持本地任意端口。
 func Load(role string) (Config, error) {
-    c := Config{Address: value("WEB_ADDR", "127.0.0.1:8080"), Version: value("DB_VERSION", "202610210001")}
+    c := Config{Address: value("WEB_ADDR", "127.0.0.1:8080"), Version: value("DB_VERSION", minimumDatabaseVersion)}
     c.Monitoring = observability.Config{
         DSN: os.Getenv("SENTRY_DSN"), Environment: value("SENTRY_ENVIRONMENT", os.Getenv("APP_MODE")), Release: os.Getenv("SENTRY_RELEASE"),
     }
@@ -80,11 +83,11 @@ func Load(role string) (Config, error) {
     if err := c.Worker.Validate(); err != nil {
         return c, errors.New("Redis 或 Worker 配置无效")
     }
-    if c.Version < "202610210001" {
-        return c, errors.New("当前应用至少需要数据库版本 202610210001")
-    }
     if !regexp.MustCompile(`^[0-9]{6,14}$`).MatchString(c.Version) {
-        return c, errors.New("数据库配置无效")
+        return c, errors.New("DB_VERSION 无效：需要 6–14 位数字的数据库迁移版本")
+    }
+    if c.Version < minimumDatabaseVersion {
+        return c, fmt.Errorf("当前 DB_VERSION=%s 低于应用最低要求 %s；请先在应用目录使用与本次启动相同的后端配置执行 pnpm migrate（自定义配置须传 --env-file），迁移成功后将后端配置更新为 DB_VERSION=%s，再重新启动", c.Version, minimumDatabaseVersion, minimumDatabaseVersion)
     }
     if role == "web" {
         if _, _, err := net.SplitHostPort(c.Address); err != nil {

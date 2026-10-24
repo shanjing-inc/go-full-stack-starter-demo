@@ -59,7 +59,7 @@ Vite、Codegen 和请求回归由 `frontend/package.json` 的 `test` 执行；�
 ## 前端工具与监控契约
 
 - Web 的 Tailwind 与 @tailwindcss/vite 固定 4.3.3，小程序 Tailwind 使用同一版本；Prettier 全工作区统一 3.9.10。
-- ESLint 10.13.0 配合 typescript-eslint 8.72.0，使用 flat config、typescript-eslint recommended、Hooks 的 rules-of-hooks/exhaustive-deps 和 jsx-a11y recommended，零 warning 门禁。Input/Button/SelectTrigger 等组件映射到原生元素；角色选择使用自身 aria-label 与普通容器。no-explicit-any 保留现有显式泛型/动态边界，类型正确性由严格 TypeScript 与 Codegen 负责。
+- ESLint 10.13.0 配合 typescript-eslint 8.71.2，使用 flat config、typescript-eslint recommended、Hooks 的 rules-of-hooks/exhaustive-deps 和 jsx-a11y recommended，零 warning 门禁。Input/Button/SelectTrigger 等组件映射到原生元素；角色选择使用自身 aria-label 与普通容器。no-explicit-any 保留现有显式泛型/动态边界，类型正确性由严格 TypeScript 与 Codegen 负责。
 - 两级 workspace 的 peerDependencyRules.allowedVersions 仅为固定 eslint-plugin-jsx-a11y 6.10.2 允许 ESLint 10；升级插件时重新核对。`tests/node/eslint.test.mjs` 在独立进程中加载应用与公共 Dashboard 的真实配置，验证合法 JSX 通过、图片说明／标签关联及条件 Hook 违规仍被拦截；独立应用缺少公共源码时只验应用配置。
 - `typecheck` 先执行 lint；测试统一位于 frontend/tests。Vitest 仅收集 tests/unit 下的 `*.test.ts/tsx`，tests/types 中的编译契约由 tsc 校验；TypeScript 与 ESLint 同时覆盖 src、unit、types 和 tests/setup.ts。DOM 测试按文件启用 jsdom，setup 加载 jest-dom 并在每例结束 cleanup；Node 回归由 `node --test tests/node/*.test.mjs` 单独执行，Playwright 仅匹配 `tests/**/*.spec.ts`；独立 HMR 验收脚本位于 tests/verify-hmr.mjs，由共享验收工具调用。
 - 店铺创建输入在提交请求前通过 Zod 校验，归整空白并按 Unicode 字符验证 1–255 长度；沿用服务器权威校验及操作生成类型。
@@ -67,6 +67,7 @@ Vite、Codegen 和请求回归由 `frontend/package.json` 的 `test` 执行；�
 
 ## 依赖安装与类型解析诊断
 
+- pnpm minimumReleaseAge 固定 10080 分钟（7 天）；仅自维护 @shanjing/shadcnui-dashboard 按包名豁免。主仓与独立应用同步配置，发布／升级保留包级豁免，第三方包不得沿用临时版本豁免。
 - 主仓开发在工作区根执行 `rtk proxy env CI=true pnpm install --frozen-lockfile`，独立应用在自己的根目录安装；离线安装须已有缓存，可追加 `--offline`。
 - 第三方 React 组件声明出现 TS2607、TS2786、TS2769 时，先以 TypeScript `--traceResolution` 核对声明文件中的 react 解析路径，并检查 pnpm 安装目录与 hoisted @types/react 的实际文件。2026-10-12 的 Sentry.ErrorBoundary 异常由原锁文件完整安装恢复；业务源码、依赖版本与锁文件保持原值。
 - 修复后分别验证主仓前端类型检查、独立应用原锁文件全新安装和真实监控回归；共享脚本验收继续运行主仓 test/check/test:go:coverage/build。缓存复用、独立候选快照、正式固定提交发布验收分别记录。
@@ -77,6 +78,7 @@ Vite、Codegen 和请求回归由 `frontend/package.json` 的 `test` 执行；�
 
 ## Bus 页面局部交互
 
+- 匿名访问时广播和设备连接按钮可点击，点击打开匹配主题的原生 `<dialog>` 登录引导弹窗，同时更新对应状态栏；弹窗提供“取消”和“去登录”，登录地址携带 `returnTo=/test/bus`，支持 Esc 关闭、焦点限制及关闭后恢复触发按钮焦点，不使用 `alert`，不创建 WebSocket；发布输入、发布按钮、设备回执模式和查询表单保持禁用，服务端继续鉴权。
 - `features/bus/{bus-page,protocol,query-stream}.ts` 维护 `/test/bus` 的原生 DOM 增强、载荷校验及 POST SSE 增量读取；应用仍保持 Go SSR 公开页与 `/admin/*` React SPA 的入口边界。
 - SSE 支持 UTF-8 跨块、CR/LF/CRLF、多行 data 与注释心跳，事件大小上限 64 KiB；每次查询独立校验 requestId/responseKey、序号与总数，重复结果去重，终止需要匹配 done。提前 EOF、非法载荷、HTTP 错误和客户端等待超时落到当前记录，终止路径取消读取器并释放锁。
 - 浏览器设备等待 `bus.query.ready` 后展示就绪，成功模式返回 1–3 条回执，每条等待 200–700 毫秒以匹配后端 5 秒窗口；另有错误、超时模式。模拟器与页面查询并发上限各 8，广播/设备日志各 30 条，查询历史 20 条；断开和 pagehide 清理计时器、WebSocket 与请求，单笔取消保持其他查询独立。
@@ -87,7 +89,7 @@ Vite、Codegen 和请求回归由 `frontend/package.json` 的 `test` 执行；�
 
 ## React 类型依赖隔离
 
-Web 使用 React 19，小程序使用 React 18。两级 pnpm workspace 为固定 `@sentry/react@11.6.0` 补齐可选 `@types/react` peer，按消费端声明选择类型；两份锁文件记录 Web 的 React 19 类型上下文。回归见主仓 `scripts/test-project.py` 与 Web `tests/unit/observability.test.ts` 的 ErrorBoundary 类型检查和运行时测试。
+Web 使用 React 19，小程序使用 React 18。两级 pnpm workspace 为固定 `@sentry/react@11.8.0` 补齐可选 `@types/react` peer，按消费端声明选择类型；两份锁文件记录 Web 的 React 19 类型上下文。回归见主仓 `scripts/test-project.py` 与 Web `tests/unit/observability.test.ts` 的 ErrorBoundary 类型检查和运行时测试。
 
 ## Dashboard 源码模式与依赖安装
 
@@ -102,4 +104,18 @@ Web 使用 React 19，小程序使用 React 18。两级 pnpm workspace 为固定
 - 认证操作使用 `identity=true` 的独立 HTTP 请求；业务请求继续沿用批量查询、错误事件、取消与权限语义。后台源码中的认证和业务调用统一经过 `/api/graphql/admin`；公开 Bus/Queue 演示页的 REST/SSE/WebSocket 保持各自传输边界。
 - 数量与体积预算集中在 Node 构建测试；浏览器根据 manifest 静态依赖闭包核对实际请求、增量与复用。匿名直接访问后台深链会先加载完整后台闭包进行会话检查，再跳转登录；直接访问登录页加载相同的后台静态闭包。
 
-依赖安全维护：Codegen CLI 与小程序统一为 7.4.6，Vitest 使用 4.1.12；传递依赖补丁由两级 workspace 配置统一维护，原始审计结果与补丁缓解状态分别报告。
+依赖安全维护：Codegen CLI 与小程序统一为 7.4.6，Vitest 使用 5.0.5；传递依赖补丁由两级 workspace 配置统一维护，原始审计结果与补丁缓解状态分别报告。
+
+Vitest 5.0.5 沿用默认 clearMocks，模块 mock 放在顶层，异步断言必须 await。Web 的 @vitejs/plugin-react 固定 6.1.2，react() 使用 Vite 8 内置 Oxc 转换 JSX 与 React Refresh；当前不配置 Babel 或 React Compiler。工具升级需验证源码／包导出构建、分包预算与开发热更新；Taro 小程序单独维护兼容范围。
+
+Node 工具链固定 v26.12.0；Web、公共 Dashboard 与小程序显式声明开发依赖 @types/node 26.6.5，两级锁文件随类型依赖同步。Node 升级需验证 Web／小程序构建、Codegen、Node 回归与组件测试。
+
+Web 的 React／React DOM 固定 19.3.1、React Router 固定 8.4.0，对应 React 类型固定 19.3.0；Sentry 固定 11.8.0，workspace 可选 React 类型 peer 扩展跟随固定版本。typescript-operations 固定 6.1.10，与小程序一致。升级后核对 Codegen、严格类型检查、构建和测试，新增第三方锁定版本仍须满足 7 天策略；小程序保留 React 18／Babel 7／Vite 7 基线。
+
+## TypeScript 类型检查与编译器 API
+
+Web、公共 Dashboard 和小程序的纯类型检查固定使用 TypeScript 7.0.2，通过开发依赖 `typescript7: npm:typescript@7.0.2` 独立安装。检查命令显式调用 `node node_modules/typescript7/bin/tsc --noEmit`，避免与旧版 TypeScript 的 `tsc` 可执行文件冲突；Web 生产构建的前置类型检查使用同一入口。
+
+Web／公共 Dashboard 的 `typescript` 保持 `npm:@typescript/typescript6@6.0.2`，小程序保持 5.9.3，供 typescript-eslint、Node 测试加载器及 Taro／TDesign 编译器 API 使用。TypeScript 7 不提供旧版 transpileModule／createSourceFile API，不将其作为这些工具的 typescript peer。公共 Dashboard 的 JS 和声明生成继续由 build.mjs 显式调用 tsc6，类型检查入口与产物生成入口分别维护。
+
+变更同步两级锁文件，仍遵守 7 天发布时间策略；验收主仓与独立应用的类型检查、旧 API 回归和真实小程序生产构建。历史采集记录中的 tsc／tsc6 命令保留原始执行事实。

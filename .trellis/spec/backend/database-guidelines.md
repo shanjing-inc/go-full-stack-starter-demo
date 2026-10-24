@@ -3,6 +3,8 @@
 用于模型、查询、连接或迁移变化。入口：应用 share/schema/migrate 命令、应用 scripts 的 URL/迁移工具、Go kit 的 infra/database、应用 backend/internal/model、backend/internal/schema 和 migrations。
 
 - `DB_DSN` 是连接 URL，方言由 mysql、postgres/postgresql、sqlite 协议推导；不增加 `DB_DRIVER` 环境开关。
+- PostgreSQL URL 的 query 中 `+` 与 `%20` 表示空格、`%2B` 表示加号，只解码一次；userinfo 的 `+` 保持字面量，密码中的未编码 `@` 按最后一个分隔符识别。Go kit 在交给 pgx 前解析后重编码 query 键值（含值内未转义的 `=`），空格编码为 `%20`；重复参数按旧驱动与 Atlas 的规则保留首值，首值为空也不取后续值，重复 `sslmode` 不得静默改变 TLS。`ParseDSN` 与直接 `Open` 保持相同语义；原生键值 DSN 沿用驱动语义。Atlas 默认／显式迁移 URL 与开发库 URL 保持相同含义，开发库只移除 `search_path`。升级 kit 或 pgx 时同时核对运行时与迁移入口，保留已有配置含义。
+- 当前正式 kit `v0.1.0` 不包含 URL 归一化修复，独立应用保持 pgx `v5.10.0`；主仓源码联调由当前 kit 选择并验证 `v5.11.0`。应用升级到包含修复的新 kit 并通过固定依赖候选验收后，才能跟随采用新解析器。
 - `MIGRATION_URL` 可选，缺省、空字符串或纯空白时使用 `DB_DSN`；显式配置时优先使用并校验方言一致。执行迁移的账户需要建表与改表权限，生产环境推荐独立迁移账户。`ATLAS_DEV_URL` 必填且指向同方言、可清空的隔离开发库；清理范围限定在隔离开发库。
 - SQLite 默认迁移先按应用规则解码 `DB_DSN` 文件路径，再转为 Atlas 的 `file:` URI；编码空格、中文及百分号路径必须指向同一物理文件。相对路径以命令工作目录为基准，query 原值保留；显式 `MIGRATION_URL` 和内存模式延续现有 Atlas URL 语义。
 - ORM/Gen 沿用实体、事务和查询层；筛选、排序、分页在数据库执行，不取全表再前端过滤。
@@ -23,6 +25,7 @@
 - 公共入口为 `database.ParseDSN(raw)`、`database.Open(ctx, driver, dsn)`；模型继续使用 `time.Time` / `*time.Time`。
 - MySQL 使用秒级 `DATETIME`；PostgreSQL 目标 SQL 使用 `timestamptz(0)`；SQLite 保留 `datetime` 声明供驱动识别，实际值为 INTEGER epoch seconds。
 - 应用最低 `DB_VERSION=202610210001`。Web/Worker 启动前由 Atlas 执行三方言同版本增量迁移，历史迁移与 checksum 不改写。
+- `DB_VERSION` 低于最低要求时，启动错误同时说明当前配置、最低版本，以及先使用与本次启动相同的后端配置在应用目录执行 `pnpm migrate`（自定义配置须传 `--env-file`）、成功后再更新后端 `DB_VERSION` 并重启的顺序；配置值不能替代真实迁移状态。非法版本仅提示配置键与格式，不回显原值。开发监管器同时展示业务原因、实际后端配置文件及角色日志路径；对该版本错误生成带 `pnpm --dir <应用目录>` 和实际 `--env-file <绝对路径>` 的迁移命令，按 Shell 规则引用空格和引号，环境变量仍保持优先。
 
 ### 3. 契约
 

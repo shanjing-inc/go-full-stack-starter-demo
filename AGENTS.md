@@ -3,6 +3,7 @@
 # Multi Database Demo 协作约定
 
 - 对话与项目文档用中文；Shell 通过 rtk，原始输出用 rtk proxy。
+- 第三方 npm、Go 包及固定下载工具统一发布满 7 天后采用；Go 按官方模块代理精确版本时间核对，并覆盖本轮新增／升级的传递依赖。
 - 本目录是独立应用发布根，布局为 app-layout-v2：Go 模块在 backend，共享协议在 share/schema，容器配置在 docker；构建/生成/迁移/开发/测试在本目录执行，使用自己的 package.json/lockfile/toolchain，Go 使用 GOWORK=off。
 - 应用命令直接执行本地 scripts/\*.py；公共支持脚本与 format-go 分别由主仓 scripts、tools 维护，独立导出展开完整脚本并注入固定 CLI 依赖与 formatter 工具白名单。主仓用 multi-database-demo:<命令> 转发。Go kit、Dashboard 使用固定真实版本与完整性；派生项目直接修改自己的命令和脚本，源码升级采用定向补丁。
 - 本 `.trellis` 管应用任务；共享包、工具、发布回工作区根使用根 Trellis，同一任务不建两份。

@@ -73,13 +73,48 @@ it("采用真实 SSR 模板，Tab 可通过键盘切换且保留连接", () => {
     expect(node("[data-bus-tab=query]").getAttribute("aria-selected")).toBe("true");
     expect(document.activeElement).toBe(node("[data-bus-tab=query]"));
 });
-it("匿名操作保持禁用，程序触发同样经过页面门禁", () => {
+it("匿名连接打开登录引导弹窗，可取消且不创建连接；发布与查询仍禁用", () => {
+    const alert = vi.spyOn(window, "alert").mockImplementation(() => {});
     dispose();
     mount(false);
+    const dialog = node<HTMLDialogElement>("[data-bus-login-dialog]");
+    expect(dialog).not.toBeNull();
+    // jsdom 尚未实现原生 dialog 的打开和关闭；焦点与 Esc 由浏览器回归验证。
+    dialog.showModal = vi.fn(() => {
+        dialog.open = true;
+    });
+    dialog.close = vi.fn(() => {
+        dialog.open = false;
+    });
+    expect(node("[data-broadcast-connect]")).toBeEnabled();
     node("[data-broadcast-connect]").click();
+    expect(dialog.open).toBe(true);
+    expect(dialog.querySelector("a")).toHaveAttribute(
+        "href",
+        "/admin/login?returnTo=%2Ftest%2Fbus",
+    );
+    expect(node("[data-broadcast-status]")).toHaveTextContent("请先登录后再连接");
+    node("[data-bus-login-cancel]").click();
+    expect(dialog.open).toBe(false);
+    node("[data-bus-tab=query]").click();
+    expect(node("[data-device-connect]")).toBeEnabled();
+    node("[data-device-connect]").click();
+    expect(dialog.open).toBe(true);
+    expect(alert).not.toHaveBeenCalled();
+    expect(node("[data-device-status]")).toHaveTextContent("请先登录后再连接");
+    expect(node("#bus-message")).toBeDisabled();
+    expect(node("#broadcast-publish")).toBeDisabled();
+    expect(node("[data-device-mode]")).toBeDisabled();
+    expect(node("[data-query-submit]")).toBeDisabled();
+    const fetch = vi.fn();
+    vi.stubGlobal("fetch", fetch);
+    submit("[data-broadcast-form]");
     submit("[data-query-form]");
     expect(FakeSocket.all).toHaveLength(0);
+    expect(fetch).not.toHaveBeenCalled();
     expect(queryDevice).not.toHaveBeenCalled();
+    window.dispatchEvent(new Event("pagehide"));
+    expect(dialog.open).toBe(false);
 });
 it("等待服务端订阅就绪，安全显示广播并清空记录", () => {
     node("[data-broadcast-connect]").click();

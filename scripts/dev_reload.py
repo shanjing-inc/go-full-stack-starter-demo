@@ -5,11 +5,12 @@ import json
 import os
 from pathlib import Path
 import signal
+import shlex
 import shutil
 import subprocess
 import time
 import host_platform as host
-from starter_context import workspace_modules, write_workspace
+from starter_context import frontend_directory, workspace_modules, write_workspace
 
 
 def runtime_base(root):
@@ -350,7 +351,8 @@ class ReloadSupervisor:
             except ValueError:
                 continue
             if (
-                record.get("msg") == role.capitalize() + " 就绪"
+                isinstance(record, dict)
+                and record.get("msg") == role.capitalize() + " 就绪"
                 and record.get("pid") == process.pid
             ):
                 if host.darwin():
@@ -359,6 +361,44 @@ class ReloadSupervisor:
                 return actual == binary_fingerprint(self.folder / role)
         return False
 
+    def exit_error(self, role, code):
+        """仅展示结构化退出错误；原始日志保留在文件中供排查。"""
+        log = self.folder / (role + ".log")
+        message = f"{role} 业务进程退出：{code}"
+        migration_required = False
+        try:
+            with log.open("rb") as file:
+                file.seek(0, os.SEEK_END)
+                file.seek(max(0, file.tell() - 16384))
+                lines = file.read().decode("utf-8", errors="replace").splitlines()
+            for line in reversed(lines):
+                try:
+                    record = json.loads(line)
+                except ValueError:
+                    continue
+                if (
+                    isinstance(record, dict)
+                    and record.get("level") == "ERROR"
+                    and record.get("msg") == role.capitalize() + " 退出"
+                    and isinstance(record.get("error"), str)
+                    and record["error"].strip()
+                ):
+                    message += "\n原因：" + " ".join(record["error"][:2000].split())
+                    migration_required = record["error"].startswith("当前 DB_VERSION=")
+                    break
+        except OSError:
+            pass
+        config = self.env.get("STARTER_ENV_FILE")
+        if config:
+            message += f"\n后端配置：{config}（同名进程环境变量优先）"
+        if migration_required:
+            application = frontend_directory(self.module).parent
+            command = ["pnpm", "--dir", str(application), "migrate"]
+            if config:
+                command += ["--env-file", str((self.root / config).resolve())]
+            message += "\n迁移命令：" + shlex.join(command)
+        return message + "\n日志：" + str(log)
+
     def tick(self):
         now = time.monotonic()
         fingerprint = source_fingerprint(self.root, self.module, self.embedded, self.env)
@@ -366,8 +406,8 @@ class ReloadSupervisor:
             self.observed, self.changed_at = fingerprint, now
         for role, process in self.roles.items():
             if process.poll() is not None:
-                self.publish("failed", error=f"{role} 业务进程退出：{process.returncode}")
-                raise RuntimeError(self.state["error"] + "，日志：" + str(self.folder))
+                self.publish("failed", error=self.exit_error(role, process.returncode))
+                raise RuntimeError(self.state["error"])
         if self.build is not None:
             if self.build.poll() is None:
                 return

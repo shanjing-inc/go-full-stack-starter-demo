@@ -1,3 +1,4 @@
+diff --git a/dist/mini/emit.js b/dist/mini/emit.js
 --- a/dist/mini/emit.js
 +++ b/dist/mini/emit.js
 @@ -75,7 +75,7 @@

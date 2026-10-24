@@ -9,12 +9,12 @@
         "codegen": "node scripts/codegen.mjs",
         "codegen:check": "node scripts/codegen.mjs --check",
         "lint": "eslint src config types tests/types --max-warnings 0",
-        "typecheck": "pnpm lint && pnpm codegen:check && tsc --noEmit",
+        "typecheck": "pnpm lint && pnpm codegen:check && node node_modules/typescript7/bin/tsc --noEmit",
         "check": "pnpm typecheck",
         "test": "node --test tests/node/*.test.cjs tests/node/*.test.mjs"
     },
     "dependencies": {
-        "@apollo/client": "4.3.5",
+        "@apollo/client": "4.3.4",
         "@babel/runtime": "7.29.10",
         "@tarojs/components": "4.3.0",
         "@tarojs/helper": "4.3.0",
@@ -40,7 +40,7 @@
         "@graphql-codegen/typescript-operations": "6.1.10",
         "@tarojs/cli": "4.3.0",
         "@tarojs/vite-runner": "4.3.0",
-        "@types/node": "22.20.5",
+        "@types/node": "26.6.5",
         "@types/react": "18.3.31",
         "@types/react-dom": "18.3.7",
         "babel-preset-taro": "4.3.0",
@@ -50,7 +50,8 @@
         "tailwindcss": "4.3.3",
         "ts-node": "10.9.2",
         "typescript": "5.9.3",
-        "typescript-eslint": "8.72.0",
+        "typescript7": "npm:typescript@7.0.2",
+        "typescript-eslint": "8.71.2",
         "vite": "7.3.7",
         "weapp-tailwindcss": "5.6.3"
     }

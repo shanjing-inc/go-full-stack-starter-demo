@@ -4,20 +4,11 @@ packages:
 linkWorkspacePackages: false
 # 脚本执行只提示依赖状态；安装统一在选定工作区根显式执行。
 verifyDepsBeforeRun: warn
+# 配置包的最少发布时间：至少发布 7 天后才能使用，降低供应链攻击风险。
+minimumReleaseAge: 10080 # 7 天（以分钟为单位）
+# 自己开发维护的包按包名豁免，后续升级无需逐版本调整。
 minimumReleaseAgeExclude:
-    - "@shanjing/shadcnui-dashboard@1.2.0"
-    - "@apollo/client@4.3.5"
-    - "@typescript-eslint/eslint-plugin@8.72.0"
-    - "@typescript-eslint/parser@8.72.0"
-    - "@typescript-eslint/project-service@8.72.0"
-    - "@typescript-eslint/scope-manager@8.72.0"
-    - "@typescript-eslint/tsconfig-utils@8.72.0"
-    - "@typescript-eslint/type-utils@8.72.0"
-    - "@typescript-eslint/types@8.72.0"
-    - "@typescript-eslint/typescript-estree@8.72.0"
-    - "@typescript-eslint/utils@8.72.0"
-    - "@typescript-eslint/visitor-keys@8.72.0"
-    - typescript-eslint@8.72.0
+    - "@shanjing/shadcnui-dashboard"
 # 原生 esbuild 安装脚本按固定版本放行；其他已审阅的生命周期脚本保持关闭。
 # Taro CLI 的 postinstall 会修改用户级插件配置，项目明确关闭。
 allowBuilds:
@@ -36,7 +27,7 @@ packageExtensions:
     "download-git-repo@3.0.2":
         dependencies:
             "@xhmikosr/downloader": "16.3.1"
-    "@sentry/react@11.6.0":
+    "@sentry/react@11.8.0":
         peerDependencies:
             "@types/react": "*"
         peerDependenciesMeta:

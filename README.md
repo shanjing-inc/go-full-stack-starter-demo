@@ -25,7 +25,9 @@ Docker 从应用根使用 `rtk proxy docker build -f docker/Dockerfile -t multi-
 
 ## 安装与命令
 
-源码平台矩阵：Linux amd64、macOS Intel（amd64）/Apple Silicon（arm64）；Python 3.12+、Node 24、pnpm 11.15.1。toolchain.json 按平台固定 Go/Atlas/Ruff 的版本、下载地址与 SHA256。命令直接执行本应用 `scripts/*.py`，独立导出的 `tools` 提供固定 CLI 依赖锁和格式工具，应用开发重载由 `scripts/dev_reload.py` 负责。主仓使用 `pnpm multi-database-demo:dev` 等名称前缀转发，本目录使用 `pnpm dev` 等原生入口。macOS 两架构保留实机验收。
+源码平台矩阵：Linux amd64、macOS Intel（amd64）/Apple Silicon（arm64）；Python 3.12+、Node 26、pnpm 12.14.0。toolchain.json 按平台固定 Go/Atlas/Ruff 的版本、下载地址与 SHA256。命令直接执行本应用 `scripts/*.py`，独立导出的 `tools` 提供固定 CLI 依赖锁和格式工具，应用开发重载由 `scripts/dev_reload.py` 负责。主仓使用 `pnpm multi-database-demo:dev` 等名称前缀转发，本目录使用 `pnpm dev` 等原生入口。macOS 两架构保留实机验收。
+
+pnpm 要求第三方包至少发布 7 天（minimumReleaseAge: 10080 分钟）后才能安装；自维护的 @shanjing/shadcnui-dashboard 按包名豁免，升级时保留该配置。
 
 布局规范名为 `app-layout-v2`，旧 `app-only-v2` 保留为兼容别名，两者使用相同目录与环境规则；`app-only-v1` 保持历史根目录布局。应用脚本通过 starter.config.json 校验布局。
 
