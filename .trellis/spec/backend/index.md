@@ -10,6 +10,56 @@
 
 开发前读受影响源码、同目录测试、配置和 SDL；收尾核对接口/生成物/spec 一致，并记录实际命令结果。
 
+## API URI 规范
+
+新增或调整 API 时，按协议统一 URI 前缀，便于路由注册、客户端调用和代理配置保持一致。
+
+| 协议      | URI 形式                  | 现有示例                                                   |
+| --------- | ------------------------- | ---------------------------------------------------------- |
+| REST      | `/api/rest/*`             | `/api/rest/demo/shops/:id`、`/api/rest/internal/health`    |
+| GraphQL   | `/api/graphql/endpoint`   | `/api/graphql/admin`、`/api/graphql/member`                |
+| WebSocket | `/api/websocket/endpoint` | `/api/websocket/bus-query`、`/api/websocket/bus-broadcast` |
+
+- `*` 为具体资源或业务路径；`endpoint` 为端点名称占位符，实际 URI 使用具体名称。
+- REST 资源路径放在 `/api/rest/` 下；GraphQL 操作由对应端点的 Schema 定义；WebSocket 使用对应端点建立连接。
+- 例如店铺 REST 使用 `/api/rest/demo/shops/:id`，不能直接注册为 `/api/shops/:id`；GraphQL Admin 使用 `/api/graphql/admin`，不能简写为 `/graphql/admin`。
+- 变更 URI 时同步后端路由、前端与小程序请求、开发和部署代理、测试与文档。回归断言对应 REST 请求、GraphQL 操作或 WebSocket 握手到达预期处理器，并保持已有鉴权与错误契约。
+- 代码依据：应用目录下的 `backend/internal/web/server.go` 与 `backend/internal/realtime/runtime.go`；Go 路由回归沿用对应包内 `*_test.go`。
+
+## 内部健康探针
+
+### 适用范围
+
+正式应用的存活与就绪接口统一归入 REST；旧 `/health/live`、`/health/ready` 停止注册。历史 `poc/delivery` 保持自己的隔离接口。
+
+### 接口
+
+| 方法与 URI                            | 响应                                                                                  |
+| ------------------------------------- | ------------------------------------------------------------------------------------- |
+| `GET /api/rest/internal/health`       | `200`，纯文本 `ok\n`；另支持无正文的 `HEAD`                                           |
+| `GET /api/rest/internal/health/live`  | `200`，JSON `{"status":"alive"}`                                                      |
+| `GET /api/rest/internal/health/ready` | `200`，JSON `{"status":"ready"}`；依赖异常返回 `503`，JSON `{"status":"unavailable"}` |
+
+### 请求与依赖契约
+
+应用最外层 HTTP Handler 通过 `web.WithHealth` 精确承接三个探针路径，复用公共 `httpx.New` 的请求标识、恢复和错误处理；探针允许匿名访问，不进入业务 Guard、来源校验或会话数据库。其他路径继续交给原有业务 Handler。存活检查只表示进程存活；就绪检查在一秒上下文期限内核验数据库迁移版本与 Redis。探针不接收业务载荷，不新增环境变量。
+
+### 校验与错误矩阵
+
+新路径由各自处理器返回上述状态；相邻的 `/api/rest/internal/health/details`、`/api/rest/internal/health/live/details` 等已注册业务路由仍执行认证，匿名返回 `401`。不得按整个健康路径前缀放行。
+
+### 正常、基线与拒绝场景
+
+正常：匿名请求就绪探针得到依赖检查结果。基线：原有轻量健康检查保持响应。拒绝：伪装成探针子路径的业务接口不能绕过认证；携带过期凭据的真实探针仍可执行健康检查。
+
+### 验证要求
+
+应用 `internal/web/health_test.go` 在工作区和 `GOWORK=off` 固定 kit 模式分别覆盖匿名、无效 token、会话数据库关闭、就绪超时及相邻路径认证；公共 auth 包内的健康路径测试保留公共 Guard 契约。正式宿主与 Docker 验收脚本使用新就绪地址，Docker 故障专项同时断言依赖异常下存活为 `200`、就绪为 `503`。工作区源码联调与独立应用的固定 kit 版本验收分别记录，正式发布、升级版本另行执行。
+
+### 错误与正确写法
+
+错误：继续调用 `/health/ready`，或使用 `HasPrefix(path, "/api/rest/internal/health")` 放行认证。正确：调用 `/api/rest/internal/health/ready`，应用边界只匹配表中三个完整路径，其他请求进入业务认证链路。
+
 ## 开发工具来源
 
 应用 package.json 直接调用 scripts/\*.py，生成、开发监管、格式与清理实现随源码交付。应用使用自己的 .tools/.runtime 与默认 GOWORK=off；固定 Go kit 和 Dashboard 依赖保持 release-dependencies.json 校验。发布凭证绑定应用提交、kit 原来源和完整交付摘要，独立 demo 同步消费该凭证。

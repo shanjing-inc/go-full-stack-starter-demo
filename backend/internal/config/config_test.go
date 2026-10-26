@@ -4,7 +4,6 @@ package config_test
 
 import (
     subject "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/projects/multi-database-demo/internal/config"
-    "strings"
     "testing"
     "time"
 )
@@ -13,7 +12,6 @@ func TestConfig(t *testing.T) {
     t.Setenv("APP_MODE", "development")
     t.Setenv("AUTH_SECRET", "test-secret-with-at-least-32-bytes")
     t.Setenv("AUTH_BOOTSTRAP_TOKEN", "")
-    t.Setenv("DB_VERSION", "202610210001")
     t.Setenv("ALLOW_ORIGINS", "https://localhost")
     t.Setenv("REDIS_URL", "redis://127.0.0.1:6379/0")
     t.Setenv("DB_DSN", "sqlite://sample.sqlite")
@@ -25,25 +23,14 @@ func TestConfig(t *testing.T) {
     if c.QueueRecordRetention != 7*24*time.Hour {
         t.Fatal(c.QueueRecordRetention)
     }
-    t.Run("旧数据库版本提示迁移和配置更新顺序", func(t *testing.T) {
-        t.Setenv("DB_VERSION", "202610040001")
-        for _, role := range []string{"web", "worker"} {
-            _, err := subject.Load(role)
-            if err == nil {
-                t.Fatalf("%s 应拒绝旧版本配置", role)
-            }
-            for _, want := range []string{"DB_VERSION=202610040001", "最低要求 202610210001", "pnpm migrate", "相同的后端配置", "--env-file", "迁移成功后", "DB_VERSION=202610210001"} {
-                if !strings.Contains(err.Error(), want) {
-                    t.Errorf("%s 错误缺少 %q：%v", role, want, err)
+    t.Run("历史版本环境变量不影响启动配置", func(t *testing.T) {
+        for _, version := range []string{"", "202610040001", "99999999999999", "123-private-value"} {
+            t.Setenv("DB_VERSION", version)
+            for _, role := range []string{"web", "worker"} {
+                if _, err := subject.Load(role); err != nil {
+                    t.Fatalf("%s 不应依赖 DB_VERSION=%q：%v", role, version, err)
                 }
             }
-        }
-    })
-    t.Run("非法版本配置不回显原值", func(t *testing.T) {
-        t.Setenv("DB_VERSION", "123-private-value")
-        _, err := subject.Load("web")
-        if err == nil || !strings.Contains(err.Error(), "DB_VERSION") || strings.Contains(err.Error(), "private-value") {
-            t.Fatalf("非法版本应提示配置键且隐藏原值：%v", err)
         }
     })
     t.Run("监控默认关闭并支持公开部署配置", func(t *testing.T) {
@@ -102,14 +89,12 @@ func TestConfig(t *testing.T) {
         {"WORKER_CONCURRENCY", "0"},
         {"DB_DSN", "invalid://localhost/demo"},
         {"DB_DSN", ""},
-        {"DB_VERSION", "oops"},
         {"WEB_ADDR", "invalid"},
         {"REDIS_URL", "secret-invalid"},
         {"AUTH_SECRET", "short"},
         {"AUTH_BOOTSTRAP_TOKEN", "short"},
         {"ALLOW_ORIGINS", "*"},
         {"ALLOW_ORIGINS", "https://localhost/path"},
-        {"DB_VERSION", "202610030001"},
     } {
         t.Run(item.key, func(t *testing.T) {
             t.Setenv(item.key, item.value)
@@ -123,7 +108,6 @@ func TestConfig(t *testing.T) {
 func TestExplicitDevelopmentMode(t *testing.T) {
     t.Setenv("AUTH_SECRET", "test-secret-with-at-least-32-bytes")
     t.Setenv("AUTH_BOOTSTRAP_TOKEN", "")
-    t.Setenv("DB_VERSION", "202610210001")
     t.Setenv("ALLOW_ORIGINS", "https://localhost")
     t.Setenv("REDIS_URL", "redis://127.0.0.1:6379/0")
     t.Setenv("DB_DSN", "sqlite://sample.sqlite")
@@ -143,7 +127,6 @@ func TestDatabaseTypeComesFromDSN(t *testing.T) {
     t.Setenv("DB_DSN", "postgresql://dev:password@localhost/demo")
     t.Setenv("APP_MODE", "development")
     t.Setenv("REDIS_URL", "redis://127.0.0.1:6379/0")
-    t.Setenv("DB_VERSION", "202610210001")
     t.Setenv("WORKER_CONCURRENCY", "2")
     t.Setenv("SHUTDOWN_TIMEOUT", "4s")
     t.Setenv("QUEUE_RECORD_RETENTION_DAYS", "7")

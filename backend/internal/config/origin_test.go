@@ -10,7 +10,7 @@ import (
 func TestOriginModes(t *testing.T) {
     for key, value := range map[string]string{
         "AUTH_SECRET": "test-secret-with-at-least-32-bytes", "AUTH_BOOTSTRAP_TOKEN": "",
-        "DB_DSN": "sqlite://sample.sqlite", "DB_VERSION": "202610210001",
+        "DB_DSN":    "sqlite://sample.sqlite",
         "REDIS_URL": "redis://127.0.0.1:6379/0", "WEB_ADDR": "127.0.0.1:8080",
         "SHUTDOWN_TIMEOUT": "4s", "QUEUE_RECORD_RETENTION_DAYS": "7", "WORKER_CONCURRENCY": "2",
     } {

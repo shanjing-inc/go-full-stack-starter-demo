@@ -6,6 +6,8 @@
 
 `backend`、`frontend`、`miniprogram`、`share`、`docker`、`scripts`、AGENTS 和应用 Trellis 随发布交付。公共支持脚本与 formatter 工具白名单由导出器从同一提交交付。公共 Go kit、Dashboard 是固定版本扩展依赖；主仓发版工具和任务历史保持主仓归属。来源提交、逐文件映射和依赖完整性见 demo-release.json；依赖升级记录见 release-dependencies.json。
 
+应用 Go kit 固定为正式发布的 `v1.2.1`，与当前 GraphQL 登录接口兼容；版本、源码提交与真实 Go 校验值共同记录在 `release-dependencies.json`，独立构建使用 `GOWORK=off`。
+
 ## 目录边界
 
 ```text
@@ -168,6 +170,10 @@ STARTER_KIT_SOURCE=/path/to/go-server-kit rtk pnpm dev
 
 CI 强制 STARTER_KIT_MODE=installed，忽略本地配置并拒绝显式 STARTER_KIT_SOURCE。安装最终版本号的候选 kit，验收冻结独立应用；通过后正式核对 kit，再发布同一 demo，不重复构建或验收。
 
+## 数据库迁移版本
+
+数据库迁移成功后直接重新启动，无需修改环境配置中的 `DB_VERSION`；旧值被忽略。Web/Worker 与 readiness 自动读取 Atlas 迁移记录，要求全部记录完成且最新版本与应用 `backend/internal/databasegate.DatabaseVersion` 一致。版本落后时按提示使用相同后端配置执行 `pnpm migrate`（自定义文件带 `--env-file`）；版本超前时核对数据库连接及应用版本。
+
 ## 数据库时间
 
 业务时间统一表示绝对时间，API 输入必须带时区，输入输出均归一为秒级 UTC，页面按用户时区展示。队列耗时与 heartbeat 继续保留毫秒。
@@ -176,4 +182,10 @@ MySQL 以连接 URL 的 `loc` 作为唯一时区配置，缺省 UTC；连接工�
 
 SQLite 时间实际保存为整数 epoch seconds，保留 `datetime` 类型声明供驱动解码到 `time.Time`。写入和查询传 `time.Time`，数据库默认值使用 `unixepoch()`，筛选、排序和分页均在 SQL 内完成。升级前备份旧库；`202610210001` 迁移转换旧时间文本，保留 NULL、外键、索引和自增序列，不能解析的历史值会中止迁移，需处理后重试。旧无时区文本按 UTC 解释，其他历史约定须先核对。
 
-本次迁移要求配套包含新连接契约的 Go kit。主仓开发命令直接使用工作区源码；独立应用开发可通过 `STARTER_KIT_SOURCE` 或 `.starter.local.json` 选择同一份源码，检查、测试、生成和构建均使用该来源，无需先发布公共包。正式发布仍需按候选包流程验收并升级固定依赖，与新迁移一同交付。
+当前固定的正式 Go kit `v1.2.1` 已包含本次迁移所需的新连接契约。主仓开发命令直接使用工作区源码；独立应用开发可通过 `STARTER_KIT_SOURCE` 或 `.starter.local.json` 选择源码联调，检查、测试、生成和构建均使用所选来源。后续公共包升级仍需按候选包流程验收固定依赖，与应用迁移一同交付。
+
+## API 地址
+
+REST 使用 `/api/rest/*`，GraphQL 使用 `/api/graphql/admin`、`/api/graphql/member`，Bus WebSocket 使用 `/api/websocket/bus-query`、`/api/websocket/bus-broadcast`。
+
+健康探针允许匿名访问：轻量检查为 `/api/rest/internal/health`，存活检查为 `/api/rest/internal/health/live`，就绪检查为 `/api/rest/internal/health/ready`。三个精确路径在应用 HTTP 入口独立处理，不读取认证会话；相邻业务路径继续执行认证。就绪检查在一秒内验证数据库迁移版本与 Redis，依赖异常返回 503；存活检查保持 200。旧 `/health/live`、`/health/ready` 已迁移，部署监控与反向代理应同步新地址。

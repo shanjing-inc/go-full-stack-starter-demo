@@ -4,12 +4,12 @@
 
 - `DB_DSN` 是连接 URL，方言由 mysql、postgres/postgresql、sqlite 协议推导；不增加 `DB_DRIVER` 环境开关。
 - PostgreSQL URL 的 query 中 `+` 与 `%20` 表示空格、`%2B` 表示加号，只解码一次；userinfo 的 `+` 保持字面量，密码中的未编码 `@` 按最后一个分隔符识别。Go kit 在交给 pgx 前解析后重编码 query 键值（含值内未转义的 `=`），空格编码为 `%20`；重复参数按旧驱动与 Atlas 的规则保留首值，首值为空也不取后续值，重复 `sslmode` 不得静默改变 TLS。`ParseDSN` 与直接 `Open` 保持相同语义；原生键值 DSN 沿用驱动语义。Atlas 默认／显式迁移 URL 与开发库 URL 保持相同含义，开发库只移除 `search_path`。升级 kit 或 pgx 时同时核对运行时与迁移入口，保留已有配置含义。
-- 当前正式 kit `v0.1.0` 不包含 URL 归一化修复，独立应用保持 pgx `v5.10.0`；主仓源码联调由当前 kit 选择并验证 `v5.11.0`。应用升级到包含修复的新 kit 并通过固定依赖候选验收后，才能跟随采用新解析器。
+- 应用当前固定正式 kit `v1.2.1`，包含 URL 归一化修复，pgx 使用 `v5.11.0`；工作区联调与 `GOWORK=off` 固定依赖验收分别执行。后续升级仍需核对配置含义、真实模块来源及新增／升级传递依赖的官方发布时间。
 - `MIGRATION_URL` 可选，缺省、空字符串或纯空白时使用 `DB_DSN`；显式配置时优先使用并校验方言一致。执行迁移的账户需要建表与改表权限，生产环境推荐独立迁移账户。`ATLAS_DEV_URL` 必填且指向同方言、可清空的隔离开发库；清理范围限定在隔离开发库。
 - SQLite 默认迁移先按应用规则解码 `DB_DSN` 文件路径，再转为 Atlas 的 `file:` URI；编码空格、中文及百分号路径必须指向同一物理文件。相对路径以命令工作目录为基准，query 原值保留；显式 `MIGRATION_URL` 和内存模式延续现有 Atlas URL 语义。
 - ORM/Gen 沿用实体、事务和查询层；筛选、排序、分页在数据库执行，不取全表再前端过滤。
 - 三方言迁移/目标 SQL 分目录维护；生成 share/schema 不等于真实库均已验收。
-- Web/Worker 启动只读核对 Atlas 登记版本；部署前独立迁移，不由每个副本自行迁移。版本变化核对 `DB_VERSION` 和历史 checksum。
+- Web/Worker 启动只读核对 Atlas 登记版本；部署前独立迁移，不由每个副本自行迁移。版本变化同步应用 `internal/databasegate.DatabaseVersion`，核对三方言最新迁移和历史 checksum；不再配置 `DB_VERSION`。
 - 每批测试隔离数据库/fixture，不改生产逻辑掩盖污染。
 
 验证：`rtk pnpm share/schema`、隔离库 `rtk pnpm schema:diff -- --name <名称>`、`rtk pnpm migrate`。真实库分别记录 `rtk pnpm verify:mysql`、`rtk pnpm verify:postgresql` 的环境/结果，凭据从证据中脱敏。
@@ -24,8 +24,8 @@
 
 - 公共入口为 `database.ParseDSN(raw)`、`database.Open(ctx, driver, dsn)`；模型继续使用 `time.Time` / `*time.Time`。
 - MySQL 使用秒级 `DATETIME`；PostgreSQL 目标 SQL 使用 `timestamptz(0)`；SQLite 保留 `datetime` 声明供驱动识别，实际值为 INTEGER epoch seconds。
-- 应用最低 `DB_VERSION=202610210001`。Web/Worker 启动前由 Atlas 执行三方言同版本增量迁移，历史迁移与 checksum 不改写。
-- `DB_VERSION` 低于最低要求时，启动错误同时说明当前配置、最低版本，以及先使用与本次启动相同的后端配置在应用目录执行 `pnpm migrate`（自定义配置须传 `--env-file`）、成功后再更新后端 `DB_VERSION` 并重启的顺序；配置值不能替代真实迁移状态。非法版本仅提示配置键与格式，不回显原值。开发监管器同时展示业务原因、实际后端配置文件及角色日志路径；对该版本错误生成带 `pnpm --dir <应用目录>` 和实际 `--env-file <绝对路径>` 的迁移命令，按 Shell 规则引用空格和引号，环境变量仍保持优先。
+- 应用期望版本由 `internal/databasegate.DatabaseVersion` 固定为 `202610210001`，与三方言最新迁移一致。Web/Worker 启动前由 Atlas 执行迁移，历史迁移与 checksum 不改写。
+- 启动和 readiness 的版本行为见下方“数据库版本自动检测”；旧环境文件中的 `DB_VERSION` 被忽略，执行迁移后直接重启。
 
 ### 3. 契约
 
@@ -36,7 +36,7 @@
 - 公共认证 API 的到期时间输入也会归一为秒级 UTC，保留调用方原值。GORM 自动时间为秒级 UTC；GraphQL DateTime 输入带明确 offset 或 Z，进入业务前归一为秒级 UTC，输出保持秒级 UTC；前端按用户时区展示。
 - SQLite 增量迁移统一旧 RFC3339、Go time.String、已有整数秒及无时区日期（YYYY-MM-DD）、分钟（空格或 T 分隔）和秒级时间字符串，日期／分钟格式也兼容旧驱动支持的 `Z` 后缀；小时允许旧驱动可读的单数字形式，先补零再校验；数字 offset 后的末尾 `Z` 按旧驱动语义移除，保留 offset 对应的绝对时间；小数秒兼容旧驱动的点或逗号分隔符，仅归一秒后且紧接数字的逗号，仍严格校验完整值；无时区旧值按 UTC 解释，带 offset 的值保留绝对时间，保留 NULL、自增序列、索引和外键。转换前严格校验墙上时间的年月日、闰年及时分秒范围，拒绝 SQLite 自动归一化非法日期或 24 点时间；不能确定旧无时区值语义时先离线核对再迁移。
 - MySQL 迁移不调整历史 DATETIME 字面值；旧北京时间库继续设置 `loc=Asia%2FShanghai`。不要统一减八小时。PostgreSQL 迁移以 `date_trunc('second', column)` 截断旧值并保留 instant。
-- 开发验证可直接使用包含此连接契约的 Go kit 源码：主仓使用工作区，独立应用通过 `STARTER_KIT_SOURCE` 或 `.starter.local.json` 选择源码，检查、测试、生成和构建共用来源，无需先发布包。正式发布仍需候选包验收并升级固定依赖，与新迁移一同交付；源码联调不能替代发布时的固定依赖验收。
+- 应用当前固定的正式 kit `v1.2.1` 已包含此连接契约。开发验证可使用源码：主仓使用工作区，独立应用通过 `STARTER_KIT_SOURCE` 或 `.starter.local.json` 选择源码，检查、测试、生成和构建共用来源。后续公共包升级仍需候选包验收并更新固定依赖，与应用迁移一同交付；源码联调不能替代固定依赖验收。
 
 ### 4. 校验与错误
 
@@ -70,3 +70,42 @@
 错误：向 SQLite 时间列直接传 `now.Format(time.RFC3339Nano)`，或者查询后在 Go 中重新筛选、排序和分页。
 
 正确：向所有方言传 `time.Time`，复用连接工厂编码，并通过 `WHERE expires_at > ? ORDER BY created_at DESC, id DESC LIMIT ? OFFSET ?` 执行数据库分页。
+
+## 场景：数据库版本自动检测
+
+### 1. 范围与触发
+
+Web、Worker 启动和 readiness 需要判断数据库是否适配当前应用，避免已迁移后仍被旧环境变量拦截。
+
+### 2. 签名
+
+应用 `internal/databasegate.Open(ctx, driver, dsn) (*Gate, error)`、`Gate.Check(ctx) error` 和 `Gate.Close() error`。`DatabaseVersion` 随代码交付，三方言最新迁移必须与其一致；公共 `revision.Gate` API 保持兼容。
+
+### 3. 契约
+
+只读查询 `atlas_schema_revisions`；复用公共 Gate 对全部记录的 type、applied/total 和 error 的校验。完整版本必须精确匹配应用要求。`DB_DSN` 决定实际连接，忽略所有历史 `DB_VERSION` 值，不新增环境开关。迁移由独立命令执行，启动不写库。仅版本不匹配时额外读取最新版本以生成诊断；异常版本内容不回显。
+
+### 4. 校验与错误矩阵
+
+| 数据库状态                 | 结果                                                                                   |
+| -------------------------- | -------------------------------------------------------------------------------------- |
+| 完整且版本相同             | 启动成功；readiness 继续检查依赖                                                       |
+| 版本落后或登记为空         | 保持 `errors.Is(err, revision.ErrVersion)`，提示应用要求及迁移命令；落后时显示实际版本 |
+| 版本超前                   | 保持 ErrVersion，显示实际版本和应用要求，提示匹配应用版本及核对 DB_DSN，不提示继续迁移 |
+| 任意记录未完成或含 error   | 保持 ErrIncomplete，提示检查并完成迁移                                                 |
+| 缺表                       | 保持 ErrUnavailable，说明 atlas_schema_revisions、迁移及 DB_DSN                        |
+| 连接、权限、取消或字段异常 | 保持 ErrUnavailable，不回显驱动错误与连接信息                                          |
+
+### 5. 正常、基准与拒绝场景
+
+正常：执行 `pnpm migrate` 后直接重启；旧 `.env` 留有 `DB_VERSION=202610040001` 也能启动。基准：未设置 DB_VERSION 的已迁移库正常启动。拒绝：修改环境变量无法绕过真实版本落后、超前或历史失败记录。
+
+### 6. 验证要求
+
+`internal/config/config_test.go` 验证旧、空、超前及非法 DB_VERSION 均不影响配置加载。`internal/databasegate/gate_test.go` 使用只读 SQLite 覆盖匹配、落后、超前、空记录、未完成、历史失败、缺表、脱敏、数据库字节不变、readiness 变更与取消，并核对三方言最新迁移。主仓 verify 和 Docker 验收通过修改隔离测试库的迁移登记模拟落后，finally 恢复，不再通过环境变量模拟版本错误。真实 MySQL/PostgreSQL/Docker 属于独立专项验收。
+
+开发监管器为含 `pnpm migrate` 的迁移错误及缺表提示生成可复制命令，复用实际应用目录和后端配置的 `--env-file` 绝对路径，参数由 `shlex.join` 引用；版本超前不生成迁移命令。回归沿用 `scripts/test-dev-reload.py`。
+
+### 7. 错误与正确用法
+
+错误：迁移后要求修改 `.env` 的 DB_VERSION，或由启动进程执行迁移。正确：新增迁移时同步 DatabaseVersion；部署独立迁移，启动只读核验，使用同一后端配置执行 `pnpm migrate` 后直接重启。

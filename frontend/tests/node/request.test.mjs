@@ -166,11 +166,13 @@ test("REST 保留普通对象、Cookie、错误数组校验与认证优先级", 
         return response({ ready: true });
     });
     try {
-        assert.deepEqual(await request.getJSON("/api/health", controller.signal), { ready: true });
+        assert.deepEqual(await request.getJSON("/api/rest/internal/health", controller.signal), {
+            ready: true,
+        });
         assert.equal(sent.credentials, "include");
         assert.equal(sent.cache, "no-store");
         context.mock.method(globalThis, "fetch", async () => response({ errors: [null] }));
-        await assert.rejects(request.getJSON("/api/health", controller.signal), {
+        await assert.rejects(request.getJSON("/api/rest/internal/health", controller.signal), {
             code: "INVALID_RESPONSE",
         });
         context.mock.method(globalThis, "fetch", async () =>
@@ -181,7 +183,7 @@ test("REST 保留普通对象、Cookie、错误数组校验与认证优先级", 
                 ],
             }),
         );
-        await assert.rejects(request.getJSON("/api/health", controller.signal), {
+        await assert.rejects(request.getJSON("/api/rest/internal/health", controller.signal), {
             name: "ApiError",
             code: "UNAUTHORIZED",
         });

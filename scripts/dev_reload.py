@@ -384,7 +384,10 @@ class ReloadSupervisor:
                     and record["error"].strip()
                 ):
                     message += "\n原因：" + " ".join(record["error"][:2000].split())
-                    migration_required = record["error"].startswith("当前 DB_VERSION=")
+                    migration_required = (
+                        "pnpm migrate" in record["error"]
+                        or "迁移记录表 atlas_schema_revisions 不存在" in record["error"]
+                    )
                     break
         except OSError:
             pass

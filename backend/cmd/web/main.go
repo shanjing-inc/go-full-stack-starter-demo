@@ -21,10 +21,10 @@ import (
 
     "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit/infra/bus"
     "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit/infra/database"
-    "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit/infra/database/revision"
     worker "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit/infra/queue"
     "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/projects/multi-database-demo/internal/buildinfo"
     "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/projects/multi-database-demo/internal/config"
+    "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/projects/multi-database-demo/internal/databasegate"
     "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/projects/multi-database-demo/internal/realtime"
     "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/projects/multi-database-demo/internal/service"
     "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/projects/multi-database-demo/internal/web"
@@ -69,7 +69,7 @@ func run() (runErr error) {
     defer stop()
     startup, cancel := context.WithTimeout(ctx, 3*time.Second)
     defer cancel()
-    gate, err := schema.Open(startup, c.Driver, c.DSN, c.Version)
+    gate, err := databasegate.Open(startup, c.Driver, c.DSN)
     if err != nil {
         return err
     }
@@ -170,15 +170,6 @@ func run() (runErr error) {
     }
     api.GET("/api/rest/demo/build", buildHandler)
     api.GET("/api/rest/poc/build", buildHandler)
-    api.GET("/health/live", func(e *echo.Context) error { return e.JSON(200, map[string]any{"status": "alive"}) })
-    api.GET("/health/ready", func(e *echo.Context) error {
-        check, done := context.WithTimeout(e.Request().Context(), time.Second)
-        defer done()
-        if gate.Check(check) != nil || r.Ping(check).Err() != nil {
-            return e.JSON(503, map[string]any{"status": "unavailable"})
-        }
-        return e.JSON(200, map[string]any{"status": "ready"})
-    })
     taskHandler := func(e *echo.Context) error {
         var p tasks.Payload
         request := e.Request()
@@ -209,7 +200,12 @@ func run() (runErr error) {
     }
     defer listener.Close()
     httpServer := &http.Server{
-        Handler:           web.Handler(api, c.Development),
+        Handler: web.WithHealth(web.Handler(api, c.Development), func(check context.Context) error {
+            if err := gate.Check(check); err != nil {
+                return err
+            }
+            return r.Ping(check).Err()
+        }),
         ReadHeaderTimeout: 3 * time.Second,
         ReadTimeout:       10 * time.Second,
         IdleTimeout:       30 * time.Second,

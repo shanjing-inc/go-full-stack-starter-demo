@@ -11,6 +11,7 @@
 - Go 测试同目录 \*\_test.go；前端测试统一放在 frontend/tests，按 unit/node/types 分类，浏览器测试使用 tests/\*.spec.ts；fixture 隔离，生成物不手改。
 - commit、push 分别明确授权，自动提交关闭；用户已授权实现时继续规划、实现和验证，不重复询问开始。
 - .env/运行环境保存 DB/Redis/认证密钥，不入规范/版本库；权限同时在 Go 服务执行。
+- API URI：REST 使用 `/api/rest/*`，GraphQL 使用 `/api/graphql/endpoint`，WebSocket 使用 `/api/websocket/endpoint`；`endpoint` 为端点名称占位符，具体规则见 `.trellis/spec/backend/index.md` 的“API URI 规范”。
 
 <!-- PROJECT:END -->
 

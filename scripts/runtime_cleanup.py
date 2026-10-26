@@ -13,7 +13,7 @@ import time
 import host_platform as host
 
 GIB = 1024**3
-CACHE_LIMIT = 12 * GIB
+CACHE_LIMIT = 4 * GIB
 RUNTIME_WARNING = 5 * GIB
 FAILURE_GRACE = 48 * 3600
 SWEEP_INTERVAL = 3600
@@ -398,7 +398,9 @@ def apply_entry(root, entry):
 def clean_cache(root, dry_run=False, references=None):
     root = Path(root)
     cache = root / ".tools/gocache"
-    result = dict(path=str(cache), action="保留", reason="缓存容量在12 GiB阈值内", bytes=0)
+    result = dict(
+        path=str(cache), action="保留", reason=f"缓存容量在{CACHE_LIMIT // GIB} GiB阈值内", bytes=0
+    )
     if cache.is_symlink() or (root / ".tools").is_symlink():
         return dict(result, reason="共享缓存由主仓库入口清理")
     if not cache.is_dir():
@@ -414,7 +416,9 @@ def clean_cache(root, dry_run=False, references=None):
         with exclusive_lock(cache.parent / ".gocache-clean.lock", create=not dry_run):
             if process_references()[1]:
                 return dict(result, reason="Go构建／语言服务进程活跃")
-            result.update(action="回收Go缓存", reason="超过12 GiB，使用go clean -cache")
+            result.update(
+                action="回收Go缓存", reason=f"超过{CACHE_LIMIT // GIB} GiB，使用go clean -cache"
+            )
             if not dry_run:
                 go = root / ".tools/go/bin/go"
                 if not go.is_file():
@@ -524,7 +528,7 @@ def safe_maintain(root, **options):
             print("运行产物超过5 GiB预警线；保留项见 pnpm clean:runtime --dry-run", flush=True)
         cache = report.get("cache")
         if cache and cache["bytes"] > CACHE_LIMIT and cache["action"] == "保留":
-            print("Go缓存超过12 GiB，本轮保留：" + cache["reason"], flush=True)
+            print(f"Go缓存超过{CACHE_LIMIT // GIB} GiB，本轮保留：" + cache["reason"], flush=True)
         return report
     except (OSError, RuntimeError, subprocess.SubprocessError) as error:
         print("运行产物清理待处理：" + str(error), flush=True)

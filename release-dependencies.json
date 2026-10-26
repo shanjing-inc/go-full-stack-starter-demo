@@ -1,9 +1,9 @@
 {
     "go": {
         "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit": {
-            "version": "v1.2.1",
-            "sourceCommit": "716bc5fab913ea9b76213a00871fcfcbfe23331d",
-            "sum": "h1:dObdCELdLfYmrGsTTtUQOA//nj4wRozYNTNmS9TYpWs=",
+            "version": "v1.2.2",
+            "sourceCommit": "19125945cfc4755da7509d2f90094b53eeee79df",
+            "sum": "h1:nC7gWSa42qmZcd2e+fDaMZJT42FxpRDmYMvRRc/8VF0=",
             "goModSum": "h1:LHdn+ji8Hhr/YocJWLQCtbgsgEe6HcFwW6BtWmR4K0Y="
         }
     },

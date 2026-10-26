@@ -18,10 +18,10 @@ import (
     "time"
     _ "time/tzdata"
 
-    "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit/infra/database/revision"
     worker "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit/infra/queue"
     "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/projects/multi-database-demo/internal/buildinfo"
     "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/projects/multi-database-demo/internal/config"
+    "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/projects/multi-database-demo/internal/databasegate"
 
     queuerecords "codeup.aliyun.com/shanjing/labs/go-full-stack-starter.git/packages/go-server-kit/modules/queue"
     "github.com/hibiken/asynq"
@@ -53,7 +53,7 @@ func run() (runErr error) {
     defer stop()
     startup, cancel := context.WithTimeout(ctx, 3*time.Second)
     defer cancel()
-    gate, err := schema.Open(startup, c.Driver, c.DSN, c.Version)
+    gate, err := databasegate.Open(startup, c.Driver, c.DSN)
     if err != nil {
         return err
     }

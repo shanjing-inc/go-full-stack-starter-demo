@@ -4,7 +4,7 @@
 import argparse
 import json
 import sys
-from runtime_cleanup import maintain
+from runtime_cleanup import CACHE_LIMIT, GIB, maintain
 from starter_context import ROOT
 from toolchain import cli
 
@@ -12,7 +12,9 @@ from toolchain import cli
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dry-run", action="store_true", help="列出候选项和保护原因，保留全部产物")
-    parser.add_argument("--cache", action="store_true", help="同时检查12 GiB的Go缓存阈值")
+    parser.add_argument(
+        "--cache", action="store_true", help=f"同时检查{CACHE_LIMIT // GIB} GiB的Go缓存阈值"
+    )
     parser.add_argument("--cache-only", action="store_true", help="仅检查Go缓存")
     args = parser.parse_args()
     report = maintain(
